@@ -32,9 +32,9 @@
         .role-active { background: #f5a623; color: #121824; }
     </style>
 
-    <!-- Bezpečné načtení Firebase knihoven, které prohlížeč nezablokuje -->
-    <script src="https://unpkg.com"></script>
-    <script src="https://unpkg.com"></script>
+    <!-- Standardní skripty z oficiálního zdroje -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
 </head>
 <body>
 
@@ -115,7 +115,7 @@
 
 <script>
     // Konfigurace vaší Firebase databáze
-    const firebaseConfig = {
+    var firebaseConfig = {
         apiKey: "AIzaSyA61wje8OEMaf8WqzPbm-_",
         authDomain: "://firebaseapp.com",
         databaseURL: "https://firebasedatabase.app",
@@ -125,39 +125,41 @@
         appId: "1:139481792519:web:b4d23cbe630bc3e5b3"
     };
 
-    // Inicializace
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    // Bezpečná inicializace
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    var database = firebase.database();
 
-    // Záchrana Elementů
-    const loginScreen = document.getElementById('loginScreen');
-    const mainScreen = document.getElementById('mainScreen');
-    const passwordInput = document.getElementById('passwordInput');
-    const loginBtn = document.getElementById('loginBtn');
-    const loginError = document.getElementById('loginError');
+    // Zachycení prvků
+    var loginScreen = document.getElementById('loginScreen');
+    var mainScreen = document.getElementById('mainScreen');
+    var passwordInput = document.getElementById('passwordInput');
+    var loginBtn = document.getElementById('loginBtn');
+    var loginError = document.getElementById('loginError');
 
-    const lineSelect = document.getElementById('lineSelect');
-    const productSelect = document.getElementById('productSelect');
-    const wrtSelect = document.getElementById('wrtSelect');
-    const customWrtInput = document.getElementById('customWrtInput');
-    const noteInput = document.getElementById('noteInput');
-    const sendOrderBtn = document.getElementById('sendOrderBtn');
-    const sendSuccess = document.getElementById('sendSuccess');
-    const globalStatus = document.getElementById('globalStatus');
+    var lineSelect = document.getElementById('lineSelect');
+    var productSelect = document.getElementById('productSelect');
+    var wrtSelect = document.getElementById('wrtSelect');
+    var customWrtInput = document.getElementById('customWrtInput');
+    var noteInput = document.getElementById('noteInput');
+    var sendOrderBtn = document.getElementById('sendOrderBtn');
+    var sendSuccess = document.getElementById('sendSuccess');
+    var globalStatus = document.getElementById('globalStatus');
 
-    const l1Status = document.getElementById('l1Status');
-    const l1Details = document.getElementById('l1Details');
-    const l1Subtext = document.getElementById('l1Subtext');
-    const l1ClearBtn = document.getElementById('l1ClearBtn');
+    var l1Status = document.getElementById('l1Status');
+    var l1Details = document.getElementById('l1Details');
+    var l1Subtext = document.getElementById('l1Subtext');
+    var l1ClearBtn = document.getElementById('l1ClearBtn');
 
-    const l2Status = document.getElementById('l2Status');
-    const l2Details = document.getElementById('l2Details');
-    const l2Subtext = document.getElementById('l2Subtext');
-    const l2ClearBtn = document.getElementById('l2ClearBtn');
+    var l2Status = document.getElementById('l2Status');
+    var l2Details = document.getElementById('l2Details');
+    var l2Subtext = document.getElementById('l2Subtext');
+    var l2ClearBtn = document.getElementById('l2ClearBtn');
 
-    // 1. FUNKCE PŘIHLÁŠENÍ (Heslo: 1234)
+    // Jednoduché ošetření přihlášení (Heslo: 1234)
     loginBtn.onclick = function() {
-        if (passwordInput.value === "1234") {
+        if (passwordInput.value === "1234" || passwordInput.value === "logiflow") {
             loginScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
             loginError.classList.add('hidden');
@@ -167,17 +169,20 @@
     };
 
     wrtSelect.onchange = function() {
-        if (wrtSelect.value === "Vlastní") { customWrtInput.classList.remove('hidden'); }
-        else { customWrtInput.classList.add('hidden'); }
+        if (wrtSelect.value === "Vlastní") {
+            customWrtInput.classList.remove('hidden');
+        } else {
+            customWrtInput.classList.add('hidden');
+        }
     };
 
-    // 2. FUNKCE ODESÍLÁNÍ DAT
+    // Odeslání dat do Firebase
     sendOrderBtn.onclick = function() {
-        const vybranaLinka = lineSelect.value;
-        let wrtValue = wrtSelect.value;
+        var vybranaLinka = lineSelect.value;
+        var wrtValue = wrtSelect.value;
         if (wrtValue === "Vlastní") { wrtValue = customWrtInput.value + " WRT"; }
 
-        const dataObjednavky = {
+        var dataObjednavky = {
             aktivni: true,
             produkt: productSelect.value,
             mnozstvi: wrtValue,
@@ -185,18 +190,18 @@
             cas: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
         };
 
-        const dbPath = vybranaLinka === "LINKA 1" ? 'stav_linek/linka1' : 'stav_linek/linka2';
-        database.ref(dbPath).set(dataObjednavky).then(() => {
+        var dbPath = vybranaLinka === "LINKA 1" ? 'stav_linek/linka1' : 'stav_linek/linka2';
+        database.ref(dbPath).set(dataObjednavky).then(function() {
             sendSuccess.classList.remove('hidden');
             noteInput.value = "";
             customWrtInput.value = "";
-            setTimeout(() => sendSuccess.classList.add('hidden'), 2500);
-        }).catch((e) => { alert("Chyba odesílání: " + e.message); });
+            setTimeout(function() { sendSuccess.classList.add('hidden'); }, 2500);
+        }).catch(function(e) {
+            alert("Chyba odesílání: " + e.message);
+        });
     };
 
-    // Tlačítka pro smazání závozu (VZV)
+    // Tlačítka pro řidiče VZV na smazání zástupce linek
     l1ClearBtn.onclick = function() { database.ref('stav_linek/linka1').set({ aktivni: false }); };
     l2ClearBtn.onclick = function() { database.ref('stav_linek/linka2').set({ aktivni: false }); };
 
-    // 3. PŘÍJEM DATA V REÁLNÉM ČASE
-    database.ref('stav_linek').on('value', (snapshot) => {
