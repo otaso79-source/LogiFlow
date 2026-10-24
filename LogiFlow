@@ -217,10 +217,13 @@
     <script>
         // FIREBASE PROPOJENÍ MEZI TELEFONY
         const firebaseConfig = {
-            databaseURL: "https://logiflow-default-rtdb.europe-west1.firebasedatabase.app"
+            databaseURL: "https://logiflow-app-default-rtdb.europe-west1.firebasedatabase.app"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        db.ref('.info/connected').on('value', (snapshot) => {
+            console.log('LogiFlow Firebase připojeno:', snapshot.val() === true);
+        });
 
         const SYSTEM_PASSWORD = '1234';
         let notificationsEnabled = true;
@@ -231,7 +234,8 @@
 
         // Reálná synchronizace dat přes Firebase
         db.ref('orders').on('value', (snapshot) => {
-            let updatedOrders = snapshot.val() || [];
+            let rawOrders = snapshot.val() || [];
+            let updatedOrders = Array.isArray(rawOrders) ? rawOrders : Object.values(rawOrders);
             if (updatedOrders.length > lastOrderCount) {
                 let newest = updatedOrders[updatedOrders.length - 1];
                 triggerNotification("⚡ Nová objednávka na VZV!", `${newest.car} (${newest.stojany} WRT) - Linka ${newest.line}`);
@@ -242,7 +246,8 @@
         });
 
         db.ref('alerts').on('value', (snapshot) => {
-            stockAlerts = snapshot.val() || [];
+            let rawAlerts = snapshot.val() || [];
+            stockAlerts = Array.isArray(rawAlerts) ? rawAlerts : Object.values(rawAlerts);
             render();
         });
 
@@ -481,6 +486,6 @@
             document.getElementById('doneBanner').style.display = orders.length === 0 ? 'block' : 'none';
         }
     </script>
+
 </body>
 </html>
-    
