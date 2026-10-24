@@ -3,35 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LogiFlow Vstup</title>
+    <title>LogiFlow - Systém Závozů</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #121824; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background-color: #1e2640; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; width: 320px; }
-        h1 { color: #f5a623; margin: 0 0 5px 0; font-size: 24px; display: flex; justify-content: center; align-items: center; gap: 5px; }
-        .subtitle { color: #8a99ad; font-size: 12px; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #2c3a57; border-radius: 6px; background-color: #121824; color: white; text-align: center; font-size: 16px; box-sizing: border-box; }
-        input:focus { border-color: #f5a623; outline: none; }
-        button { width: 100%; padding: 12px; background-color: #f5a623; color: #121824; font-weight: bold; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; text-transform: uppercase; }
+        body { font-family: Arial, sans-serif; background-color: #121824; color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .box { background-color: #1e2640; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 100%; max-width: 450px; box-sizing: border-box; margin-bottom: 20px; }
+        h1, h2 { color: #f5a623; text-align: center; margin-top: 0; }
+        .subtitle { color: #8a99ad; text-align: center; font-size: 12px; margin-bottom: 15px; }
+        label { display: block; margin: 10px 0 5px 0; color: #8a99ad; font-weight: bold; }
+        select, input, textarea { width: 100%; padding: 10px; border: 2px solid #2c3a57; border-radius: 6px; background-color: #121824; color: white; font-size: 16px; box-sizing: border-box; margin-bottom: 10px; }
+        select:focus, input:focus { border-color: #f5a623; outline: none; }
+        button { width: 100%; padding: 12px; background-color: #f5a623; color: #121824; font-weight: bold; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         button:hover { background-color: #e0961b; }
-        #statusMessage { margin-top: 15px; font-size: 14px; color: #2ecc71; }
+        .hidden { display: none; }
+        .error { color: #e74c3c; text-align: center; font-weight: bold; margin-bottom: 10px; }
+        .success { color: #2ecc71; text-align: center; font-weight: bold; margin-top: 10px; }
+        .order-card { background: #121824; padding: 12px; border-left: 4px solid #f5a623; margin-bottom: 10px; border-radius: 4px; font-size: 14px; }
+        .flex-row { display: flex; gap: 10px; }
     </style>
 </head>
 <body>
 
-<div class="login-box">
+<!-- 1. OBRAZOVKA: PŘIHLÁŠENÍ -->
+<div id="loginScreen" class="box">
     <h1>⚡ LogiFlow</h1>
     <div class="subtitle">Zadejte přístupové heslo zařízení</div>
+    <div id="loginError" class="error hidden">⚠ Nesprávné heslo! Zkuste to znovu.</div>
+    <input type="password" id="passwordInput" placeholder="••••">
+    <button id="loginBtn">Vstoupit do systému</button>
+</div>
+
+<!-- 2. OBRAZOVKA: HLAVNÍ LOGISTICKÝ SYSTÉM -->
+<div id="mainScreen" class="box hidden">
+    <h1>⚡ LogiFlow</h1>
+    <div class="subtitle">Obsluha A VZV B 🔓</div>
+
+    <!-- Tvorba objednávky obsluhou linky -->
+    <h2>Nová objednávka pro VZV</h2>
     
-    <input type="text" id="passwordInput" placeholder="••••">
-    <button id="submitBtn">Vstoupit do systému</button>
-    
-    <div id="statusMessage"></div>
+    <label>Vyberte Linku</label>
+    <select id="lineSelect">
+        <option value="LINKA 1">LINKA 1</option>
+        <option value="LINKA 2">LINKA 2</option>
+    </select>
+
+    <label>Produkt</label>
+    <select id="productSelect">
+        <option value="Tiguan">Tiguan</option>
+        <option value="Kodiaq">Kodiaq</option>
+        <option value="Tayron">Tayron</option>
+        <option value="Audi">Audi</option>
+        <option value="Seat">Seat</option>
+    </select>
+
+    <label>Počet Stojanů WRT</label>
+    <select id="wrtSelect">
+        <option value="3 WRT">3 WRT</option>
+        <option value="6 WRT">6 WRT</option>
+        <option value="Vlastní">✏ Vlastní</option>
+    </select>
+    <input type="number" id="customWrtInput" class="hidden" placeholder="Zadejte počet:">
+
+    <label>Poznámka pro VZV (volitelné)</label>
+    <textarea id="noteInput" rows="2" placeholder="Např. 36 ks, CELKEM 4 obaly..."></textarea>
+
+    <button id="sendOrderBtn">POSLAT OBJEDNÁVKU VZV</button>
+    <div id="sendSuccess" class="success hidden">✓ Odesláno na VZV (Probíhá)</div>
+
+    <hr style="border: 1px solid #2c3a57; margin: 20px 0;">
+
+    <!-- Přehled objednávek pro VZV i Obsluhu v reálném čase -->
+    <h2>Přehled linek & Aktivní závozy</h2>
+    <div id="ordersList">
+        <div class="subtitle">✓ Vše zpracováno! Čekám na novou objednávku.</div>
+    </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://gstatic.com";
-    import { getDatabase, ref, push, onChildAdded } from "https://gstatic.com";
+    import { getDatabase, ref, push, onValue, set } from "https://gstatic.com";
 
+    // Vaše Firebase konfigurace
     const firebaseConfig = {
         apiKey: "AIzaSyA61wje8OEMaf8WqzPbm-_",
         authDomain: "://firebaseapp.com",
@@ -44,41 +95,102 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dataRef = ref(db, 'zpravy');
+    const ordersRef = ref(db, 'objednavky');
 
+    // Elementy z HTML
+    const loginScreen = document.getElementById('loginScreen');
+    const mainScreen = document.getElementById('mainScreen');
     const passwordInput = document.getElementById('passwordInput');
-    const submitBtn = document.getElementById('submitBtn');
-    const statusMessage = document.getElementById('statusMessage');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
 
-    // Odeslání zadaného textu/hesla do databáze (odešle se z jednoho telefonu)
-    async function odeslatData() {
-        const text = passwordInput.value.trim();
-        if (text === "") return;
+    const lineSelect = document.getElementById('lineSelect');
+    const productSelect = document.getElementById('productSelect');
+    const wrtSelect = document.getElementById('wrtSelect');
+    const customWrtInput = document.getElementById('customWrtInput');
+    const noteInput = document.getElementById('noteInput');
+    const sendOrderBtn = document.getElementById('sendOrderBtn');
+    const sendSuccess = document.getElementById('sendSuccess');
+    const ordersList = document.getElementById('ordersList');
+
+    // 1. OŠETŘENÍ HESLA (Nastavil jsem univerzální heslo "1234")
+    loginBtn.addEventListener('click', () => {
+        if (passwordInput.value === "1234" || passwordInput.value.toLowerCase() === "logiflow") {
+            loginScreen.classList.add('hidden');
+            mainScreen.classList.remove('hidden');
+        } else {
+            loginError.classList.remove('hidden');
+        }
+    });
+
+    // Zobrazení vlastního počtu WRT stojanů
+    wrtSelect.addEventListener('change', () => {
+        if (wrtSelect.value === "Vlastní") {
+            customWrtInput.classList.remove('hidden');
+        } else {
+            customWrtInput.classList.add('hidden');
+        }
+    });
+
+    // 2. ODESLÁNÍ OBJEDNÁVKY DO FIREBASE (Z telefonu obsluhy)
+    sendOrderBtn.addEventListener('click', async () => {
+        let wrtValue = wrtSelect.value;
+        if (wrtValue === "Vlastní") {
+            wrtValue = customWrtInput.value + " WRT";
+        }
+
+        const novaObjednavka = {
+            linka: lineSelect.value,
+            produkt: productSelect.value,
+            stojany: wrtValue,
+            poznamka: noteInput.value.trim(),
+            cas: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+            stav: "K ZAVÁŽENÍ"
+        };
 
         try {
-            await push(dataRef, {
-                obsah: text,
-                cas: Date.now()
-            });
-            passwordInput.value = "";
-            statusMessage.style.color = "#2ecc71";
-            statusMessage.textContent = "Data byla úspěšně odeslána!";
+            await push(ordersRef, novaObjednavka);
+            sendSuccess.classList.remove('hidden');
+            noteInput.value = "";
+            customWrtInput.value = "";
+            setTimeout(() => sendSuccess.classList.add('hidden'), 3000);
         } catch (e) {
-            statusMessage.style.color = "#e74c3c";
-            statusMessage.textContent = "Chyba: Databáze je uzamčená.";
-            console.error(e);
+            alert("Chyba databáze: " + e.message);
         }
-    }
+    });
 
-    submitBtn.addEventListener('click', odeslatData);
-
-    // Přijímání v reálném čase (druhý telefon okamžitě uvidí, co ten první odeslal)
-    onChildAdded(dataRef, (snapshot) => {
+    // 3. PŘÍJEM A ZOBRAZOVÁNÍ DAT V REÁLNÉM ČASE (Na obou telefonech současně)
+    onValue(ordersRef, (snapshot) => {
+        ordersList.innerHTML = "";
         const data = snapshot.val();
-        statusMessage.style.color = "#f5a623";
-        statusMessage.textContent = "Přijato nové heslo: " + data.obsah;
+        
+        if (!data) {
+            ordersList.innerHTML = '<div class="subtitle">✓ Vše zpracováno! Čekám na novou objednávku.</div>';
+            return;
+        }
+
+        // Vykreslení všech aktivních objednávek z databáze
+        Object.keys(data).forEach((key) => {
+            const ord = data[key];
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            card.innerHTML = `
+                <strong>${ord.linka}</strong> — <span style="color:#f5a623">${ord.stav}</span> <span style="float:right; color:#8a99ad;">${ord.cas}</span><br>
+                <span>Produkt: ${ord.produkt} | Množství: ${ord.stojany}</span><br>
+                ${ord.poznamka ? `<span style="font-style:italic; color:#8a99ad;">Poznámka: ${ord.poznamka}</span><br>` : ''}
+                <button onclick="document.dispatchEvent(new CustomEvent('vyrizeno', {detail: '${key}'}))" style="padding:5px; font-size:12px; margin-top:5px; background-color:#2ecc71; color:white;">✓ Označit jako vyřízené</button>
+            `;
+            ordersList.appendChild(card);
+        });
+    });
+
+    // Smazání / vyřízení objednávky (klikne řidič VZV na svém telefonu a zmizí to u obou)
+    document.addEventListener('vyrizeno', async (e) => {
+        const id = e.detail;
+        await set(ref(db, `objednavky/${id}`), null);
     });
 </script>
 
 </body>
+
 </html>
