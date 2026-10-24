@@ -7,30 +7,34 @@
     <style>
         body { font-family: Arial, sans-serif; background-color: #121824; color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .box { background-color: #1e2640; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 100%; max-width: 450px; box-sizing: border-box; margin-bottom: 20px; }
-        h1, h2 { color: #f5a623; text-align: center; margin-top: 0; }
+        h1, h2, h3 { color: #f5a623; text-align: center; margin-top: 0; }
         .subtitle { color: #8a99ad; text-align: center; font-size: 12px; margin-bottom: 15px; }
         label { display: block; margin: 10px 0 5px 0; color: #8a99ad; font-weight: bold; }
         select, input, textarea { width: 100%; padding: 10px; border: 2px solid #2c3a57; border-radius: 6px; background-color: #121824; color: white; font-size: 16px; box-sizing: border-box; margin-bottom: 10px; }
         button { width: 100%; padding: 12px; background-color: #f5a623; color: #121824; font-weight: bold; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
         button:hover { background-color: #e0961b; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .error { color: #e74c3c; text-align: center; font-weight: bold; margin-bottom: 10px; }
         .success { color: #2ecc71; text-align: center; font-weight: bold; margin-top: 10px; }
         
-        /* Styly pro vaše přehledové boxy linek */
+        /* Styly panelů linek */
         .line-panel { background: #121824; padding: 15px; margin-top: 15px; border-radius: 8px; border: 1px solid #2c3a57; }
         .line-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-bottom: 8px; }
         .l1-badge { background-color: #00bcd4; color: #121824; }
         .l2-badge { background-color: #e91e63; color: white; }
         .order-text { font-size: 20px; font-weight: bold; margin: 5px 0; }
         .order-details { color: #8a99ad; font-size: 13px; margin-bottom: 10px; }
-        .clear-btn { background-color: #e74c3c; color: white; padding: 8px; font-size: 12px; margin-top: 5px; }
+        .clear-btn { background-color: #e74c3c; color: white; padding: 8px; font-size: 12px; margin-top: 5px; width: 100%; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .clear-btn:hover { background-color: #c0392b; }
         
         .role-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
         .role-btn { padding: 6px 12px; font-size: 12px; background: #2c3a57; color: white; border-radius: 4px; font-weight: bold; }
         .role-active { background: #f5a623; color: #121824; }
     </style>
+
+    <!-- Bezpečné načtení Firebase knihoven, které prohlížeč nezablokuje -->
+    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
 </head>
 <body>
 
@@ -53,8 +57,8 @@
     
     <div class="subtitle" style="font-size: 13px; color: #2ecc71;">🔔 Zvukové upozornění a notifikace: ANO</div>
 
-    <!-- Formulář pro odeslání -->
-    <h3 style="color: #f5a623; border-bottom: 1px solid #2c3a57; padding-bottom: 5px; margin-bottom: 10px;">Nová objednávka</h3>
+    <!-- Formulář pro odeslání objednávky -->
+    <h3 style="color: #f5a623; border-bottom: 1px solid #2c3a57; padding-bottom: 5px; margin-bottom: 10px; text-align: left;">Nová objednávka</h3>
     
     <label>Vyberte Linku</label>
     <select id="lineSelect">
@@ -85,8 +89,8 @@
     <button id="sendOrderBtn">POSLAT OBJEDNÁVKU VZV</button>
     <div id="sendSuccess" class="success hidden">✓ Odesláno na VZV (Probíhá)</div>
 
-    <!-- PŘEHLED LINEK PŘESNĚ PODLE VAŠEHO NÁVRHU -->
-    <h3 style="color: #f5a623; margin-top: 25px; margin-bottom: 5px;">PŘEHLED LINEK</h3>
+    <!-- PŘEHLED LINEK -->
+    <h3 style="color: #f5a623; margin-top: 25px; margin-bottom: 5px; text-align: left;">PŘEHLED LINEK</h3>
     
     <!-- BOX LINKA 1 -->
     <div class="line-panel">
@@ -109,10 +113,8 @@
     <div id="globalStatus" style="margin-top: 20px;" class="success">✓ Vše zpracováno! Čekám na novou objednávku.</div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://gstatic.com";
-    import { getDatabase, ref, set, onValue } from "https://gstatic.com";
-
+<script>
+    // Konfigurace vaší Firebase databáze
     const firebaseConfig = {
         apiKey: "AIzaSyA61wje8OEMaf8WqzPbm-_",
         authDomain: "://firebaseapp.com",
@@ -123,10 +125,11 @@
         appId: "1:139481792519:web:b4d23cbe630bc3e5b3"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    // Inicializace
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-    // Elementy rozhraní
+    // Záchrana Elementů
     const loginScreen = document.getElementById('loginScreen');
     const mainScreen = document.getElementById('mainScreen');
     const passwordInput = document.getElementById('passwordInput');
@@ -142,36 +145,35 @@
     const sendSuccess = document.getElementById('sendSuccess');
     const globalStatus = document.getElementById('globalStatus');
 
-    // Elementy Linky 1
     const l1Status = document.getElementById('l1Status');
     const l1Details = document.getElementById('l1Details');
     const l1Subtext = document.getElementById('l1Subtext');
     const l1ClearBtn = document.getElementById('l1ClearBtn');
 
-    // Elementy Linky 2
     const l2Status = document.getElementById('l2Status');
     const l2Details = document.getElementById('l2Details');
     const l2Subtext = document.getElementById('l2Subtext');
     const l2ClearBtn = document.getElementById('l2ClearBtn');
 
-    // Přihlášení (heslo: 1234)
-    loginBtn.addEventListener('click', () => {
+    // 1. FUNKCE PŘIHLÁŠENÍ (Heslo: 1234)
+    loginBtn.onclick = function() {
         if (passwordInput.value === "1234") {
             loginScreen.classList.add('hidden');
             mainScreen.classList.remove('hidden');
+            loginError.classList.add('hidden');
         } else {
             loginError.classList.remove('hidden');
         }
-    });
+    };
 
-    wrtSelect.addEventListener('change', () => {
+    wrtSelect.onchange = function() {
         if (wrtSelect.value === "Vlastní") { customWrtInput.classList.remove('hidden'); }
         else { customWrtInput.classList.add('hidden'); }
-    });
+    };
 
-    // ODESÍLÁNÍ DATA DO FIREBASE (Přiřazeno přímo k jednotlivým linkám)
-    sendOrderBtn.addEventListener('click', async () => {
-        const vybranaLinka = lineSelect.value; 
+    // 2. FUNKCE ODESÍLÁNÍ DAT
+    sendOrderBtn.onclick = function() {
+        const vybranaLinka = lineSelect.value;
         let wrtValue = wrtSelect.value;
         if (wrtValue === "Vlastní") { wrtValue = customWrtInput.value + " WRT"; }
 
@@ -184,20 +186,17 @@
         };
 
         const dbPath = vybranaLinka === "LINKA 1" ? 'stav_linek/linka1' : 'stav_linek/linka2';
-        
-        try {
-            await set(ref(db, dbPath), dataObjednavky);
+        database.ref(dbPath).set(dataObjednavky).then(() => {
             sendSuccess.classList.remove('hidden');
             noteInput.value = "";
             customWrtInput.value = "";
             setTimeout(() => sendSuccess.classList.add('hidden'), 2500);
-        } catch (e) { alert("Chyba: " + e.message); }
-    });
+        }).catch((e) => { alert("Chyba odesílání: " + e.message); });
+    };
 
-    // Tlačítka pro řidiče VZV na smazání/vyřízení závozu
-    l1ClearBtn.addEventListener('click', async () => { await set(ref(db, 'stav_linek/linka1'), { aktivni: false }); });
-    l2ClearBtn.addEventListener('click', async () => { await set(ref(db, 'stav_linek/linka2'), { aktivni: false }); });
+    // Tlačítka pro smazání závozu (VZV)
+    l1ClearBtn.onclick = function() { database.ref('stav_linek/linka1').set({ aktivni: false }); };
+    l2ClearBtn.onclick = function() { database.ref('stav_linek/linka2').set({ aktivni: false }); };
 
-    // PŘÍJEM DATA V REÁLNÉM ČASE (Aktualizuje přesné texty na obou mobilech)
-    onValue(ref(db, 'stav_linek'), (snapshot) => {
-        const data = snapshot.val();
+    // 3. PŘÍJEM DATA V REÁLNÉM ČASE
+    database.ref('stav_linek').on('value', (snapshot) => {
