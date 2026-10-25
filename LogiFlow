@@ -173,10 +173,12 @@
 
         <div id="viewB" style="display:none;">
             <div class="lbl">Přehled linek</div>
-             <div class="vzv-card l2">
+             
+            <!-- Fialová karta pro Linku 2 nahoře -->
+            <div class="vzv-card l2">
                 <div class="vzv-hdr">
                     <div>
-                        <span class="badge l2">Linka 2 - Box: 1 - 2</span>
+                        <span class="badge l2">Box: 1 - 2</span>
                         <h2 id="l2Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
                         <div id="l2Next" class="next-txt none">Následuje ➔ Žádné</div>
                     </div>
@@ -184,10 +186,11 @@
                 <div id="l2Body"></div>
             </div>
             
+            <!-- Modrá karta pro Linku 1 dole -->
             <div class="vzv-card">
                 <div class="vzv-hdr">
                     <div>
-                        <span class="badge">Linka 1 - Box: 3 - 4</span>
+                        <span class="badge">Box: 3 - 4</span>
                         <h2 id="l1Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
                         <div id="l1Next" class="next-txt none">Následuje ➔ Žádné</div>
                     </div>
@@ -471,6 +474,9 @@
                         boxes += `<div class="box-unit ${st}">#${i}</div>`;
                     }
 
+                    // Dynamický text tlačítka podle linky
+                    let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
+
                     let noteHtml = cur.note ? `<div class="note-tag">📝 Poznámka: ${cur.note}</div>` : '';
                     body.innerHTML = `
                         ${noteHtml}
@@ -478,7 +484,7 @@
                             <span>Zbývá zavezt: <b>${cur.total - cur.done} ob.</b></span>
                         </div>
                         <div class="boxes-row">${boxes}</div>
-                        <button class="btn-zavez" onclick="zavezt(${cur.id})">✓ ZAVEZT 1 OBAL (LINKA ${l})</button>
+                        <button class="btn-zavez" onclick="zavezt(${cur.id})">${btnText}</button>
                     `;
                 }
             });
@@ -489,4 +495,3 @@
 
 </body>
 </html>
-    
