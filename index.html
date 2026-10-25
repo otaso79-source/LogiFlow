@@ -97,6 +97,8 @@
         .done-msg { background: #065f46; color: #34d399; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
         .note-tag { background: rgba(245, 158, 11, 0.15); border-left: 3px solid #f59e0b; padding: 4px 8px; font-size: 0.75rem; color: #fbbf24; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
         .btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 8px; flex-shrink: 0; }
+        .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+        .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -218,15 +220,11 @@
     </div>
 
     <script>
-        // FIREBASE PROPOJENÍ MEZI TELEFONY
         const firebaseConfig = {
             databaseURL: "https://logiflow-app-default-rtdb.europe-west1.firebasedatabase.app"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        db.ref('.info/connected').on('value', (snapshot) => {
-            console.log('LogiFlow Firebase připojeno:', snapshot.val() === true);
-        });
 
         const SYSTEM_PASSWORD = '1234';
         let notificationsEnabled = true;
@@ -235,7 +233,6 @@
         let stockAlerts = [];
         let lastOrderCount = 0;
 
-        // Reálná synchronizace dat přes Firebase
         db.ref('orders').on('value', (snapshot) => {
             let rawOrders = snapshot.val() || [];
             let updatedOrders = Array.isArray(rawOrders) ? rawOrders : Object.values(rawOrders);
@@ -272,6 +269,7 @@
 
         function logout() {
             sessionStorage.removeItem('device_authenticated');
+            sessionStorage.removeItem('active_tab');
             document.getElementById('passInput').value = '';
             document.getElementById('loginError').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
@@ -281,6 +279,9 @@
         function showApp() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appScreen').style.display = 'block';
+            // Obnovení poslední otevřené záložky (výchozí je A, pokud nebyla uložena B)
+            let savedTab = sessionStorage.getItem('active_tab') || 'A';
+            showTab(savedTab);
             render();
         }
 
@@ -325,6 +326,8 @@
             document.getElementById('viewB').style.display = t==='B'?'block':'none';
             document.getElementById('tabA').className = 'nav-btn ' + (t==='A'?'active':'');
             document.getElementById('tabB').className = 'nav-btn ' + (t==='B'?'active':'');
+            // Uložení aktuální záložky do paměti prohlížeče
+            sessionStorage.setItem('active_tab', t);
         }
 
         function setLine(l) {
@@ -474,9 +477,7 @@
                         boxes += `<div class="box-unit ${st}">#${i}</div>`;
                     }
 
-                    // Dynamický text tlačítka podle linky
                     let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
-
                     let noteHtml = cur.note ? `<div class="note-tag">📝 Poznámka: ${cur.note}</div>` : '';
                     body.innerHTML = `
                         ${noteHtml}
