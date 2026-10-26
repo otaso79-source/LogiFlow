@@ -124,6 +124,10 @@
         .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
         
         .wrt-badge { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+        
+        /* Styly pro nové kalibrační výběrové mřížky v modálu */
+        .calib-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 4px; }
+        .calib-grid button { padding: 8px 2px; font-size: 0.75rem; }
     </style>
 </head>
 <body>
@@ -248,7 +252,7 @@
         </div>
     </div>
 
-    <!-- MODAL OKNO PRO KALIBRACI PODLE VAŠEHO NÁKRESU -->
+    <!-- MODAL OKNO PRO KALIBRACI PODLE NOVÉHO ZADÁNÍ -->
     <div id="calibModal">
         <div class="calib-box">
             <div class="calib-header">
@@ -262,26 +266,7 @@
                 <div class="line-btn" id="calibLine2" onclick="setCalibLine(2)">LINKA 2<br><span style="font-size:0.65rem;">BOX 2 - 1</span></div>
             </div>
 
-            <div class="lbl" id="lblBoxA">2. Stav - Box 4</div>
-            <div class="line-select">
-                <div class="line-btn active-1" id="calibBoxA_prazdna" onclick="setCalibBoxA('prazdna')">Prázdná</div>
-                <div class="line-btn" id="calibBoxA_plna" onclick="setCalibBoxA('plna')">Plná (9 ks)</div>
-            </div>
-
-            <div class="lbl" id="lblBoxB">3. Stav - Box 3 (Důležitý moment)</div>
-            <div class="line-select">
-                <div class="line-btn active-1" id="calibBoxB_prazdna" onclick="setCalibBoxB('prazdna')">Prázdná</div>
-                <div class="line-btn" id="calibBoxB_plna" onclick="setCalibBoxB('plna')">Plná (9 ks)</div>
-            </div>
-            <!-- Možnost výběru kusů, pokud není box plný/prázdný úplně -->
-            <div class="grid-3" style="margin-top:6px;">
-                <div class="btn-opt selected" onclick="setCalibCount(0, this)">0 ks</div>
-                <div class="btn-opt" onclick="setCalibCount(3, this)">3 ks</div>
-                <div class="btn-opt" onclick="setCalibCount(6, this)">6 ks</div>
-                <div class="btn-opt" onclick="setCalibCount(9, this)">9 ks</div>
-            </div>
-
-            <div class="lbl">4. Varianta</div>
+            <div class="lbl">2. Varianta</div>
             <div class="grid-3">
                 <div class="btn-opt selected" onclick="setCalibCar('Tiguan', this)">Tiguan</div>
                 <div class="btn-opt" onclick="setCalibCar('Kodiaq', this)">Kodiaq</div>
@@ -290,7 +275,27 @@
                 <div class="btn-opt" onclick="setCalibCar('Seat', this)">Seat</div>
             </div>
 
-            <button class="btn-submit" style="margin-top:14px;" onclick="submitCalibration()">SROVNAT A POSLAT NA VZV</button>
+            <!-- BOX A -->
+            <div class="lbl" id="lblBoxAHeader">BOX 4</div>
+            <div class="calib-grid">
+                <div class="btn-opt selected" id="boxA_prazdna" onclick="setBoxState('A', 'prazdna', this)">Prázdná</div>
+                <div class="btn-opt" id="boxA_plna" onclick="setBoxState('A', 'plna', this)">Plná</div>
+                <div class="btn-opt" id="boxA_3" onclick="setBoxState('A', 3, this)">3 ks</div>
+                <div class="btn-opt" id="boxA_6" onclick="setBoxState('A', 6, this)">6 ks</div>
+                <div class="btn-opt" id="boxA_9" onclick="setBoxState('A', 9, this)">9 ks</div>
+            </div>
+
+            <!-- BOX B -->
+            <div class="lbl" id="lblBoxBHeader" style="margin-top:10px;">BOX 3</div>
+            <div class="calib-grid">
+                <div class="btn-opt selected" id="boxB_prazdna" onclick="setBoxState('B', 'prazdna', this)">Prázdná</div>
+                <div class="btn-opt" id="boxB_plna" onclick="setBoxState('B', 'plna', this)">Plná</div>
+                <div class="btn-opt" id="boxB_3" onclick="setBoxState('B', 3, this)">3 ks</div>
+                <div class="btn-opt" id="boxB_6" onclick="setBoxState('B', 6, this)">6 ks</div>
+                <div class="btn-opt" id="boxB_9" onclick="setBoxState('B', 9, this)">9 ks</div>
+            </div>
+
+            <button class="btn-submit" style="margin-top:16px;" onclick="submitCalibration()">SROVNAT A POSLAT NA VZV</button>
         </div>
     </div>
 
@@ -309,12 +314,11 @@
         let lastOrderCount = 0;
         let selectedLoginMode = 'A';
 
-        // Stavy pro kalibraci dle nákresu
+        // Kalibrační stavy
         let calibLine = 1;
-        let calibBoxAState = 'prazdna'; // Box 4 (nebo 2)
-        let calibBoxBState = 'prazdna'; // Box 3 (nebo 1)
-        let calibCount = 0;             // Doplňkové kusy
         let calibCar = 'Tiguan';
+        let calibBoxA = 'prazdna'; // Může být 'prazdna', 'plna' nebo číslo 3, 6, 9
+        let calibBoxB = 'prazdna';
 
         db.ref('orders').on('value', (snapshot) => {
             let rawOrders = snapshot.val() || [];
@@ -492,7 +496,7 @@
             save();
         }
 
-        // --- KALIBRACE PODLE NÁKRESU ---
+        // --- KALIBRACE ---
         function openCalibModal() {
             document.getElementById('calibModal').style.display = 'flex';
         }
@@ -506,32 +510,13 @@
             document.getElementById('calibLine1').className = 'line-btn ' + (l===1?'active-1':'');
             document.getElementById('calibLine2').className = 'line-btn ' + (l===2?'active-2':'');
             
-            // Změna popisků boxů podle linky (Linka 1 = Box 4 a 3, Linka 2 = Box 2 a 1)
             if (l === 1) {
-                document.getElementById('lblBoxA').innerText = "2. Stav - Box 4";
-                document.getElementById('lblBoxB').innerText = "3. Stav - Box 3";
+                document.getElementById('lblBoxAHeader').innerText = "BOX 4";
+                document.getElementById('lblBoxBHeader').innerText = "BOX 3";
             } else {
-                document.getElementById('lblBoxA').innerText = "2. Stav - Box 2";
-                document.getElementById('lblBoxB').innerText = "3. Stav - Box 1";
+                document.getElementById('lblBoxAHeader').innerText = "BOX 2";
+                document.getElementById('lblBoxBHeader').innerText = "BOX 1";
             }
-        }
-
-        function setCalibBoxA(state) {
-            calibBoxAState = state;
-            document.getElementById('calibBoxA_prazdna').className = 'line-btn ' + (state==='prazdna'?'active-1':'');
-            document.getElementById('calibBoxA_plna').className = 'line-btn ' + (state==='plna'?'active-1':'');
-        }
-
-        function setCalibBoxB(state) {
-            calibBoxBState = state;
-            document.getElementById('calibBoxB_prazdna').className = 'line-btn ' + (state==='prazdna'?'active-1':'');
-            document.getElementById('calibBoxB_plna').className = 'line-btn ' + (state==='plna'?'active-1':'');
-        }
-
-        function setCalibCount(cnt, el) {
-            calibCount = cnt;
-            el.parentElement.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('selected'));
-            el.classList.add('selected');
         }
 
         function setCalibCar(c, el) {
@@ -540,11 +525,33 @@
             el.classList.add('selected');
         }
 
+        function setBoxState(box, state, el) {
+            if (box === 'A') {
+                calibBoxA = state;
+                ['prazdna', 'plna', '3', '6', '9'].forEach(s => {
+                    let btn = document.getElementById('boxA_' + s);
+                    if (btn) btn.classList.remove('selected');
+                });
+            } else {
+                calibBoxB = state;
+                ['prazdna', 'plna', '3', '6', '9'].forEach(s => {
+                    let btn = document.getElementById('boxB_' + s);
+                    if (btn) btn.classList.remove('selected');
+                });
+            }
+            el.classList.add('selected');
+        }
+
+        function getBoxKs(val) {
+            if (val === 'plna') return 9;
+            if (val === 'prazdna') return 0;
+            return parseInt(val) || 0;
+        }
+
         function submitCalibration() {
-            // Výpočet celkového aktuálního množství podle vašeho zadání
-            let boxAKs = (calibBoxAState === 'plna') ? 9 : 0;
-            let boxBKs = (calibBoxBState === 'plna') ? 9 : 0;
-            let totalExistingKs = boxAKs + boxBKs + parseInt(calibCount);
+            let ksA = getBoxKs(calibBoxA);
+            let ksB = getBoxKs(calibBoxB);
+            let totalExistingKs = ksA + ksB;
             
             let targetKs = 36;
             let missingKs = targetKs - totalExistingKs;
@@ -556,7 +563,7 @@
             let boxNameA = (calibLine === 1) ? 'Box 4' : 'Box 2';
             let boxNameB = (calibLine === 1) ? 'Box 3' : 'Box 1';
             
-            let noteText = `Kalibrace (${boxNameA}: ${calibBoxAState}, ${boxNameB}: ${calibBoxBState} + ${calibCount} ks) -> Celkem ${totalExistingKs} ks -> Doplnit ${missingKs} ks`;
+            let noteText = `Kalibrace (${boxNameName = boxNameA}: ${calibBoxA}, ${boxNameB}: ${calibBoxB}) -> Celkem ${totalExistingKs} ks -> Doplnit ${missingKs} ks`;
 
             orders.push({ 
                 id: Date.now(), 
