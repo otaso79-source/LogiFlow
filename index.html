@@ -548,23 +548,38 @@
 
         // --- PRESNÁ KALIBRAČNÍ LOGIKA PRO LOGIFLOW ---
         function calculateCalibContainers(valA, valB) {
-            if (!valA && !valB) return 0;
+            if (!valA || !valB) return 0;
+
+            let isPlnaA = (valA === 'plna');
+            let isPlnaB = (valB === 'plna');
+            let isPrazdnaA = (valA === 'prazdna');
+            let isPrazdnaB = (valB === 'prazdna');
 
             let ksA = getBoxKs(valA);
             let ksB = getBoxKs(valB);
 
-            // Pokud je v jakémkoliv boxu plná bedna (9 ks) a v druhém rozpracováno nebo prázdno, VZV musí navézt 2 obaly.
-            if ((valA === 'plna' || ksA === 9) && (valB === 'plna' || ksB === 9)) return 2;
-            if ((valA === 'plna' || ksA === 9) && ksB > 0) return 2;
-            if ((valB === 'plna' || ksB === 9) && ksA > 0) return 2;
-            if (valA === 'prazdna' && ksB > 0) return 2;
-            if (valB === 'prazdna' && ksA > 0) return 2;
+            // 1. PŘÍPAD: PLNA + ROZPRACOVÁNO (např. Plná + 3 ks) -> VZV přiváží 3 obaly!
+            // (1 obal výměna za plnou + 2 obaly pro rozpracovaný box do zásoby)
+            if ((isPlnaA && ksB > 0 && !isPlnaB) || (isPlnaB && ksA > 0 && !isPlnaA)) {
+                return 3;
+            }
 
+            // 2. PŘÍPAD: PRÁZDNÁ + ROZPRACOVÁNO (např. Prázdná + 3 ks) -> VZV přiváží 2 obaly!
+            if ((isPrazdnaA && ksB > 0) || (isPrazdnaB && ksA > 0)) {
+                return 2;
+            }
+
+            // 3. PŘÍPAD: OBA BOXY PLNÉ (Plná + Plná) -> 2 obaly
+            if (isPlnaA && isPlnaB) {
+                return 2;
+            }
+
+            // Všeobecný matematický výpočet pro ostatní rozpracované stavy
             let totalKs = ksA + ksB;
             let missingKs = 36 - totalKs;
             let obaly = Math.ceil(missingKs / 9);
 
-            if (obaly > 2) obaly = 2;
+            if (obaly > 4) obaly = 4;
             if (obaly < 1) obaly = 1;
             return obaly;
         }
