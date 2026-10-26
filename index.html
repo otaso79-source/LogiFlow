@@ -490,3 +490,212 @@
             save();
         }
 
+        function cancelOrder(id) {
+            orders = orders.filter(x => x.id !== id);
+            lastOrderCount = orders.length;
+            save();
+        }
+
+        // --- KALIBRACE ---
+        function openCalibModal() {
+            document.getElementById('calibModal').style.display = 'flex';
+        }
+
+        function closeCalibModal() {
+            document.getElementById('calibModal').style.display = 'none';
+        }
+
+        function setCalibLine(l) {
+            calibLine = l;
+            document.getElementById('calibLine1').className = 'line-btn ' + (l===1?'active-1':'');
+            document.getElementById('calibLine2').className = 'line-btn ' + (l===2?'active-2':'');
+            
+            if (l === 1) {
+                document.getElementById('lblBoxAHeader').innerText = "BOX 4";
+                document.getElementById('lblBoxBHeader').innerText = "BOX 3";
+            } else {
+                document.getElementById('lblBoxAHeader').innerText = "BOX 2";
+                document.getElementById('lblBoxBHeader').innerText = "BOX 1";
+            }
+        }
+
+        function setCalibCar(c, el) {
+            calibCar = c;
+            el.parentElement.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function setBoxState(box, state, el) {
+            if (box === 'A') {
+                calibBoxA = state;
+                ['prazdna', 'plna', '3', '6', '9'].forEach(s => {
+                    let btn = document.getElementById('boxA_' + s);
+                    if (btn) btn.classList.remove('selected');
+                });
+            } else {
+                calibBoxB = state;
+                ['prazdna', 'plna', '3', '6', '9'].forEach(s => {
+                    let btn = document.getElementById('boxB_' + s);
+                    if (btn) btn.classList.remove('selected');
+                });
+            }
+            el.classList.add('selected');
+        }
+
+        function getBoxKs(val) {
+            if (val === 'plna') return 9;
+            if (val === 'prazdna') return 0;
+            return parseInt(val) || 0;
+        }
+
+        function submitCalibration() {
+            let ksA = getBoxKs(calibBoxA);
+            let ksB = getBoxKs(calibBoxB);
+            let totalExistingKs = ksA + ksB;
+            
+            let targetKs = 36;
+            let missingKs = targetKs - totalExistingKs;
+            if (missingKs < 0) missingKs = 0;
+
+            let obalyKZavezeni = Math.ceil(missingKs / 9);
+            if (obalyKZavezeni === 0 && missingKs > 0) obalyKZavezeni = 1;
+
+            let boxNameA = (calibLine === 1) ? 'Box 4' : 'Box 2';
+            let boxNameB = (calibLine === 1) ? 'Box 3' : 'Box 1';
+            
+            let noteText = `Kalibrace (${boxNameA}: ${calibBoxA}, ${boxNameB}: ${calibBoxB}) -> Celkem ${totalExistingKs} ks -> Doplnit ${missingKs} ks`;
+
+            orders.push({ 
+                id: Date.now(), 
+                line: calibLine, 
+                car: calibCar, 
+                stojany: 3, 
+                total: obalyKZavezeni, 
+                done: 0, 
+                note: noteText 
+            });
+
+            closeCalibModal();
+            lastOrderCount = orders.length;
+            save();
+        }
+
+        function sendCustomStockAlert() {
+            let variant = document.getElementById('vzvVariantSelect').value;
+            let count = document.getElementById('vzvCountInput').value || '5';
+            stockAlerts.push({ id: Date.now(), variant: variant, count: count });
+            save();
+        }
+
+        function dismissAlert(alertId) {
+            stockAlerts = stockAlerts.filter(a => a.id !== alertId);
+            save();
+        }
+
+        function zavezt(id) {
+            let o = orders.find(x => x.id === id);
+            if (o) {
+                o.done++;
+                if (o.done >= o.total) {
+                    orders = orders.filter(x => x.id !== id);
+                    lastOrderCount = orders.length;
+                }
+                save();
+            }
+        }
+
+        function render() {
+            if (sessionStorage.getItem('device_authenticated') !== 'true') return;
+
+            let alertArea = document.getElementById('alertAreaA');
+            if (alertArea) {
+                alertArea.innerHTML = '';
+                stockAlerts.forEach(a => {
+                    alertArea.innerHTML += `
+                        <div class="stock-alert-box">
+                            <span>⚠️ <b>VZV hlásí:</b> Pro variantu <b>${a.variant}</b> zbývá posledních <b>${a.count} obalů</b>!</span>
+                            <button class="btn-dismiss" onclick="dismissAlert(${a.id})">✕ Rozumím</button>
+                        </div>
+                    `;
+                });
+            }
+
+            let listA = document.getElementById('listA');
+            if (listA) {
+                listA.innerHTML = orders.length === 0 ? '<div class="empty">Žádné aktivní objednávky</div>' : '';
+                orders.forEach(o => {
+                    let noteHtml = o.note ? `<div class="note-tag">📝 ${o.note}</div>` : '';
+                    let remainingObaly = o.total - o.done;
+                    let remainingKs = remainingObaly * 9;
+                    let remainingWRT = (remainingKs / 12).toFixed(2).replace('.00', '');
+
+                    listA.innerHTML += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="flex-grow:1;"><b>${o.car}</b> (${o.stojany} WRT) - Linka ${o.line} <span class="wrt-badge">Zbývá ${remainingWRT} WRT</span></span>
+                            <span style="color:#f59e0b; font-weight:bold; white-space:nowrap; margin-left:8px;">${o.done}/${o.total} obalů</span>
+                            <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
+                        </div>
+                        ${noteHtml}
+                    </div>`;
+                });
+            }
+
+            [1, 2].forEach(l => {
+                let lOrders = orders.filter(x => x.line === l);
+                let title = document.getElementById(`l${l}Title`);
+                let next = document.getElementById(`l${l}Next`);
+                let body = document.getElementById(`l${l}Body`);
+
+                if (title && next && body) {
+                    if (lOrders.length === 0) {
+                        title.innerText = 'Žádná objednávka';
+                        next.className = 'next-txt none';
+                        next.innerText = 'Následuje ➔ Žádné';
+                        body.innerHTML = '<div class="empty">Linka je volná</div>';
+                    } else {
+                        let cur = lOrders[0];
+                        let nxt1 = lOrders[1];
+                        let nxt2 = lOrders[2];
+                        
+                        title.innerText = `${cur.car} (${cur.stojany} WRT)`;
+                        
+                        if (nxt1) {
+                            next.className = 'next-txt';
+                            let queueText = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
+                            if (nxt2) queueText += ` ➔ <b>${nxt2.car}</b> (${nxt2.total} ob.)`;
+                            next.innerHTML = queueText;
+                        } else {
+                            next.className = 'next-txt none';
+                            next.innerText = 'Následuje ➔ Žádné';
+                        }
+
+                        let boxes = '';
+                        for (let i = 1; i <= cur.total; i++) {
+                            let st = i <= cur.done ? 'done' : (i === cur.done + 1 ? 'active' : '');
+                            boxes += `<div class="box-unit ${st}">#${i}</div>`;
+                        }
+
+                        let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
+                        let noteHtml = cur.note ? `<div class="note-tag">📝 Poznámka: ${cur.note}</div>` : '';
+
+                        body.innerHTML = `
+                            ${noteHtml}
+                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; color:#94a3b8;">
+                                <span>Zbývá zavezt: <b>${cur.total - cur.done} ob.</b></span>
+                            </div>
+                            <div class="boxes-row">${boxes}</div>
+                            <button class="btn-zavez" onclick="zavezt(${cur.id})">${btnText}</button>
+                        `;
+                    }
+                }
+            });
+
+            let doneBanner = document.getElementById('doneBanner');
+            if (doneBanner) {
+                doneBanner.style.display = orders.length === 0 ? 'block' : 'none';
+            }
+        }
+    </script>
+
+</body>
+</html>
