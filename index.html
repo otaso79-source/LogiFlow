@@ -523,9 +523,9 @@
             el.classList.add('selected');
         }
 
-        function submitCalibration() {
+                function submitCalibration() {
             let baseKs = (calibBoxState === 'plny') ? 9 : 0;
-            let totalExistingKs = baseKs + calibCount;
+            let totalExistingKs = baseKs + parseInt(calibCount);
             let targetKs = 36;
             
             let missingKs = targetKs - totalExistingKs;
@@ -534,7 +534,7 @@
             let obalyKZavezeni = Math.ceil(missingKs / 9);
             if (obalyKZavezeni === 0 && missingKs > 0) obalyKZavezeni = 1;
 
-            let noteText = `Kalibrace: zadaný stav ${calibCount} ks (${calibBoxState === 'plny' ? 'plný box' : 'čeká'}), srovnáno na 3 WRT`;
+            let noteText = `Kalibrace: ${totalExistingKs} ks na lince (${calibBoxState === 'plny' ? 'Plný obal' : 'Prázdný obal'} + ${calibCount} ks) -> Doplnit ${missingKs} ks`;
 
             orders.push({ 
                 id: Date.now(), 
@@ -549,6 +549,8 @@
             closeCalibModal();
             lastOrderCount = orders.length;
             save();
+        }
+
         }
 
         function sendCustomStockAlert() {
