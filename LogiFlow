@@ -47,6 +47,7 @@
         .role-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; font-weight: bold; background: #1e3a8a; color: #3b82f6; }
         .role-badge.b { background: #581c87; color: #a855f7; }
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-calib { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
         .line-select { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .line-btn { padding: 10px 6px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.75rem; line-height: 1.3; }
@@ -55,6 +56,7 @@
 
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
         .btn-opt { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px 4px; border-radius: 8px; font-weight: bold; text-align: center; cursor: pointer; font-size: 0.85rem; }
         .btn-opt.selected { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
 
@@ -68,6 +70,20 @@
         .box-info { background: #1e293b; border: 1px dashed #334155; border-radius: 8px; padding: 8px; display: flex; justify-content: space-around; text-align: center; margin-bottom: 12px; }
         .val { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
         .btn-submit { width: 100%; padding: 12px; background: #f59e0b; color: #0f172a; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+
+        /* MODAL KALIBRACE */
+        #calibModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px;
+        }
+        .calib-box {
+            background: #1e293b; border: 2px solid #f59e0b; border-radius: 12px;
+            width: 100%; max-width: 380px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .calib-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .calib-title { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
+        .btn-close { background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
 
         .vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid #3b82f6; }
         .vzv-card.l2 { border-top-color: #a855f7; }
@@ -106,6 +122,9 @@
         .btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 8px; flex-shrink: 0; }
         .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
         .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        
+        /* ŠTÍTEK PRO ODEČÍTÁNÍ WRT (POUZE PRO OBSLUHU A) */
+        .wrt-badge { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
     </style>
 </head>
 <body>
@@ -130,6 +149,8 @@
         <div class="header">
             <div class="logo">⚡ LogiFlow</div>
             <div class="header-right">
+                <!-- Tlačítko kalibrace viditelné pouze pro Obsluhu A -->
+                <button id="btnCalibHeader" class="btn-calib" onclick="openCalibModal()">⚖️ Kalibrace</button>
                 <span id="roleBadge" class="role-badge">Obsluha A</span>
                 <button class="btn-logout" onclick="logout()" title="Odhlásit tento telefon">🔓 Odhlásit</button>
             </div>
@@ -188,7 +209,6 @@
         <div id="viewB" style="display:none;">
             <div class="lbl">Přehled linek</div>
              
-            <!-- Fialová karta pro Linku 2 nahoře -->
             <div class="vzv-card l2">
                 <div class="vzv-hdr">
                     <div>
@@ -200,7 +220,6 @@
                 <div id="l2Body"></div>
             </div>
             
-            <!-- Modrá karta pro Linku 1 dole -->
             <div class="vzv-card">
                 <div class="vzv-hdr">
                     <div>
@@ -231,6 +250,47 @@
         </div>
     </div>
 
+    <!-- MODAL OKNO PRO KALIBRACI (POUZE PRO OBSLUHU A) -->
+    <div id="calibModal">
+        <div class="calib-box">
+            <div class="calib-header">
+                <div class="calib-title">⚖️ Kalibrace obalu (Cíl: 36 ks)</div>
+                <button class="btn-close" onclick="closeCalibModal()">✕</button>
+            </div>
+
+            <div class="lbl">Vyberte Linku</div>
+            <div class="line-select">
+                <div class="line-btn active-1" id="calibLine1" onclick="setCalibLine(1)">LINKA 1<br><span style="font-size:0.65rem;">BOX 4 - 3</span></div>
+                <div class="line-btn" id="calibLine2" onclick="setCalibLine(2)">LINKA 2<br><span style="font-size:0.65rem;">BOX 2 - 1</span></div>
+            </div>
+
+            <div class="lbl">Stav Boxu / Obalu</div>
+            <div class="line-select">
+                <div class="line-btn active-1" id="calibBoxPlny" onclick="setCalibBoxState('plny')">📦 Box plný / Zavezen</div>
+                <div class="line-btn" id="calibBoxCeka" onclick="setCalibBoxState('ceka')">⏳ Čeká na výměnu / Prázdný</div>
+            </div>
+
+            <div class="lbl">Varianta</div>
+            <div class="grid-3">
+                <div class="btn-opt selected" onclick="setCalibCar('Tiguan', this)">Tiguan</div>
+                <div class="btn-opt" onclick="setCalibCar('Kodiaq', this)">Kodiaq</div>
+                <div class="btn-opt" onclick="setCalibCar('Tayron', this)">Tayron</div>
+                <div class="btn-opt" onclick="setCalibCar('Audi', this)">Audi</div>
+                <div class="btn-opt" onclick="setCalibCar('Seat', this)">Seat</div>
+            </div>
+
+            <div class="lbl">Aktuální počet dílů v otevřeném obalu</div>
+            <div class="grid-4">
+                <div class="btn-opt selected" onclick="setCalibCount(0, this)">0 ks</div>
+                <div class="btn-opt" onclick="setCalibCount(3, this)">3 ks</div>
+                <div class="btn-opt" onclick="setCalibCount(6, this)">6 ks</div>
+                <div class="btn-opt" onclick="setCalibCount(9, this)">9 ks</div>
+            </div>
+
+            <button class="btn-submit" style="margin-top:14px;" onclick="submitCalibration()">SROVNAT A POSLAT NA VZV</button>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
             databaseURL: "https://logiflow-app-default-rtdb.europe-west1.firebasedatabase.app"
@@ -245,6 +305,12 @@
         let stockAlerts = [];
         let lastOrderCount = 0;
         let selectedLoginMode = 'A';
+
+        // Stavy pro kalibraci
+        let calibLine = 1;
+        let calibBoxState = 'plny';
+        let calibCar = 'Tiguan';
+        let calibCount = 0;
 
         db.ref('orders').on('value', (snapshot) => {
             let rawOrders = snapshot.val() || [];
@@ -312,6 +378,9 @@
             document.getElementById('viewA').style.display = savedTab === 'A' ? 'block' : 'none';
             document.getElementById('viewB').style.display = savedTab === 'B' ? 'block' : 'none';
             
+            // Tlačítko kalibrace zobrazíme JEN pro Obsluhu A
+            document.getElementById('btnCalibHeader').style.display = savedTab === 'A' ? 'block' : 'none';
+
             let badge = document.getElementById('roleBadge');
             if (savedTab === 'A') {
                 badge.innerText = 'Obsluha A';
@@ -368,7 +437,7 @@
 
         function setCar(c, el) {
             curCar = c;
-            document.querySelectorAll('.grid-3 .btn-opt').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('#viewA .grid-3 .btn-opt').forEach(b => b.classList.remove('selected'));
             el.classList.add('selected');
         }
 
@@ -421,6 +490,67 @@
             save();
         }
 
+        // --- FUNKCE KALIBRACE ---
+        function openCalibModal() {
+            document.getElementById('calibModal').style.display = 'flex';
+        }
+
+        function closeCalibModal() {
+            document.getElementById('calibModal').style.display = 'none';
+        }
+
+        function setCalibLine(l) {
+            calibLine = l;
+            document.getElementById('calibLine1').className = 'line-btn ' + (l===1?'active-1':'');
+            document.getElementById('calibLine2').className = 'line-btn ' + (l===2?'active-2':'');
+        }
+
+        function setCalibBoxState(state) {
+            calibBoxState = state;
+            document.getElementById('calibBoxPlny').className = 'line-btn ' + (state==='plny'?'active-1':'');
+            document.getElementById('calibBoxCeka').className = 'line-btn ' + (state==='ceka'?'active-1':'');
+        }
+
+        function setCalibCar(c, el) {
+            calibCar = c;
+            el.parentElement.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function setCalibCount(cnt, el) {
+            calibCount = cnt;
+            el.parentElement.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function submitCalibration() {
+            let baseKs = (calibBoxState === 'plny') ? 9 : 0;
+            let totalExistingKs = baseKs + calibCount;
+            let targetKs = 36;
+            
+            let missingKs = targetKs - totalExistingKs;
+            if (missingKs < 0) missingKs = 0;
+
+            let obalyKZavezeni = Math.ceil(missingKs / 9);
+            if (obalyKZavezeni === 0 && missingKs > 0) obalyKZavezeni = 1;
+
+            let noteText = `Kalibrace: zadaný stav ${calibCount} ks (${calibBoxState === 'plny' ? 'plný box' : 'čeká'}), srovnáno na 3 WRT`;
+
+            orders.push({ 
+                id: Date.now(), 
+                line: calibLine, 
+                car: calibCar, 
+                stojany: 3, 
+                total: obalyKZavezeni, 
+                done: 0, 
+                note: noteText 
+            });
+
+            closeCalibModal();
+            lastOrderCount = orders.length;
+            save();
+        }
+
         function sendCustomStockAlert() {
             let variant = document.getElementById('vzvVariantSelect').value;
             let count = document.getElementById('vzvCountInput').value || '5';
@@ -461,14 +591,21 @@
                 });
             }
 
+            // RENDEROVÁNÍ PRO OBSLUHU A (Zobrazuje odpočet WRT)
             let listA = document.getElementById('listA');
             if (listA) {
                 listA.innerHTML = orders.length === 0 ? '<div class="empty">Žádné aktivní objednávky</div>' : '';
                 orders.forEach(o => {
                     let noteHtml = o.note ? `<div class="note-tag">📝 ${o.note}</div>` : '';
+                    
+                    // Výpočet zbývajících WRT pro Obsluhu A
+                    let remainingObaly = o.total - o.done;
+                    let remainingKs = remainingObaly * 9;
+                    let remainingWRT = (remainingKs / 12).toFixed(2).replace('.00', '');
+
                     listA.innerHTML += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="flex-grow:1;"><b>${o.car}</b> (${o.stojany} WRT) - Linka ${o.line}</span>
+                            <span style="flex-grow:1;"><b>${o.car}</b> (${o.stojany} WRT) - Linka ${o.line} <span class="wrt-badge">Zbývá ${remainingWRT} WRT</span></span>
                             <span style="color:#f59e0b; font-weight:bold; white-space:nowrap; margin-left:8px;">${o.done}/${o.total} obalů</span>
                             <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
                         </div>
@@ -477,6 +614,7 @@
                 });
             }
 
+            // RENDEROVÁNÍ PRO VZV B (Bez informací o WRT, pouze čisté obaly)
             [1, 2].forEach(l => {
                 let lOrders = orders.filter(x => x.line === l);
                 let title = document.getElementById(`l${l}Title`);
@@ -514,6 +652,7 @@
 
                         let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
                         let noteHtml = cur.note ? `<div class="note-tag">📝 Poznámka: ${cur.note}</div>` : '';
+
                         body.innerHTML = `
                             ${noteHtml}
                             <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; color:#94a3b8;">
