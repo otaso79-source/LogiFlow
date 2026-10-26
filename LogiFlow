@@ -279,12 +279,13 @@
                 <div class="btn-opt" onclick="setCalibCar('Seat', this)">Seat</div>
             </div>
 
-            <!-- VÝBĚROVÉ ROLETKY VEDLE SEBE S UPRAVENÝM POPISKEM -->
+            <!-- VÝBĚROVÉ ROLETKY VEDLE SEBE S MOŽNOSTÍ PRÁZDNÉ -->
             <div class="calib-boxes-row">
                 <div class="calib-box-col">
                     <div class="calib-box-title" id="lblBoxAHeader">BOX 4</div>
                     <select id="selectBoxA" class="calib-select">
-                        <option value="prazdna" selected>Vyberte možnost</option>
+                        <option value="" disabled selected>Vyberte možnost</option>
+                        <option value="prazdna">Prázdná (0 ks)</option>
                         <option value="plna">Plná (1 obal / 9 ks)</option>
                         <option value="3">3 ks</option>
                         <option value="6">6 ks</option>
@@ -294,7 +295,8 @@
                 <div class="calib-box-col">
                     <div class="calib-box-title" id="lblBoxBHeader">BOX 3</div>
                     <select id="selectBoxB" class="calib-select">
-                        <option value="prazdna" selected>Vyberte možnost</option>
+                        <option value="" disabled selected>Vyberte možnost</option>
+                        <option value="prazdna">Prázdná (0 ks)</option>
                         <option value="plna">Plná (1 obal / 9 ks)</option>
                         <option value="3">3 ks</option>
                         <option value="6">6 ks</option>
@@ -539,6 +541,11 @@
         function submitCalibration() {
             let valA = document.getElementById('selectBoxA').value;
             let valB = document.getElementById('selectBoxB').value;
+
+            if (!valA || !valB) {
+                alert("Prosím vyberte stav pro oba boxy.");
+                return;
+            }
 
             let ksA = getBoxKs(valA);
             let ksB = getBoxKs(valB);
