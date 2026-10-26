@@ -284,8 +284,8 @@
                 <div class="calib-box-col">
                     <div class="calib-box-title" id="lblBoxAHeader">BOX 4</div>
                     <select id="selectBoxA" class="calib-select">
-                        <option value="prazdna">Prázdná (0 ks)</option>
-                        <option value="plna" selected>Plná (9 ks)</option>
+                        <option value="prazdna">Prázdná (0 obalů)</option>
+                        <option value="plna" selected>Plná (1 obal)</option>
                         <option value="3">3 ks</option>
                         <option value="6">6 ks</option>
                         <option value="9">9 ks</option>
@@ -294,9 +294,9 @@
                 <div class="calib-box-col">
                     <div class="calib-box-title" id="lblBoxBHeader">BOX 3</div>
                     <select id="selectBoxB" class="calib-select">
-                        <option value="prazdna">Prázdná (0 ks)</option>
-                        <option value="plna">Plná (9 ks)</option>
-                        <option value="3" selected>3 ks</option>
+                        <option value="prazdna">Prázdná (0 obalů)</option>
+                        <option value="plna">Plná (1 obal)</option>
+                        <option value="3" selected>3 ks (rozpracovaný obal)</option>
                         <option value="6">6 ks</option>
                         <option value="9">9 ks</option>
                     </select>
@@ -501,7 +501,7 @@
             save();
         }
 
-        // --- PŘESNÝ KALIBRAČNÍ VÝPOČET ---
+        // --- PŘESNÝ KALIBRAČNÍ VÝPOČET DLE VAŠICH POŽADAVKŮ ---
         function openCalibModal() {
             document.getElementById('calibModal').style.display = 'flex';
         }
@@ -530,41 +530,43 @@
             el.classList.add('selected');
         }
 
-        function getBoxKs(val) {
-            if (val === 'plna') return 9; // Plný box = 9 ks
-            if (val === 'prazdna') return 0; // Prázdný = 0 ks
-            return parseInt(val) || 0; // 3, 6 nebo 9 ks
+        function getBoxObalyCount(val) {
+            if (val === 'plna') return 1; // Plný box = 1 celý obal
+            if (val === 'prazdna') return 0; // Prázdný = 0
+            // Pokud je to rozpracovaný (např. 3, 6, 9 ks), počítá se jako 1 částečně otevřený/rozpracovaný obal,
+            // který se započítává do rozehraných beden (zde ho bereme jako 1 nehotový obal, který se musí dovézt/doplnit)
+            return 1; 
         }
 
         function submitCalibration() {
             let valA = document.getElementById('selectBoxA').value;
             let valB = document.getElementById('selectBoxB').value;
 
-            // 1. Spočítáme reálné kusy na lince (např. 9 ks + 3 ks = 12 ks)
-            let ksA = getBoxKs(valA);
-            let ksB = getBoxKs(valB);
-            let totalExistingKs = ksA + ksB;
-            
-            // 2. Cílový stav jsou 4 obaly, což je 36 ks
-            let targetKs = 36;
-            let missingKs = targetKs - totalExistingKs;
-            if (missingKs < 0) missingKs = 0;
+            // Cílový stav jsou vždy 4 obaly celkem na lince
+            let targetObaly = 4;
 
-            // 3. Kolik obalů (po 9 ks) chybí dovézt? (např. 24 ks / 9 = 2.66 -> zaokrouhleno nahoru na 2 obaly)
-            let obalyKZavezeni = Math.ceil(missingKs / 9);
-            if (obalyKZavezeni === 0 && missingKs > 0) obalyKZavezeni = 1;
+            // Spočítáme, kolik obalů už na lince reálně figuruje (plné + rozpracované dohromady)
+            let existingObaly = 0;
+            if (valA !== 'prazdna') existingObaly += 1;
+            if (valB !== 'prazdna') existingObaly += 1;
+
+            // Kolik obalů chybí do celkového počtu 4?
+            // Příklad: 1 plný (valA) + 1 rozpracovaný (valB) = 2 obaly na lince. 
+            // Cíl (4) - 2 stávající = přesně 2 obaly k zavezení!
+            let missingObaly = targetObaly - existingObaly;
+            if (missingObaly < 0) missingObaly = 0;
 
             let boxNameA = (calibLine === 1) ? 'Box 4' : 'Box 2';
             let boxNameB = (calibLine === 1) ? 'Box 3' : 'Box 1';
             
-            let noteText = `Kalibrace (${boxNameA}: ${valA}, ${boxNameB}: ${valB}) -> Celkem ${totalExistingKs} ks -> Doplnit ${missingKs} ks (${obalyKZavezeni} obaly)`;
+            let noteText = `Kalibrace (${boxNameA}: ${valA}, ${boxNameB}: ${valB}) -> Chybí doplnit ${missingObaly} obaly`;
 
             orders.push({ 
                 id: Date.now(), 
                 line: calibLine, 
                 car: calibCar, 
                 stojany: 3, 
-                total: obalyKZavezeni, // Nyní zde vyjde přesně 2 obaly k zavezení!
+                total: missingObaly, // Tady vyjde přesně 2 obaly!
                 done: 0, 
                 note: noteText 
             });
