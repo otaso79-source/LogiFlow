@@ -84,7 +84,6 @@
         .calib-title { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
         .btn-close { background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
 
-        /* Styly pro rozvržení select boxů v kalibraci přesně dle vašeho návrhu */
         .calib-boxes-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
         .calib-box-col { display: flex; flex-direction: column; }
         .calib-box-title { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin-bottom: 4px; }
@@ -257,11 +256,11 @@
         </div>
     </div>
 
-    <!-- MODAL OKNO KALIBRACE PŘESNĚ DLE NÁVRHU -->
+    <!-- MODAL OKNO KALIBRACE -->
     <div id="calibModal">
         <div class="calib-box">
             <div class="calib-header">
-                <div class="calib-title">⚖️ Kalibrace obalů (Cíl: 36 ks)</div>
+                <div class="calib-title">⚖️ Kalibrace obalů (Cíl: 4 obaly / 36 ks)</div>
                 <button class="btn-close" onclick="closeCalibModal()">✕</button>
             </div>
 
@@ -280,13 +279,13 @@
                 <div class="btn-opt" onclick="setCalibCar('Seat', this)">Seat</div>
             </div>
 
-            <!-- VÝBĚROVÉ ROLETKY VEDLE SEBE (PŘESNĚ JAKO NA NÁVRHU) -->
+            <!-- VÝBĚROVÉ ROLETKY VEDLE SEBE -->
             <div class="calib-boxes-row">
                 <div class="calib-box-col">
                     <div class="calib-box-title" id="lblBoxAHeader">BOX 4</div>
                     <select id="selectBoxA" class="calib-select">
-                        <option value="prazdna">Prázdná</option>
-                        <option value="plna">Plná (9 ks)</option>
+                        <option value="prazdna">Prázdná (0 obalů)</option>
+                        <option value="plna" selected>Plná (1 obal / 9 ks)</option>
                         <option value="3">3 ks</option>
                         <option value="6">6 ks</option>
                         <option value="9">9 ks</option>
@@ -295,9 +294,9 @@
                 <div class="calib-box-col">
                     <div class="calib-box-title" id="lblBoxBHeader">BOX 3</div>
                     <select id="selectBoxB" class="calib-select">
-                        <option value="prazdna">Prázdná</option>
-                        <option value="plna">Plná (9 ks)</option>
-                        <option value="3">3 ks</option>
+                        <option value="prazdna">Prázdná (0 obalů)</option>
+                        <option value="plna">Plná (1 obal / 9 ks)</option>
+                        <option value="3" selected>3 ks</option>
                         <option value="6">6 ks</option>
                         <option value="9">9 ks</option>
                     </select>
@@ -531,38 +530,37 @@
             el.classList.add('selected');
         }
 
-        function getBoxKs(val) {
-            if (val === 'plna') return 9;
+        function getBoxObaly(val) {
+            if (val === 'plna') return 1; // 1 plný obal = 1 celá jednotka z 4
             if (val === 'prazdna') return 0;
-            return parseInt(val) || 0;
+            return 0.5; // Rozpracovaný obal (3, 6, 9 ks) počítáme jako částečně naplněný obal (~0.5)
         }
 
         function submitCalibration() {
             let valA = document.getElementById('selectBoxA').value;
             let valB = document.getElementById('selectBoxB').value;
 
-            let ksA = getBoxKs(valA);
-            let ksB = getBoxKs(valB);
-            let totalExistingKs = ksA + ksB;
+            // Výpočet obsazených obalů (např. 1 plný + 0.5 rozpracovaný = 1.5 obalu hotovo)
+            let obalyA = getBoxObaly(valA);
+            let obalyB = getBoxObaly(valB);
+            let totalExistingObaly = obalyA + obalyB;
             
-            let targetKs = 36;
-            let missingKs = targetKs - totalExistingKs;
-            if (missingKs < 0) missingKs = 0;
-
-            let obalyKZavezeni = Math.ceil(missingKs / 9);
-            if (obalyKZavezeni === 0 && missingKs > 0) obalyKZavezeni = 1;
+            let targetObaly = 4; // Cílový stav jsou 4 obaly
+            let missingObaly = Math.ceil(targetObaly - totalExistingObaly);
+            if (missingObaly < 0) missingObaly = 0;
+            if (missingObaly === 0 && (valA === 'prazdna' || valB === 'prazdna')) missingObaly = 1;
 
             let boxNameA = (calibLine === 1) ? 'Box 4' : 'Box 2';
             let boxNameB = (calibLine === 1) ? 'Box 3' : 'Box 1';
             
-            let noteText = `Kalibrace (${boxNameA}: ${valA}, ${boxNameB}: ${valB}) -> Celkem ${totalExistingKs} ks -> Doplnit ${missingKs} ks`;
+            let noteText = `Kalibrace (${boxNameA}: ${valA}, ${boxNameB}: ${valB}) -> Chybí doplnit ${missingObaly} obaly`;
 
             orders.push({ 
                 id: Date.now(), 
                 line: calibLine, 
                 car: calibCar, 
                 stojany: 3, 
-                total: obalyKZavezeni, 
+                total: missingObaly, // Zde se propíše přesně počet obalů k zavezení (např. 2)
                 done: 0, 
                 note: noteText 
             });
