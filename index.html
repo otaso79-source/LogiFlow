@@ -509,7 +509,7 @@
             save();
         }
 
-        // --- KALIBRACE A ŽIVÝ NÁHLED ---
+        // --- KALIBRACE A INTELIGENTNÍ LOGISTICKÝ VÝPOČET ---
         function openCalibModal() {
             document.getElementById('selectBoxA').selectedIndex = 0;
             document.getElementById('selectBoxB').selectedIndex = 0;
@@ -555,12 +555,26 @@
             let ksB = getBoxKs(valB);
             let totalExistingKs = ksA + ksB;
             
+            // Logistická logika:
+            // Pokud je v boxu PLNÁ bedna (9 ks), VZV nemůže na tu pozici nic přivézt, 
+            // dokud obsluha plnou bednu neodveze. Počítáme tedy volné/dostupné sloty k závozu
+            // dle toho, kolik pozic (z celkem 2 boxů) NEJSOU plné.
+            let availableSlots = 2; // Máme 2 boxy
+            if (valA === 'plna') availableSlots--;
+            if (valB === 'plna') availableSlots--;
+
             let targetKs = 36;
             let missingKs = targetKs - totalExistingKs;
             if (missingKs < 0) missingKs = 0;
 
+            // Kolik obalů (po 9ks) reálně chybí k doplnění do volných slotů
             let obalyKZavezeni = Math.ceil(missingKs / 9);
-            if (obalyKZavezeni === 0 && missingKs > 0 && (valA !== '' && valB !== '')) obalyKZavezeni = 1;
+            
+            // Omezení: VZV může najednou zavážet maximálně tolik obalů, kolik je volných/dostupných slotů (kde nestojí plná bedna)
+            if (obalyKZavezeni > availableSlots) {
+                obalyKZavezeni = availableSlots;
+            }
+            if (obalyKZavezeni < 0) obalyKZavezeni = 0;
 
             document.getElementById('calibPreviewKs').innerText = totalExistingKs + ' ks';
             document.getElementById('calibPreviewOb').innerText = obalyKZavezeni + ' obaly';
@@ -579,17 +593,29 @@
             let ksB = getBoxKs(valB);
             let totalExistingKs = ksA + ksB;
             
+            let availableSlots = 2;
+            if (valA === 'plna') availableSlots--;
+            if (valB === 'plna') availableSlots--;
+
             let targetKs = 36;
             let missingKs = targetKs - totalExistingKs;
             if (missingKs < 0) missingKs = 0;
 
             let obalyKZavezeni = Math.ceil(missingKs / 9);
-            if (obalyKZavezeni === 0 && missingKs > 0) obalyKZavezeni = 1;
+            if (obalyKZavezeni > availableSlots) {
+                obalyKZavezeni = availableSlots;
+            }
+            if (obalyKZavezeni === 0 && missingKs > 0 && availableSlots > 0) obalyKZavezeni = 1;
+
+            if (obalyKZavezeni === 0) {
+                alert("Nelze objednat závoz – obě pozice jsou plné nebo není kam zavážet!");
+                return;
+            }
 
             let boxNameA = (calibLine === 1) ? 'Box 4' : 'Box 2';
             let boxNameB = (calibLine === 1) ? 'Box 3' : 'Box 1';
             
-            let noteText = `Kalibrace (${boxNameA}: ${valA}, ${boxNameB}: ${valB}) -> Celkem ${totalExistingKs} ks -> Doplnit ${missingKs} ks (${obalyKZavezeni} obaly)`;
+            let noteText = `Kalibrace (${boxNameA}: ${valA}, ${boxNameB}: ${valB}) -> Celkem ${totalExistingKs} ks -> Doplnit ${obalyKZavezeni} obaly`;
 
             orders.push({ 
                 id: Date.now(), 
