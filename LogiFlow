@@ -125,7 +125,7 @@
         
         .wrt-badge { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
         
-        /* Styly pro nové kalibrační výběrové mřížky v modálu */
+        /* Rozvržení pro výběr možností v kalibraci (Prázdná, Plná, 3, 6, 9) */
         .calib-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 4px; }
         .calib-grid button { padding: 8px 2px; font-size: 0.75rem; }
     </style>
@@ -252,7 +252,7 @@
         </div>
     </div>
 
-    <!-- MODAL OKNO PRO KALIBRACI PODLE NOVÉHO ZADÁNÍ -->
+    <!-- MODAL OKNO KALIBRACE -->
     <div id="calibModal">
         <div class="calib-box">
             <div class="calib-header">
@@ -317,7 +317,7 @@
         // Kalibrační stavy
         let calibLine = 1;
         let calibCar = 'Tiguan';
-        let calibBoxA = 'prazdna'; // Může být 'prazdna', 'plna' nebo číslo 3, 6, 9
+        let calibBoxA = 'prazdna'; 
         let calibBoxB = 'prazdna';
 
         db.ref('orders').on('value', (snapshot) => {
@@ -563,7 +563,7 @@
             let boxNameA = (calibLine === 1) ? 'Box 4' : 'Box 2';
             let boxNameB = (calibLine === 1) ? 'Box 3' : 'Box 1';
             
-            let noteText = `Kalibrace (${boxNameName = boxNameA}: ${calibBoxA}, ${boxNameB}: ${calibBoxB}) -> Celkem ${totalExistingKs} ks -> Doplnit ${missingKs} ks`;
+            let noteText = `Kalibrace (${boxNameA}: ${calibBoxA}, ${boxNameB}: ${calibBoxB}) -> Celkem ${totalExistingKs} ks -> Doplnit ${missingKs} ks`;
 
             orders.push({ 
                 id: Date.now(), 
