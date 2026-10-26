@@ -279,11 +279,11 @@
                 <div class="btn-opt" onclick="setCalibCar('Seat', this)">Seat</div>
             </div>
 
-            <!-- VÝBĚROVÉ ROLETKY VEDLE SEBE S MOŽNOSTÍ PRÁZDNÉ -->
+            <!-- VÝBĚROVÉ ROLETKY VEDLE SEBE -->
             <div class="calib-boxes-row">
                 <div class="calib-box-col">
                     <div class="calib-box-title" id="lblBoxAHeader">BOX 4</div>
-                    <select id="selectBoxA" class="calib-select">
+                    <select id="selectBoxA" class="calib-select" onchange="updateCalibrationPreview()">
                         <option value="" disabled selected>Vyberte možnost</option>
                         <option value="prazdna">Prázdná (0 ks)</option>
                         <option value="plna">Plná (1 obal / 9 ks)</option>
@@ -294,7 +294,7 @@
                 </div>
                 <div class="calib-box-col">
                     <div class="calib-box-title" id="lblBoxBHeader">BOX 3</div>
-                    <select id="selectBoxB" class="calib-select">
+                    <select id="selectBoxB" class="calib-select" onchange="updateCalibrationPreview()">
                         <option value="" disabled selected>Vyberte možnost</option>
                         <option value="prazdna">Prázdná (0 ks)</option>
                         <option value="plna">Plná (1 obal / 9 ks)</option>
@@ -305,7 +305,13 @@
                 </div>
             </div>
 
-            <button class="btn-submit" style="margin-top:16px;" onclick="submitCalibration()">SROVNAT A POSLAT NA VZV</button>
+            <!-- RYCHLÝ PŘEPOČET / KONTROLNÍ NÁHLED PŘED OBJEDNÁNÍM -->
+            <div class="box-info" style="margin-top: 12px; margin-bottom: 12px;">
+                <div><div class="val" id="calibPreviewKs">0 ks</div><div style="font-size:0.65rem; color:#94a3b8;">ZJIŠTĚNO NA LINCE</div></div>
+                <div><div class="val" id="calibPreviewOb" style="color:#10b981;">0 obalů</div><div style="font-size:0.65rem; color:#94a3b8;">K OBJEDNÁNÍ</div></div>
+            </div>
+
+            <button class="btn-submit" onclick="submitCalibration()">OBJEDNAT</button>
         </div>
     </div>
 
@@ -503,8 +509,11 @@
             save();
         }
 
-        // --- PŘESNÝ KALIBRAČNÍ VÝPOČET ---
+        // --- KALIBRACE A ŽIVÝ NÁHLED ---
         function openCalibModal() {
+            document.getElementById('selectBoxA').selectedIndex = 0;
+            document.getElementById('selectBoxB').selectedIndex = 0;
+            updateCalibrationPreview();
             document.getElementById('calibModal').style.display = 'flex';
         }
 
@@ -536,6 +545,25 @@
             if (val === 'plna') return 9;
             if (val === 'prazdna') return 0;
             return parseInt(val) || 0;
+        }
+
+        function updateCalibrationPreview() {
+            let valA = document.getElementById('selectBoxA').value;
+            let valB = document.getElementById('selectBoxB').value;
+
+            let ksA = getBoxKs(valA);
+            let ksB = getBoxKs(valB);
+            let totalExistingKs = ksA + ksB;
+            
+            let targetKs = 36;
+            let missingKs = targetKs - totalExistingKs;
+            if (missingKs < 0) missingKs = 0;
+
+            let obalyKZavezeni = Math.ceil(missingKs / 9);
+            if (obalyKZavezeni === 0 && missingKs > 0 && (valA !== '' && valB !== '')) obalyKZavezeni = 1;
+
+            document.getElementById('calibPreviewKs').innerText = totalExistingKs + ' ks';
+            document.getElementById('calibPreviewOb').innerText = obalyKZavezeni + ' obaly';
         }
 
         function submitCalibration() {
