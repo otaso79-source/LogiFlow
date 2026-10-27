@@ -131,7 +131,7 @@
         .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
         .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
         
-        .wrt-badge { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+        .wrt-badge { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -285,6 +285,7 @@
                     <div class="calib-box-title" id="lblBoxAHeader">BOX 4</div>
                     <select id="selectBoxA" class="calib-select" onchange="updateCalibrationPreview()">
                         <option value="" disabled selected>Vyberte možnost</option>
+                        <option value="neznamy">❓ Neznámý (za krytem)</option>
                         <option value="prazdna">Prázdná (0 ks)</option>
                         <option value="plna">Plná (1 obal / 9 ks)</option>
                         <option value="3">3 ks</option>
@@ -296,6 +297,7 @@
                     <div class="calib-box-title" id="lblBoxBHeader">BOX 3</div>
                     <select id="selectBoxB" class="calib-select" onchange="updateCalibrationPreview()">
                         <option value="" disabled selected>Vyberte možnost</option>
+                        <option value="neznamy">❓ Neznámý (za krytem)</option>
                         <option value="prazdna">Prázdná (0 ks)</option>
                         <option value="plna">Plná (1 obal / 9 ks)</option>
                         <option value="3">3 ks</option>
@@ -541,12 +543,11 @@
         }
 
         function getBoxKs(val) {
-            if (val === 'plna') return 9;
+            if (val === 'plna' || val === 'neznamy') return 9;
             if (val === 'prazdna') return 0;
             return parseInt(val) || 0;
         }
 
-        // --- PRESNÁ KALIBRAČNÍ LOGIKA PRO LOGIFLOW ---
         function calculateCalibContainers(valA, valB) {
             if (!valA || !valB) return 0;
 
@@ -554,32 +555,35 @@
             let isPlnaB = (valB === 'plna');
             let isPrazdnaA = (valA === 'prazdna');
             let isPrazdnaB = (valB === 'prazdna');
+            let isNeznamyA = (valA === 'neznamy');
+            let isNeznamyB = (valB === 'neznamy');
 
             let ksA = getBoxKs(valA);
             let ksB = getBoxKs(valB);
 
-            // 1. PŘÍPAD: PLNA + ROZPRACOVÁNO (např. Plná + 3 ks) -> VZV přiváží 3 obaly!
-            // (1 obal výměna za plnou + 2 obaly pro rozpracovaný box do zásoby)
+            if (isNeznamyA || isNeznamyB) {
+                let baseCalc = 2;
+                if ((isPlnaA && ksB > 0) || (isPlnaB && ksA > 0)) baseCalc = 3;
+                return Math.min(baseCalc, 3);
+            }
+
             if ((isPlnaA && ksB > 0 && !isPlnaB) || (isPlnaB && ksA > 0 && !isPlnaA)) {
                 return 3;
             }
 
-            // 2. PŘÍPAD: PRÁZDNÁ + ROZPRACOVÁNO (např. Prázdná + 3 ks) -> VZV přiváží 2 obaly!
             if ((isPrazdnaA && ksB > 0) || (isPrazdnaB && ksA > 0)) {
                 return 2;
             }
 
-            // 3. PŘÍPAD: OBA BOXY PLNÉ (Plná + Plná) -> 2 obaly
             if (isPlnaA && isPlnaB) {
                 return 2;
             }
 
-            // Všeobecný matematický výpočet pro ostatní rozpracované stavy
             let totalKs = ksA + ksB;
             let missingKs = 36 - totalKs;
             let obaly = Math.ceil(missingKs / 9);
 
-            if (obaly > 4) obaly = 4;
+            if (obaly > 3) obaly = 3;
             if (obaly < 1) obaly = 1;
             return obaly;
         }
@@ -607,16 +611,19 @@
                 return;
             }
 
-            let ksA = getBoxKs(valA);
-            let ksB = getBoxKs(valB);
-            let totalExistingKs = ksA + ksB;
-            
             let obalyKZavezeni = calculateCalibContainers(valA, valB);
 
             let boxNameA = (calibLine === 1) ? 'Box 4' : 'Box 2';
             let boxNameB = (calibLine === 1) ? 'Box 3' : 'Box 1';
             
-            let noteText = `Kalibrace (${boxNameA}: ${valA}, ${boxNameB}: ${valB}) -> Zjištěno ${totalExistingKs} ks -> Závoz ${obalyKZavezeni} obaly`;
+            let hasNeznamy = (valA === 'neznamy' || valB === 'neznamy');
+            
+            // Upravená hláška pro VZV
+            let noteText = `POZOR: KALIBRACE/SROVNÁNÍ OBALU (${boxNameA}: ${valA}, ${boxNameB}: ${valB}) -> Závoz ${obalyKZavezeni} obaly`;
+            
+            if (hasNeznamy) {
+                noteText += " | ⚠️ Neznámý stav za krytem, nutná kontrola VZV!";
+            }
 
             orders.push({ 
                 id: Date.now(), 
@@ -680,7 +687,8 @@
                     let noteHtml = o.note ? `<div class="note-tag">📝 ${o.note}</div>` : '';
                     let remainingObaly = o.total - o.done;
                     let remainingKs = remainingObaly * 9;
-                    let remainingWRT = (remainingKs / 12).toFixed(2).replace('.00', '');
+                    // Celá čísla WRT odpočítávající se dolů (3, 2, 1)
+                    let remainingWRT = Math.ceil(remainingKs / 12);
 
                     listA.innerHTML += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
