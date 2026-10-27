@@ -617,8 +617,6 @@
             let boxNameB = (calibLine === 1) ? 'Box 3' : 'Box 1';
             
             let hasNeznamy = (valA === 'neznamy' || valB === 'neznamy');
-            
-            // Upravená hláška pro VZV
             let noteText = `POZOR: KALIBRACE/SROVNÁNÍ OBALU (${boxNameA}: ${valA}, ${boxNameB}: ${valB}) -> Závoz ${obalyKZavezeni} obaly`;
             
             if (hasNeznamy) {
@@ -685,14 +683,13 @@
                 listA.innerHTML = orders.length === 0 ? '<div class="empty">Žádné aktivní objednávky</div>' : '';
                 orders.forEach(o => {
                     let noteHtml = o.note ? `<div class="note-tag">📝 ${o.note}</div>` : '';
-                    let remainingObaly = o.total - o.done;
-                    let remainingKs = remainingObaly * 9;
-                    // Celá čísla WRT odpočítávající se dolů (3, 2, 1)
-                    let remainingWRT = Math.ceil(remainingKs / 12);
+                    
+                    // Speciální výpočet WRT přímo pro Obsluhu A: 1 odklik = 1 WRT méně
+                    let remainingWRT = Math.max(0, o.stojany - o.done);
 
                     listA.innerHTML += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="flex-grow:1;"><b>${o.car}</b> (${o.stojany} WRT) - Linka ${o.line} <span class="wrt-badge">Zbývá ${remainingWRT} WRT</span></span>
+                            <span style="flex-grow:1;"><b>${o.car}</b> <span class="wrt-badge">Zbývá ${remainingWRT}/${o.stojany} WRT</span> - Linka ${o.line}</span>
                             <span style="color:#f59e0b; font-weight:bold; white-space:nowrap; margin-left:8px;">${o.done}/${o.total} obalů</span>
                             <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
                         </div>
@@ -718,6 +715,7 @@
                         let nxt1 = lOrders[1];
                         let nxt2 = lOrders[2];
                         
+                        // VZV B vidí původní název se stojany, protože jemu to WRT neukazujeme
                         title.innerText = `${cur.car} (${cur.stojany} WRT)`;
                         
                         if (nxt1) {
