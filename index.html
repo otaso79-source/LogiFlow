@@ -57,11 +57,16 @@
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
         .btn-opt { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px 4px; border-radius: 8px; font-weight: bold; text-align: center; cursor: pointer; font-size: 0.85rem; }
-        .btn-opt.selected { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        
+        /* Dynamické styly pro vybrané prvky podle linky */
+        .btn-opt.selected-1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #93c5fd; }
+        .btn-opt.selected-2 { border-color: #a855f7; background: rgba(168, 85, 247, 0.25); color: #d8b4fe; }
 
         .custom-stojan-input { margin-top: 6px; display: none; gap: 6px; align-items: center; }
         .custom-stojan-input.active { display: flex; }
-        .custom-stojan-input input { background: #1e293b; border: 1px solid #f59e0b; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.9rem; width: 100%; font-weight: bold; }
+        .custom-stojan-input input { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.9rem; width: 100%; font-weight: bold; }
+        .custom-stojan-input.line-1 input { border-color: #3b82f6; }
+        .custom-stojan-input.line-2 input { border-color: #a855f7; }
 
         .note-input { width: 100%; background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; outline: none; }
         .note-input:focus { border-color: #f59e0b; }
@@ -126,7 +131,12 @@
 
         .empty { text-align: center; color: #64748b; padding: 12px; font-size: 0.85rem; }
         .done-msg { background: #065f46; color: #34d399; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
-        .note-tag { background: rgba(245, 158, 11, 0.15); border-left: 3px solid #f59e0b; padding: 4px 8px; font-size: 0.75rem; color: #fbbf24; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
+        
+        /* Barevné rozlišení linek v poznámkách / štítcích */
+        .note-tag { padding: 4px 8px; font-size: 0.75rem; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
+        .note-tag.line-1 { background: rgba(59, 130, 246, 0.15); border-left: 3px solid #3b82f6; color: #93c5fd; }
+        .note-tag.line-2 { background: rgba(168, 85, 247, 0.15); border-left: 3px solid #a855f7; color: #d8b4fe; }
+
         .btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 8px; flex-shrink: 0; }
         .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
         .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
@@ -179,8 +189,8 @@
             </div>
 
             <div class="lbl">Produkt</div>
-            <div class="grid-3">
-                <div class="btn-opt selected" onclick="setCar('Tiguan', this)">Tiguan</div>
+            <div class="grid-3" id="carGrid">
+                <div class="btn-opt selected-1" onclick="setCar('Tiguan', this)">Tiguan</div>
                 <div class="btn-opt" onclick="setCar('Kodiaq', this)">Kodiaq</div>
                 <div class="btn-opt" onclick="setCar('Tayron', this)">Tayron</div>
                 <div class="btn-opt" onclick="setCar('Audi', this)">Audi</div>
@@ -188,13 +198,13 @@
             </div>
 
             <div class="lbl">Počet Stojanů WRT</div>
-            <div class="grid-3">
-                <div class="btn-opt selected" id="opt3WRT" onclick="setStojany(3, this)">3 WRT</div>
+            <div class="grid-3" id="stojanGrid">
+                <div class="btn-opt selected-1" id="opt3WRT" onclick="setStojany(3, this)">3 WRT</div>
                 <div class="btn-opt" id="opt6WRT" onclick="setStojany(6, this)">6 WRT</div>
                 <div class="btn-opt" id="optCustomWRT" onclick="enableCustomStojany(this)">✏️ Vlastní</div>
             </div>
 
-            <div class="custom-stojan-input" id="customStojanBox">
+            <div class="custom-stojan-input line-1" id="customStojanBox">
                 <span style="font-size:0.8rem; color:#94a3b8; white-space:nowrap;">Zadejte počet:</span>
                 <input type="number" id="customInput" min="1" max="50" value="4" oninput="onCustomStojanyInput(this.value)">
             </div>
@@ -272,7 +282,7 @@
 
             <div class="lbl">2. Varianta</div>
             <div class="grid-3">
-                <div class="btn-opt selected" onclick="setCalibCar('Tiguan', this)">Tiguan</div>
+                <div class="btn-opt selected-1" onclick="setCalibCar('Tiguan', this)">Tiguan</div>
                 <div class="btn-opt" onclick="setCalibCar('Kodiaq', this)">Kodiaq</div>
                 <div class="btn-opt" onclick="setCalibCar('Tayron', this)">Tayron</div>
                 <div class="btn-opt" onclick="setCalibCar('Audi', this)">Audi</div>
@@ -450,31 +460,57 @@
             setTimeout(() => { document.title = "Logistik - Systém Závozů"; }, 5000);
         }
 
+        function updateDynamicTheme() {
+            let activeClass = curLine === 1 ? 'selected-1' : 'selected-2';
+            let customBoxClass = curLine === 1 ? 'custom-stojan-input line-1 active' : 'custom-stojan-input line-2 active';
+
+            // Přeznačení produktů
+            document.querySelectorAll('#carGrid .btn-opt').forEach(b => {
+                b.classList.remove('selected-1', 'selected-2');
+                if (b.innerText === curCar) b.classList.add(activeClass);
+            });
+
+            // Přeznačení stojanů
+            let isCustom = !document.getElementById('opt3WRT').classList.contains('selected-1') && 
+                           !document.getElementById('opt3WRT').classList.contains('selected-2') &&
+                           !document.getElementById('opt6WRT').classList.contains('selected-1') && 
+                           !document.getElementById('opt6WRT').classList.contains('selected-2');
+
+            document.querySelectorAll('#opt3WRT, #opt6WRT, #optCustomWRT').forEach(b => b.classList.remove('selected-1', 'selected-2'));
+            
+            if (curStojany === 3) {
+                document.getElementById('opt3WRT').classList.add(activeClass);
+            } else if (curStojany === 6) {
+                document.getElementById('opt6WRT').classList.add(activeClass);
+            } else {
+                document.getElementById('optCustomWRT').classList.add(activeClass);
+                document.getElementById('customStojanBox').className = customBoxClass;
+            }
+        }
+
         function setLine(l) {
             curLine = l;
             document.getElementById('lBtn1').className = 'line-btn ' + (l===1?'active-1':'');
             document.getElementById('lBtn2').className = 'line-btn ' + (l===2?'active-2':'');
+            updateDynamicTheme();
         }
 
         function setCar(c, el) {
             curCar = c;
-            document.querySelectorAll('#viewA .grid-3 .btn-opt').forEach(b => b.classList.remove('selected'));
-            el.classList.add('selected');
+            updateDynamicTheme();
         }
 
         function setStojany(s, el) {
             curStojany = s;
             document.getElementById('customStojanBox').classList.remove('active');
-            document.querySelectorAll('#opt3WRT, #opt6WRT, #optCustomWRT').forEach(b => b.classList.remove('selected'));
-            el.classList.add('selected');
+            updateDynamicTheme();
             updateCalculations();
         }
 
         function enableCustomStojany(el) {
-            document.querySelectorAll('#opt3WRT, #opt6WRT, #optCustomWRT').forEach(b => b.classList.remove('selected'));
-            el.classList.add('selected');
             document.getElementById('customStojanBox').classList.add('active');
             curStojany = parseInt(document.getElementById('customInput').value) || 1;
+            updateDynamicTheme();
             updateCalculations();
         }
 
@@ -527,6 +563,12 @@
             document.getElementById('calibLine1').className = 'line-btn ' + (l===1?'active-1':'');
             document.getElementById('calibLine2').className = 'line-btn ' + (l===2?'active-2':'');
             
+            let activeClass = l === 1 ? 'selected-1' : 'selected-2';
+            document.querySelectorAll('#calibModal .grid-3 .btn-opt').forEach(b => {
+                b.classList.remove('selected-1', 'selected-2');
+                if (b.innerText === calibCar) b.classList.add(activeClass);
+            });
+
             if (l === 1) {
                 document.getElementById('lblBoxAHeader').innerText = "BOX 4";
                 document.getElementById('lblBoxBHeader').innerText = "BOX 3";
@@ -538,8 +580,9 @@
 
         function setCalibCar(c, el) {
             calibCar = c;
-            el.parentElement.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('selected'));
-            el.classList.add('selected');
+            let activeClass = calibLine === 1 ? 'selected-1' : 'selected-2';
+            el.parentElement.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('selected-1', 'selected-2'));
+            el.classList.add(activeClass);
         }
 
         function getBoxKs(val) {
@@ -682,9 +725,10 @@
             if (listA) {
                 listA.innerHTML = orders.length === 0 ? '<div class="empty">Žádné aktivní objednávky</div>' : '';
                 orders.forEach(o => {
-                    let noteHtml = o.note ? `<div class="note-tag">📝 ${o.note}</div>` : '';
+                    // Barevně odlišená poznámka / štítek podle linky (Linka 1 modře, Linka 2 fialově)
+                    let lineClass = o.line === 1 ? 'line-1' : 'line-2';
+                    let noteHtml = o.note ? `<div class="note-tag ${lineClass}">📝 ${o.note}</div>` : '';
                     
-                    // Speciální výpočet WRT přímo pro Obsluhu A: 1 odklik = 1 WRT méně
                     let remainingWRT = Math.max(0, o.stojany - o.done);
 
                     listA.innerHTML += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
@@ -715,7 +759,6 @@
                         let nxt1 = lOrders[1];
                         let nxt2 = lOrders[2];
                         
-                        // VZV B vidí původní název se stojany, protože jemu to WRT neukazujeme
                         title.innerText = `${cur.car} (${cur.stojany} WRT)`;
                         
                         if (nxt1) {
@@ -735,7 +778,8 @@
                         }
 
                         let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
-                        let noteHtml = cur.note ? `<div class="note-tag">📝 Poznámka: ${cur.note}</div>` : '';
+                        let lineClass = cur.line === 1 ? 'line-1' : 'line-2';
+                        let noteHtml = cur.note ? `<div class="note-tag ${lineClass}">📝 Poznámka: ${cur.note}</div>` : '';
 
                         body.innerHTML = `
                             ${noteHtml}
