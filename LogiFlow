@@ -115,6 +115,7 @@
         .color-picker-input { width: 40px; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent; }
 
         .btn-reset { width: 100%; padding: 10px; background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-sync-trigger { width: 100%; padding: 10px; background: #3b82f6; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.85rem; }
 
         .sync-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; margin-top: 12px; text-align: center; }
         .sync-txt { font-size: 0.8rem; color: #fbbf24; font-weight: bold; margin-bottom: 8px; line-height: 1.3; }
@@ -300,18 +301,21 @@
             <div class="lbl" style="margin-top:10px;">Barva pro Linku 1</div>
             <div class="settings-row">
                 <span style="font-size:0.8rem; color:#94a3b8;">Vyberte barvu:</span>
-                <input type="color" id="colorPickerLine1" class="color-picker-input" value="#3b82f6" onchange="stageColorChange(1, this.value)">
+                <input type="color" id="colorPickerLine1" class="color-picker-input" value="#3b82f6" onchange="updateLineColor(1, this.value)">
             </div>
 
             <div class="lbl" style="margin-top:10px;">Barva pro Linku 2</div>
             <div class="settings-row">
                 <span style="font-size:0.8rem; color:#94a3b8;">Vyberte barvu:</span>
-                <input type="color" id="colorPickerLine2" class="color-picker-input" value="#a855f7" onchange="stageColorChange(2, this.value)">
+                <input type="color" id="colorPickerLine2" class="color-picker-input" value="#a855f7" onchange="updateLineColor(2, this.value)">
             </div>
 
-            <!-- SYNCHRONIZAČNÍ SEKCE (VYŽADUJE SOUHLAS OBOU) -->
+            <!-- TLAČÍTKO PRO SPOLEČNOU KALIBRACI / SJEDNOCENÍ BAREV -->
+            <button class="btn-sync-trigger" onclick="requestColorSync()">🤝 Kalibrovat / sjednotit barvy s druhou stranou</button>
+
+            <!-- OKNO PRO SCHVÁLENÍ KALIBRACE -->
             <div class="sync-box" id="syncBox" style="display:none;">
-                <div class="sync-txt" id="syncStatusText">⚠️ Požadavek na změnu barev. Oba uživatelé musí potvrdit!</div>
+                <div class="sync-txt" id="syncStatusText">⚠️ Požadavek na kalibraci barev. S tímto musí souhlasit obě strany!</div>
                 <div style="display:flex; gap:6px; justify-content:center;">
                     <button class="btn-yn active-yes" style="padding:6px 14px;" onclick="voteColorSync(true)">SOUHLASÍM (ANO)</button>
                     <button class="btn-yn active-no" style="padding:6px 14px;" onclick="voteColorSync(false)">NESOUHLASÍM (NE)</button>
@@ -348,7 +352,6 @@
             }
         };
 
-        // Stav synchronizace barev (vyžaduje ANO od A i B)
         let colorSyncRequest = {
             active: false,
             role: '',
@@ -436,38 +439,47 @@
             }
         }
 
-        function stageColorChange(lineNum, hexColor) {
+        function updateLineColor(lineNum, hexColor) {
             let darkBg = lineNum === 1 ? '#1e3a8a' : '#581c87';
             let lightRgba = hexToRgba(hexColor, 0.25);
             
-            let newColors = JSON.parse(JSON.stringify(roleColors[currentRole]));
-            newColors[lineNum] = { main: hexColor, bg: darkBg, light: lightRgba };
+            // Změna se uloží POUZE pro aktuální roli, druhou stranu to neovlivní, dokud se nekalibruje
+            roleColors[currentRole][lineNum] = {
+                main: hexColor,
+                bg: darkBg,
+                light: lightRgba
+            };
+            applyThemeColors();
+            save();
+        }
 
-            // Inicializujeme požadavek na schválení oběma stranami
+        function requestColorSync() {
             colorSyncRequest = {
                 active: true,
                 role: currentRole,
-                colors: newColors,
+                colors: JSON.parse(JSON.stringify(roleColors[currentRole])),
                 votes: { A: null, B: null }
             };
-            colorSyncRequest.votes[currentRole] = true; // Kdo to navrhl, ten automaticky hlásí ANO
+            colorSyncRequest.votes[currentRole] = true; // Ten, kdo klikl, dává automaticky ANO
             save();
+            updateSyncUI();
+            alert("Požadavek na kalibraci barev byl odeslán druhé straně. Musí s ním souhlasit i druhý operátor!");
         }
 
         function voteColorSync(agree) {
             colorSyncRequest.votes[currentRole] = agree;
             
             if (!agree) {
-                // Pokud někdo dal NE, požadavek se zamítne a zruší
-                alert("Změna barev byla zamítnuta (někdo dal NE).");
+                alert("Kalibrace barev byla odmítnuta.");
                 colorSyncRequest = { active: false, role: '', colors: null, votes: { A: null, B: null } };
             } else {
-                // Pokud oba dali ANO, aplikujeme barvy pro obě role
                 if (colorSyncRequest.votes.A === true && colorSyncRequest.votes.B === true) {
-                    let targetRole = colorSyncRequest.role;
-                    roleColors[targetRole] = colorSyncRequest.colors;
+                    // Obě strany odsouhlasily – barvy se sjednotí na obou zařízeních
+                    let targetColors = colorSyncRequest.colors;
+                    roleColors.A = JSON.parse(JSON.stringify(targetColors));
+                    roleColors.B = JSON.parse(JSON.stringify(targetColors));
                     colorSyncRequest = { active: false, role: '', colors: null, votes: { A: null, B: null } };
-                    alert("Oba uživatelé potvrdili změnu. Barvy byly úspěšně aktualizovány!");
+                    alert("Úspěch! Obě strany odsouhlasily kalibraci. Barvy jsou sjednocené.");
                 }
             }
             save();
@@ -483,7 +495,7 @@
                 syncBox.style.display = 'block';
                 let vA = colorSyncRequest.votes.A === true ? 'ANO' : (colorSyncRequest.votes.A === false ? 'NE' : 'Čeká se');
                 let vB = colorSyncRequest.votes.B === true ? 'ANO' : (colorSyncRequest.votes.B === false ? 'NE' : 'Čeká se');
-                syncTxt.innerHTML = `⚠️ Žádost o změnu barev od role <b>${colorSyncRequest.role}</b>.<br>Hlasy – Obsluha A: [<b>${vA}</b>] | VZV B: [<b>${vB}</b>]`;
+                syncTxt.innerHTML = `⚠️ Kalibrace od <b>${colorSyncRequest.role}</b>.<br>Hlasy – Obsluha A: [<b>${vA}</b>] | VZV B: [<b>${vB}</b>]`;
             } else {
                 syncBox.style.display = 'none';
             }
