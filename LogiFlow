@@ -47,7 +47,6 @@
         .role-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; font-weight: bold; background: #1e3a8a; color: #3b82f6; }
         .role-badge.b { background: #581c87; color: #a855f7; }
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-calib { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
         .line-select { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .line-btn { padding: 10px 6px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.75rem; line-height: 1.3; }
@@ -61,7 +60,6 @@
         .btn-opt.selected-1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #93c5fd; }
         .btn-opt.selected-2 { border-color: #a855f7; background: rgba(168, 85, 247, 0.25); color: #d8b4fe; }
 
-        /* Panel pro jednovariantní režim */
         .single-mode-panel { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .single-mode-panel.line-1 { border-color: #3b82f6; }
         .single-mode-panel.line-2 { border-color: #a855f7; }
@@ -79,29 +77,6 @@
         .box-info { background: #1e293b; border: 1px dashed #334155; border-radius: 8px; padding: 8px; display: flex; justify-content: space-around; text-align: center; margin-bottom: 12px; }
         .val { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
         .btn-submit { width: 100%; padding: 12px; background: #f59e0b; color: #0f172a; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-
-        /* MODAL KALIBRACE */
-        #calibModal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px;
-        }
-        .calib-box {
-            background: #1e293b; border: 2px solid #f59e0b; border-radius: 12px;
-            width: 100%; max-width: 380px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            max-height: 90vh; overflow-y: auto;
-        }
-        .calib-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .calib-title { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
-        .btn-close { background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
-
-        .calib-boxes-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
-        .calib-box-col { display: flex; flex-direction: column; }
-        .calib-box-title { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin-bottom: 4px; }
-        .calib-select {
-            width: 100%; background: #0f172a; border: 1px solid #334155; color: #fff;
-            padding: 10px 8px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; outline: none; cursor: pointer;
-        }
-        .calib-select:focus { border-color: #f59e0b; }
 
         .vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid #3b82f6; }
         .vzv-card.l2 { border-top-color: #a855f7; }
@@ -141,14 +116,20 @@
         .note-tag.line-1 { background: rgba(59, 130, 246, 0.15); border-left: 3px solid #3b82f6; color: #93c5fd; }
         .note-tag.line-2 { background: rgba(168, 85, 247, 0.15); border-left: 3px solid #a855f7; color: #d8b4fe; }
 
-        /* Upozornění pro VZV v jednovariantním režimu */
         .vzv-single-mode-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.75rem; color: #fbbf24; font-weight: bold; text-align: center; line-height: 1.4; }
 
         .btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 8px; flex-shrink: 0; }
-        .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+        .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.80rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
         .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
         
         .wrt-badge { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+        
+        /* Styl pro klikací stav obalů */
+        .editable-progress {
+            color: #f59e0b; font-weight: bold; white-space: nowrap; margin-left: 8px;
+            background: rgba(245, 158, 11, 0.15); padding: 4px 8px; border-radius: 6px; cursor: pointer;
+            border: 1px dashed #f59e0b;
+        }
     </style>
 </head>
 <body>
@@ -173,7 +154,6 @@
         <div class="header">
             <div class="logo">⚡ LogiFlow</div>
             <div class="header-right">
-                <button id="btnCalibHeader" class="btn-calib" onclick="openCalibModal()">⚖️ Kalibrace</button>
                 <span id="roleBadge" class="role-badge">Obsluha A</span>
                 <button class="btn-logout" onclick="logout()" title="Odhlásit tento telefon">🔓 Odhlásit</button>
             </div>
@@ -204,7 +184,6 @@
                 <div class="btn-opt" onclick="setCar('Seat', this)">Seat</div>
             </div>
 
-            <!-- JEDNOVARIANTNÍ REŽIM PŘEPÍNAČ -->
             <div class="single-mode-panel line-1" id="singleModePanel">
                 <div class="single-mode-txt">🔒 Režim: Jede pouze 1 varianta</div>
                 <div class="banner-btns">
@@ -282,65 +261,6 @@
         </div>
     </div>
 
-    <!-- MODAL OKNO KALIBRACE -->
-    <div id="calibModal">
-        <div class="calib-box">
-            <div class="calib-header">
-                <div class="calib-title">⚖️ Kalibrace obalů (Cíl: 4 obaly / 36 ks)</div>
-                <button class="btn-close" onclick="closeCalibModal()">✕</button>
-            </div>
-
-            <div class="lbl">1. Vyberte Linku</div>
-            <div class="line-select">
-                <div class="line-btn active-1" id="calibLine1" onclick="setCalibLine(1)">LINKA 1<br><span style="font-size:0.65rem;">BOX 4 - 3</span></div>
-                <div class="line-btn" id="calibLine2" onclick="setCalibLine(2)">LINKA 2<br><span style="font-size:0.65rem;">BOX 2 - 1</span></div>
-            </div>
-
-            <div class="lbl">2. Varianta</div>
-            <div class="grid-3">
-                <div class="btn-opt selected-1" onclick="setCalibCar('Tiguan', this)">Tiguan</div>
-                <div class="btn-opt" onclick="setCalibCar('Kodiaq', this)">Kodiaq</div>
-                <div class="btn-opt" onclick="setCalibCar('Tayron', this)">Tayron</div>
-                <div class="btn-opt" onclick="setCalibCar('Audi', this)">Audi</div>
-                <div class="btn-opt" onclick="setCalibCar('Seat', this)">Seat</div>
-            </div>
-
-            <!-- VÝBĚROVÉ ROLETKY VEDLE SEBE (BEZ NEZNÁMÉHO) -->
-            <div class="calib-boxes-row">
-                <div class="calib-box-col">
-                    <div class="calib-box-title" id="lblBoxAHeader">BOX 4</div>
-                    <select id="selectBoxA" class="calib-select" onchange="updateCalibrationPreview()">
-                        <option value="" disabled selected>Vyberte možnost</option>
-                        <option value="prazdna">Prázdná (0 ks)</option>
-                        <option value="plna">Plná (1 obal / 9 ks)</option>
-                        <option value="3">3 ks</option>
-                        <option value="6">6 ks</option>
-                        <option value="9">9 ks</option>
-                    </select>
-                </div>
-                <div class="calib-box-col">
-                    <div class="calib-box-title" id="lblBoxBHeader">BOX 3</div>
-                    <select id="selectBoxB" class="calib-select" onchange="updateCalibrationPreview()">
-                        <option value="" disabled selected>Vyberte možnost</option>
-                        <option value="prazdna">Prázdná (0 ks)</option>
-                        <option value="plna">Plná (1 obal / 9 ks)</option>
-                        <option value="3">3 ks</option>
-                        <option value="6">6 ks</option>
-                        <option value="9">9 ks</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- RYCHLÝ PŘEPOČET / KONTROLNÍ NÁHLED PŘED OBJEDNÁNÍM -->
-            <div class="box-info" style="margin-top: 12px; margin-bottom: 12px;">
-                <div><div class="val" id="calibPreviewKs">0 ks</div><div style="font-size:0.65rem; color:#94a3b8;">ZJIŠTĚNO NA LINCE</div></div>
-                <div><div class="val" id="calibPreviewOb" style="color:#10b981;">0 obalů</div><div style="font-size:0.65rem; color:#94a3b8;">K OBJEDNÁNÍ</div></div>
-            </div>
-
-            <button class="btn-submit" onclick="submitCalibration()">OBJEDNAT</button>
-        </div>
-    </div>
-
     <script>
         const firebaseConfig = {
             databaseURL: "https://logiflow-app-default-rtdb.europe-west1.firebasedatabase.app"
@@ -357,9 +277,6 @@
         let stockAlerts = [];
         let lastOrderCount = 0;
         let selectedLoginMode = 'A';
-
-        let calibLine = 1;
-        let calibCar = 'Tiguan';
 
         db.ref('orders').on('value', (snapshot) => {
             let rawOrders = snapshot.val() || [];
@@ -440,7 +357,6 @@
             
             document.getElementById('viewA').style.display = savedTab === 'A' ? 'block' : 'none';
             document.getElementById('viewB').style.display = savedTab === 'B' ? 'block' : 'none';
-            document.getElementById('btnCalibHeader').style.display = savedTab === 'A' ? 'block' : 'none';
 
             let badge = document.getElementById('roleBadge');
             if (savedTab === 'A') {
@@ -594,127 +510,29 @@
             save();
         }
 
-        function openCalibModal() {
-            document.getElementById('selectBoxA').selectedIndex = 0;
-            document.getElementById('selectBoxB').selectedIndex = 0;
-            updateCalibrationPreview();
-            document.getElementById('calibModal').style.display = 'flex';
-        }
-
-        function closeCalibModal() {
-            document.getElementById('calibModal').style.display = 'none';
-        }
-
-        function setCalibLine(l) {
-            calibLine = l;
-            document.getElementById('calibLine1').className = 'line-btn ' + (l===1?'active-1':'');
-            document.getElementById('calibLine2').className = 'line-btn ' + (l===2?'active-2':'');
+        // --- INTERAKTIVNÍ KALIBRACE / ÚPRAVA STAVU PŘÍMO V SEZNAMU ---
+        function editOrderProgress(id) {
+            let o = orders.find(x => x.id === id);
+            if (!o) return;
             
-            let activeClass = l === 1 ? 'selected-1' : 'selected-2';
-            document.querySelectorAll('#calibModal .grid-3 .btn-opt').forEach(b => {
-                b.classList.remove('selected-1', 'selected-2');
-                if (b.innerText === calibCar) b.classList.add(activeClass);
-            });
-
-            if (l === 1) {
-                document.getElementById('lblBoxAHeader').innerText = "BOX 4";
-                document.getElementById('lblBoxBHeader').innerText = "BOX 3";
-            } else {
-                document.getElementById('lblBoxAHeader').innerText = "BOX 2";
-                document.getElementById('lblBoxBHeader').innerText = "BOX 1";
-            }
-        }
-
-        function setCalibCar(c, el) {
-            calibCar = c;
-            let activeClass = calibLine === 1 ? 'selected-1' : 'selected-2';
-            el.parentElement.querySelectorAll('.btn-opt').forEach(b => b.classList.remove('selected-1', 'selected-2'));
-            el.classList.add(activeClass);
-        }
-
-        function getBoxKs(val) {
-            if (val === 'plna') return 9;
-            if (val === 'prazdna') return 0;
-            return parseInt(val) || 0;
-        }
-
-        function calculateCalibContainers(valA, valB) {
-            if (!valA || !valB) return 0;
-
-            let isPlnaA = (valA === 'plna');
-            let isPlnaB = (valB === 'plna');
-            let isPrazdnaA = (valA === 'prazdna');
-            let isPrazdnaB = (valB === 'prazdna');
-
-            let ksA = getBoxKs(valA);
-            let ksB = getBoxKs(valB);
-
-            if ((isPlnaA && ksB > 0 && !isPlnaB) || (isPlnaB && ksA > 0 && !isPlnaA)) {
-                return 3;
-            }
-
-            if ((isPrazdnaA && ksB > 0) || (isPrazdnaB && ksA > 0)) {
-                return 2;
-            }
-
-            if (isPlnaA && isPlnaB) {
-                return 2;
-            }
-
-            let totalKs = ksA + ksB;
-            let missingKs = 36 - totalKs;
-            let obaly = Math.ceil(missingKs / 9);
-
-            if (obaly > 3) obaly = 3;
-            if (obaly < 1) obaly = 1;
-            return obaly;
-        }
-
-        function updateCalibrationPreview() {
-            let valA = document.getElementById('selectBoxA').value;
-            let valB = document.getElementById('selectBoxB').value;
-
-            let ksA = getBoxKs(valA);
-            let ksB = getBoxKs(valB);
-            let totalExistingKs = ksA + ksB;
+            let input = prompt(`Kalibrace / Úprava stavu obalů pro ${o.car} (Celkem: ${o.total} obalů):\nZadejte aktuální počet zavezených obalů (0 až ${o.total}):`, o.done);
+            if (input === null) return;
             
-            let obalyKZavezeni = calculateCalibContainers(valA, valB);
-
-            document.getElementById('calibPreviewKs').innerText = totalExistingKs + ' ks';
-            document.getElementById('calibPreviewOb').innerText = obalyKZavezeni + ' obaly';
-        }
-
-        function submitCalibration() {
-            let valA = document.getElementById('selectBoxA').value;
-            let valB = document.getElementById('selectBoxB').value;
-
-            if (!valA || !valB) {
-                alert("Prosím vyberte stav pro oba boxy.");
+            let newVal = parseInt(input);
+            if (isNaN(newVal) || newVal < 0) {
+                alert("Zadejte platné číslo od 0 do " + o.total);
                 return;
             }
-
-            let obalyKZavezeni = calculateCalibContainers(valA, valB);
-
-            let boxNameA = (calibLine === 1) ? 'Box 4' : 'Box 2';
-            let boxNameB = (calibLine === 1) ? 'Box 3' : 'Box 1';
             
-            let noteText = `POZOR: KALIBRACE/SROVNÁNÍ OBALU (${boxNameA}: ${valA}, ${boxNameB}: ${valB}) -> Závoz ${obalyKZavezeni} obaly`;
-
-            if (singleModeLines[calibLine]) {
-                singleModeLines[calibLine] = false;
+            if (newVal > o.total) newVal = o.total;
+            
+            o.done = newVal;
+            o.note = (o.note ? o.note + " | " : "") + `Kalibrace (Ručně upraveno na ${newVal}/${o.total} obalů)`;
+            
+            if (o.done >= o.total) {
+                orders = orders.filter(x => x.id !== id);
             }
-
-            orders.push({ 
-                id: Date.now(), 
-                line: calibLine, 
-                car: calibCar, 
-                stojany: 3, 
-                total: obalyKZavezeni, 
-                done: 0, 
-                note: noteText 
-            });
-
-            closeCalibModal();
+            
             lastOrderCount = orders.length;
             save();
         }
@@ -770,7 +588,7 @@
                     listA.innerHTML += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="flex-grow:1;"><b>${o.car}</b> <span class="wrt-badge">Zbývá ${remainingWRT}/${o.stojany} WRT</span> - Linka ${o.line}</span>
-                            <span style="color:#f59e0b; font-weight:bold; white-space:nowrap; margin-left:8px;">${o.done}/${o.total} obalů</span>
+                            <span onclick="editOrderProgress(${o.id})" class="editable-progress" title="Kliknutím upravit/zkalibrovat stav obalů">📦 ${o.done}/${o.total} obalů</span>
                             <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
                         </div>
                         ${noteHtml}
