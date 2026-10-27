@@ -51,26 +51,27 @@
 
         .line-select { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .line-btn { padding: 10px 6px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.75rem; line-height: 1.3; }
-        .line-btn.active-1 { border-color: var(--line1-color, #3b82f6); color: #fff; background: var(--line1-bg, #1e3a8a); }
-        .line-btn.active-2 { border-color: var(--line2-color, #a855f7); color: #fff; background: var(--line2-bg, #581c87); }
+        
+        .line-btn.active-1 { border-color: var(--active-line1, #3b82f6); color: #fff; background: var(--active-line1-bg, #1e3a8a); }
+        .line-btn.active-2 { border-color: var(--active-line2, #a855f7); color: #fff; background: var(--active-line2-bg, #581c87); }
 
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
         .btn-opt { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px 4px; border-radius: 8px; font-weight: bold; text-align: center; cursor: pointer; font-size: 0.85rem; }
         
-        .btn-opt.selected-1 { border-color: var(--line1-color, #3b82f6); background: var(--line1-light, rgba(59, 130, 246, 0.25)); color: #fff; }
-        .btn-opt.selected-2 { border-color: var(--line2-color, #a855f7); background: var(--line2-light, rgba(168, 85, 247, 0.25)); color: #fff; }
+        .btn-opt.selected-1 { border-color: var(--active-line1, #3b82f6); background: var(--active-line1-light, rgba(59, 130, 246, 0.25)); color: #fff; }
+        .btn-opt.selected-2 { border-color: var(--active-line2, #a855f7); background: var(--active-line2-light, rgba(168, 85, 247, 0.25)); color: #fff; }
 
         .single-mode-panel { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .single-mode-panel.line-1 { border-color: var(--line1-color, #3b82f6); }
-        .single-mode-panel.line-2 { border-color: var(--line2-color, #a855f7); }
+        .single-mode-panel.line-1 { border-color: var(--active-line1, #3b82f6); }
+        .single-mode-panel.line-2 { border-color: var(--active-line2, #a855f7); }
         .single-mode-txt { font-size: 0.8rem; font-weight: bold; color: #f8fafc; }
 
         .custom-stojan-input { margin-top: 6px; display: none; gap: 6px; align-items: center; }
         .custom-stojan-input.active { display: flex; }
         .custom-stojan-input input { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.9rem; width: 100%; font-weight: bold; }
-        .custom-stojan-input.line-1 input { border-color: var(--line1-color, #3b82f6); }
-        .custom-stojan-input.line-2 input { border-color: var(--line2-color, #a855f7); }
+        .custom-stojan-input.line-1 input { border-color: var(--active-line1, #3b82f6); }
+        .custom-stojan-input.line-2 input { border-color: var(--active-line2, #a855f7); }
 
         .note-input { width: 100%; background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; outline: none; }
         .note-input:focus { border-color: #f59e0b; }
@@ -79,11 +80,11 @@
         .val { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
         .btn-submit { width: 100%; padding: 12px; background: #f59e0b; color: #0f172a; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
 
-        .vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid var(--line2-color, #a855f7); }
-        .vzv-card.l1-card { border-top-color: var(--line1-color, #3b82f6); }
+        .vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid var(--active-line2, #a855f7); }
+        .vzv-card.l1-card { border-top-color: var(--active-line1, #3b82f6); }
         .vzv-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: var(--line1-color, #3b82f6); }
-        .badge.l2 { background: var(--line2-color, #a855f7); }
+        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: var(--active-line1, #3b82f6); }
+        .badge.l2 { background: var(--active-line2, #a855f7); }
         .next-txt { font-size: 0.8rem; color: #f59e0b; font-weight: bold; margin-top: 2px; line-height: 1.3; }
         .next-txt.none { color: #64748b; font-weight: normal; }
         
@@ -115,6 +116,9 @@
 
         .btn-reset { width: 100%; padding: 10px; background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
+        .sync-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; margin-top: 12px; text-align: center; }
+        .sync-txt { font-size: 0.8rem; color: #fbbf24; font-weight: bold; margin-bottom: 8px; line-height: 1.3; }
+
         .permanent-banner {
             background: #1e293b; border: 1px solid #334155; border-radius: 8px;
             padding: 8px 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
@@ -136,8 +140,8 @@
         .done-msg { background: #065f46; color: #34d399; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
         
         .note-tag { padding: 4px 8px; font-size: 0.75rem; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
-        .note-tag.line-1 { background: var(--line1-light, rgba(59, 130, 246, 0.15)); border-left: 3px solid var(--line1-color, #3b82f6); color: var(--line1-color, #93c5fd); }
-        .note-tag.line-2 { background: var(--line2-light, rgba(168, 85, 247, 0.15)); border-left: 3px solid var(--line2-color, #a855f7); color: var(--line2-color, #d8b4fe); }
+        .note-tag.line-1 { background: var(--active-line1-light, rgba(59, 130, 246, 0.15)); border-left: 3px solid var(--active-line1, #3b82f6); color: var(--active-line1, #93c5fd); }
+        .note-tag.line-2 { background: var(--active-line2-light, rgba(168, 85, 247, 0.15)); border-left: 3px solid var(--active-line2, #a855f7); color: var(--active-line2, #d8b4fe); }
 
         .vzv-single-mode-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.75rem; color: #fbbf24; font-weight: bold; text-align: center; line-height: 1.4; }
 
@@ -145,8 +149,8 @@
         .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.80rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
         .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
         
-        .wrt-badge-1 { background: var(--line1-light, rgba(59, 130, 246, 0.25)); border: 1px solid var(--line1-color, #3b82f6); color: var(--line1-color, #93c5fd); font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
-        .wrt-badge-2 { background: var(--line2-light, rgba(168, 85, 247, 0.25)); border: 1px solid var(--line2-color, #a855f7); color: var(--line2-color, #d8b4fe); font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+        .wrt-badge-1 { background: var(--active-line1-light, rgba(59, 130, 246, 0.25)); border: 1px solid var(--active-line1, #3b82f6); color: var(--active-line1, #93c5fd); font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+        .wrt-badge-2 { background: var(--active-line2-light, rgba(168, 85, 247, 0.25)); border: 1px solid var(--active-line2, #a855f7); color: var(--active-line2, #d8b4fe); font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
         
         .editable-progress {
             color: #f59e0b; font-weight: bold; white-space: nowrap; margin-left: 8px;
@@ -277,7 +281,7 @@
         </div>
     </div>
 
-    <!-- MODAL OKNO NASTAVENÍ -->
+    <!-- MODAL NASTAVENÍ -->
     <div id="settingsModal">
         <div class="settings-box">
             <div class="settings-header">
@@ -296,13 +300,22 @@
             <div class="lbl" style="margin-top:10px;">Barva pro Linku 1</div>
             <div class="settings-row">
                 <span style="font-size:0.8rem; color:#94a3b8;">Vyberte barvu:</span>
-                <input type="color" id="colorPickerLine1" class="color-picker-input" value="#3b82f6" onchange="updateLineColor(1, this.value)">
+                <input type="color" id="colorPickerLine1" class="color-picker-input" value="#3b82f6" onchange="stageColorChange(1, this.value)">
             </div>
 
             <div class="lbl" style="margin-top:10px;">Barva pro Linku 2</div>
             <div class="settings-row">
                 <span style="font-size:0.8rem; color:#94a3b8;">Vyberte barvu:</span>
-                <input type="color" id="colorPickerLine2" class="color-picker-input" value="#a855f7" onchange="updateLineColor(2, this.value)">
+                <input type="color" id="colorPickerLine2" class="color-picker-input" value="#a855f7" onchange="stageColorChange(2, this.value)">
+            </div>
+
+            <!-- SYNCHRONIZAČNÍ SEKCE (VYŽADUJE SOUHLAS OBOU) -->
+            <div class="sync-box" id="syncBox" style="display:none;">
+                <div class="sync-txt" id="syncStatusText">⚠️ Požadavek na změnu barev. Oba uživatelé musí potvrdit!</div>
+                <div style="display:flex; gap:6px; justify-content:center;">
+                    <button class="btn-yn active-yes" style="padding:6px 14px;" onclick="voteColorSync(true)">SOUHLASÍM (ANO)</button>
+                    <button class="btn-yn active-no" style="padding:6px 14px;" onclick="voteColorSync(false)">NESOUHLASÍM (NE)</button>
+                </div>
             </div>
 
             <button class="btn-reset" onclick="resetDefaultColors()">🔄 Vrátit do původního stavu barev</button>
@@ -322,10 +335,25 @@
         let singleModeLines = { 1: false, 2: false };
         let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' };
         
-        // Vlastní barvy linek (výchozí hodnoty)
-        let lineColors = {
-            1: { main: '#3b82f6', bg: '#1e3a8a', light: 'rgba(59, 130, 246, 0.25)' },
-            2: { main: '#a855f7', bg: '#581c87', light: 'rgba(168, 85, 247, 0.25)' }
+        let currentRole = 'A'; // 'A' nebo 'B'
+
+        let roleColors = {
+            A: {
+                1: { main: '#3b82f6', bg: '#1e3a8a', light: 'rgba(59, 130, 246, 0.25)' },
+                2: { main: '#a855f7', bg: '#581c87', light: 'rgba(168, 85, 247, 0.25)' }
+            },
+            B: {
+                1: { main: '#3b82f6', bg: '#1e3a8a', light: 'rgba(59, 130, 246, 0.25)' },
+                2: { main: '#a855f7', bg: '#581c87', light: 'rgba(168, 85, 247, 0.25)' }
+            }
+        };
+
+        // Stav synchronizace barev (vyžaduje ANO od A i B)
+        let colorSyncRequest = {
+            active: false,
+            role: '',
+            colors: null,
+            votes: { A: null, B: null }
         };
 
         let orders = [];
@@ -363,13 +391,21 @@
             render();
         });
 
-        db.ref('lineColors').on('value', (snapshot) => {
+        db.ref('roleColors').on('value', (snapshot) => {
             let data = snapshot.val();
             if (data) {
-                lineColors = data;
+                roleColors = data;
                 applyThemeColors();
             }
             render();
+        });
+
+        db.ref('colorSyncRequest').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) {
+                colorSyncRequest = data;
+                updateSyncUI();
+            }
         });
 
         function save() {
@@ -377,36 +413,80 @@
             db.ref('alerts').set(stockAlerts);
             db.ref('singleModeLines').set(singleModeLines);
             db.ref('singleModeCar').set(singleModeCar);
-            db.ref('lineColors').set(lineColors);
+            db.ref('roleColors').set(roleColors);
+            db.ref('colorSyncRequest').set(colorSyncRequest);
         }
 
         function applyThemeColors() {
             let root = document.documentElement;
-            root.style.setProperty('--line1-color', lineColors[1].main);
-            root.style.setProperty('--line1-bg', lineColors[1].bg);
-            root.style.setProperty('--line1-light', lineColors[1].light);
+            
+            root.style.setProperty('--active-line1', roleColors[currentRole][1].main);
+            root.style.setProperty('--active-line1-bg', roleColors[currentRole][1].bg);
+            root.style.setProperty('--active-line1-light', roleColors[currentRole][1].light);
 
-            root.style.setProperty('--line2-color', lineColors[2].main);
-            root.style.setProperty('--line2-bg', lineColors[2].bg);
-            root.style.setProperty('--line2-light', lineColors[2].light);
+            root.style.setProperty('--active-line2', roleColors[currentRole][2].main);
+            root.style.setProperty('--active-line2-bg', roleColors[currentRole][2].bg);
+            root.style.setProperty('--active-line2-light', roleColors[currentRole][2].light);
 
             let cp1 = document.getElementById('colorPickerLine1');
             let cp2 = document.getElementById('colorPickerLine2');
-            if (cp1) cp1.value = lineColors[1].main;
-            if (cp2) cp2.value = lineColors[2].main;
+            if (cp1 && cp2) {
+                cp1.value = roleColors[currentRole][1].main;
+                cp2.value = roleColors[currentRole][2].main;
+            }
         }
 
-        function updateLineColor(lineNum, hexColor) {
+        function stageColorChange(lineNum, hexColor) {
             let darkBg = lineNum === 1 ? '#1e3a8a' : '#581c87';
             let lightRgba = hexToRgba(hexColor, 0.25);
             
-            lineColors[lineNum] = {
-                main: hexColor,
-                bg: darkBg,
-                light: lightRgba
+            let newColors = JSON.parse(JSON.stringify(roleColors[currentRole]));
+            newColors[lineNum] = { main: hexColor, bg: darkBg, light: lightRgba };
+
+            // Inicializujeme požadavek na schválení oběma stranami
+            colorSyncRequest = {
+                active: true,
+                role: currentRole,
+                colors: newColors,
+                votes: { A: null, B: null }
             };
-            applyThemeColors();
+            colorSyncRequest.votes[currentRole] = true; // Kdo to navrhl, ten automaticky hlásí ANO
             save();
+        }
+
+        function voteColorSync(agree) {
+            colorSyncRequest.votes[currentRole] = agree;
+            
+            if (!agree) {
+                // Pokud někdo dal NE, požadavek se zamítne a zruší
+                alert("Změna barev byla zamítnuta (někdo dal NE).");
+                colorSyncRequest = { active: false, role: '', colors: null, votes: { A: null, B: null } };
+            } else {
+                // Pokud oba dali ANO, aplikujeme barvy pro obě role
+                if (colorSyncRequest.votes.A === true && colorSyncRequest.votes.B === true) {
+                    let targetRole = colorSyncRequest.role;
+                    roleColors[targetRole] = colorSyncRequest.colors;
+                    colorSyncRequest = { active: false, role: '', colors: null, votes: { A: null, B: null } };
+                    alert("Oba uživatelé potvrdili změnu. Barvy byly úspěšně aktualizovány!");
+                }
+            }
+            save();
+            updateSyncUI();
+        }
+
+        function updateSyncUI() {
+            let syncBox = document.getElementById('syncBox');
+            let syncTxt = document.getElementById('syncStatusText');
+            if (!syncBox || !syncTxt) return;
+
+            if (colorSyncRequest.active) {
+                syncBox.style.display = 'block';
+                let vA = colorSyncRequest.votes.A === true ? 'ANO' : (colorSyncRequest.votes.A === false ? 'NE' : 'Čeká se');
+                let vB = colorSyncRequest.votes.B === true ? 'ANO' : (colorSyncRequest.votes.B === false ? 'NE' : 'Čeká se');
+                syncTxt.innerHTML = `⚠️ Žádost o změnu barev od role <b>${colorSyncRequest.role}</b>.<br>Hlasy – Obsluha A: [<b>${vA}</b>] | VZV B: [<b>${vB}</b>]`;
+            } else {
+                syncBox.style.display = 'none';
+            }
         }
 
         function hexToRgba(hex, alpha) {
@@ -417,7 +497,7 @@
         }
 
         function resetDefaultColors() {
-            lineColors = {
+            roleColors[currentRole] = {
                 1: { main: '#3b82f6', bg: '#1e3a8a', light: 'rgba(59, 130, 246, 0.25)' },
                 2: { main: '#a855f7', bg: '#581c87', light: 'rgba(168, 85, 247, 0.25)' }
             };
@@ -426,6 +506,8 @@
         }
 
         function openSettingsModal() {
+            applyThemeColors();
+            updateSyncUI();
             document.getElementById('settingsModal').style.display = 'flex';
         }
 
@@ -472,6 +554,7 @@
             document.getElementById('appScreen').style.display = 'block';
             
             let savedTab = sessionStorage.getItem('active_tab') || selectedLoginMode || 'A';
+            currentRole = savedTab;
             
             document.getElementById('viewA').style.display = savedTab === 'A' ? 'block' : 'none';
             document.getElementById('viewB').style.display = savedTab === 'B' ? 'block' : 'none';
