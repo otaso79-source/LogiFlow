@@ -47,32 +47,29 @@
         .role-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; font-weight: bold; background: #1e3a8a; color: #3b82f6; }
         .role-badge.b { background: #581c87; color: #a855f7; }
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-settings { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
         .line-select { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .line-btn { padding: 10px 6px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.75rem; line-height: 1.3; }
-        
-        /* Opravené aktivní stavy linek – nyní respektují žlutý/aktivní obrys, pokud je potřeba */
-        .line-btn.active-1 { border-color: #f59e0b; color: #fff; background: var(--active-line1-bg, #1e3a8a); }
-        .line-btn.active-2 { border-color: #f59e0b; color: #fff; background: var(--active-line2-bg, #581c87); }
+        .line-btn.active-1 { border-color: #3b82f6; color: #fff; background: #1e3a8a; }
+        .line-btn.active-2 { border-color: #a855f7; color: #fff; background: #581c87; }
 
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
         .btn-opt { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px 4px; border-radius: 8px; font-weight: bold; text-align: center; cursor: pointer; font-size: 0.85rem; }
         
-        .btn-opt.selected-1 { border-color: #f59e0b; background: var(--active-line1-light, rgba(59, 130, 246, 0.25)); color: #fff; }
-        .btn-opt.selected-2 { border-color: #f59e0b; background: var(--active-line2-light, rgba(168, 85, 247, 0.25)); color: #fff; }
+        .btn-opt.selected-1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #93c5fd; }
+        .btn-opt.selected-2 { border-color: #a855f7; background: rgba(168, 85, 247, 0.25); color: #d8b4fe; }
 
         .single-mode-panel { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .single-mode-panel.line-1 { border-color: #f59e0b; }
-        .single-mode-panel.line-2 { border-color: #f59e0b; }
+        .single-mode-panel.line-1 { border-color: #3b82f6; }
+        .single-mode-panel.line-2 { border-color: #a855f7; }
         .single-mode-txt { font-size: 0.8rem; font-weight: bold; color: #f8fafc; }
 
         .custom-stojan-input { margin-top: 6px; display: none; gap: 6px; align-items: center; }
         .custom-stojan-input.active { display: flex; }
         .custom-stojan-input input { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.9rem; width: 100%; font-weight: bold; }
-        .custom-stojan-input.line-1 input { border-color: #f59e0b; }
-        .custom-stojan-input.line-2 input { border-color: #f59e0b; }
+        .custom-stojan-input.line-1 input { border-color: #3b82f6; }
+        .custom-stojan-input.line-2 input { border-color: #a855f7; }
 
         .note-input { width: 100%; background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; outline: none; }
         .note-input:focus { border-color: #f59e0b; }
@@ -81,11 +78,11 @@
         .val { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
         .btn-submit { width: 100%; padding: 12px; background: #f59e0b; color: #0f172a; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
 
-        .vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid var(--active-line2, #a855f7); }
-        .vzv-card.l1-card { border-top-color: var(--active-line1, #3b82f6); }
+        .vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid #3b82f6; }
+        .vzv-card.l2 { border-top-color: #a855f7; }
         .vzv-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: var(--active-line1, #3b82f6); }
-        .badge.l2 { background: var(--active-line2, #a855f7); }
+        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: #3b82f6; }
+        .badge.l2 { background: #a855f7; }
         .next-txt { font-size: 0.8rem; color: #f59e0b; font-weight: bold; margin-top: 2px; line-height: 1.3; }
         .next-txt.none { color: #64748b; font-weight: normal; }
         
@@ -97,25 +94,6 @@
         .box-unit.active { background: #0f172a; color: #f8fafc; border-color: #334155; }
 
         .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-
-        /* MODAL NASTAVENÍ */
-        #settingsModal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px;
-        }
-        .settings-box {
-            background: #1e293b; border: 2px solid #f59e0b; border-radius: 12px;
-            width: 100%; max-width: 360px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            max-height: 90vh; overflow-y: auto;
-        }
-        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .settings-title { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
-        .btn-close { background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
-
-        .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: #0f172a; padding: 10px; border-radius: 8px; }
-        .color-picker-input { width: 40px; height: 30px; border: none; border-radius: 4px; cursor: pointer; background: transparent; }
-
-        .btn-reset { width: 100%; padding: 10px; background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
         .permanent-banner {
             background: #1e293b; border: 1px solid #334155; border-radius: 8px;
@@ -131,15 +109,15 @@
         .vzv-alert-title { font-size: 0.8rem; font-weight: bold; color: #ef4444; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
         .vzv-alert-row { display: flex; gap: 6px; margin-bottom: 8px; }
         .vzv-select { flex: 1; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; outline: none; }
-        .vzv-num-input { width: 110px; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.85rem; text-align: center; font-weight: bold; outline: none; }
+        .vzv-num-input { width: 70px; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.85rem; text-align: center; font-weight: bold; outline: none; }
         .btn-send-alert { width: 100%; padding: 9px; background: #ef4444; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
 
         .empty { text-align: center; color: #64748b; padding: 12px; font-size: 0.85rem; }
         .done-msg { background: #065f46; color: #34d399; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
         
         .note-tag { padding: 4px 8px; font-size: 0.75rem; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
-        .note-tag.line-1 { background: var(--active-line1-light, rgba(59, 130, 246, 0.15)); border-left: 3px solid var(--active-line1, #3b82f6); color: var(--active-line1, #93c5fd); }
-        .note-tag.line-2 { background: var(--active-line2-light, rgba(168, 85, 247, 0.15)); border-left: 3px solid var(--active-line2, #a855f7); color: var(--active-line2, #d8b4fe); }
+        .note-tag.line-1 { background: rgba(59, 130, 246, 0.15); border-left: 3px solid #3b82f6; color: #93c5fd; }
+        .note-tag.line-2 { background: rgba(168, 85, 247, 0.15); border-left: 3px solid #a855f7; color: #d8b4fe; }
 
         .vzv-single-mode-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.75rem; color: #fbbf24; font-weight: bold; text-align: center; line-height: 1.4; }
 
@@ -147,8 +125,9 @@
         .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.80rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
         .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
         
-        .wrt-badge-1 { background: var(--active-line1-light, rgba(59, 130, 246, 0.25)); border: 1px solid var(--active-line1, #3b82f6); color: var(--active-line1, #93c5fd); font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
-        .wrt-badge-2 { background: var(--active-line2-light, rgba(168, 85, 247, 0.25)); border: 1px solid var(--active-line2, #a855f7); color: var(--active-line2, #d8b4fe); font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+        /* Barevné odznaky pro WRT podle linky v seznamu odeslaných */
+        .wrt-badge-1 { background: rgba(59, 130, 246, 0.25); border: 1px solid #3b82f6; color: #93c5fd; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+        .wrt-badge-2 { background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #d8b4fe; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
         
         .editable-progress {
             color: #f59e0b; font-weight: bold; white-space: nowrap; margin-left: 8px;
@@ -179,9 +158,16 @@
         <div class="header">
             <div class="logo">⚡ LogiFlow</div>
             <div class="header-right">
-                <button class="btn-settings" onclick="openSettingsModal()" title="Nastavení">⚙️ Nastavení</button>
                 <span id="roleBadge" class="role-badge">Obsluha A</span>
                 <button class="btn-logout" onclick="logout()" title="Odhlásit tento telefon">🔓 Odhlásit</button>
+            </div>
+        </div>
+
+        <div class="permanent-banner">
+            <div class="banner-txt">🔔 Zvukové upozornění a notifikace</div>
+            <div class="banner-btns">
+                <button class="btn-yn active-yes" id="btnNotifYes" onclick="toggleNotifications(true)">ANO</button>
+                <button class="btn-yn" id="btnNotifNo" onclick="toggleNotifications(false)">NE</button>
             </div>
         </div>
 
@@ -249,7 +235,7 @@
                 <div id="l2Body"></div>
             </div>
             
-            <div class="vzv-card l1-card">
+            <div class="vzv-card">
                 <div class="vzv-hdr">
                     <div>
                         <span class="badge">Box: 3 - 4</span>
@@ -268,7 +254,7 @@
                         <option value="Audi / Seat">Audi / Seat</option>
                         <option value="Tayron">Tayron</option>
                     </select>
-                    <input type="number" id="vzvCountInput" class="vzv-num-input" placeholder="Zde napiš počet" value="" min="1" max="99">
+                    <input type="number" id="vzvCountInput" class="vzv-num-input" placeholder="Počet" value="5" min="1" max="99">
                 </div>
                 <button class="btn-send-alert" onclick="sendCustomStockAlert()">📢 ODESLAT HLÁŠENÍ OBSLUZE A</button>
             </div>
@@ -276,38 +262,6 @@
             <div id="doneBanner" class="done-msg" style="display:none;">
                 ✓ Vše zpracováno! Čekám na novou objednávku.
             </div>
-        </div>
-    </div>
-
-    <!-- MODAL NASTAVENÍ -->
-    <div id="settingsModal">
-        <div class="settings-box">
-            <div class="settings-header">
-                <div class="settings-title">⚙️ Nastavení systému</div>
-                <button class="btn-close" onclick="closeSettingsModal()">✕</button>
-            </div>
-
-            <div class="settings-row">
-                <span style="font-size:0.85rem; font-weight:bold;">🔔 Zvukové notifikace</span>
-                <div class="banner-btns">
-                    <button class="btn-yn active-yes" id="setNotifYes" onclick="toggleNotifications(true)">ANO</button>
-                    <button class="btn-yn" id="setNotifNo" onclick="toggleNotifications(false)">NE</button>
-                </div>
-            </div>
-
-            <div class="lbl" style="margin-top:10px;">Barva pro Linku 1</div>
-            <div class="settings-row">
-                <span style="font-size:0.8rem; color:#94a3b8;">Vyberte barvu:</span>
-                <input type="color" id="colorPickerLine1" class="color-picker-input" value="#3b82f6" onchange="updateLineColor(1, this.value)">
-            </div>
-
-            <div class="lbl" style="margin-top:10px;">Barva pro Linku 2</div>
-            <div class="settings-row">
-                <span style="font-size:0.8rem; color:#94a3b8;">Vyberte barvu:</span>
-                <input type="color" id="colorPickerLine2" class="color-picker-input" value="#a855f7" onchange="updateLineColor(2, this.value)">
-            </div>
-
-            <button class="btn-reset" onclick="resetDefaultColors()">🔄 Vrátit do původního stavu barev</button>
         </div>
     </div>
 
@@ -323,20 +277,6 @@
         let curLine = 1, curCar = 'Tiguan', curStojany = 3;
         let singleModeLines = { 1: false, 2: false };
         let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' };
-        
-        let currentRole = 'A'; // 'A' nebo 'B'
-
-        let roleColors = {
-            A: {
-                1: { main: '#3b82f6', bg: '#1e3a8a', light: 'rgba(59, 130, 246, 0.25)' },
-                2: { main: '#a855f7', bg: '#581c87', light: 'rgba(168, 85, 247, 0.25)' }
-            },
-            B: {
-                1: { main: '#3b82f6', bg: '#1e3a8a', light: 'rgba(59, 130, 246, 0.25)' },
-                2: { main: '#a855f7', bg: '#581c87', light: 'rgba(168, 85, 247, 0.25)' }
-            }
-        };
-
         let orders = [];
         let stockAlerts = [];
         let lastOrderCount = 0;
@@ -372,78 +312,11 @@
             render();
         });
 
-        db.ref('roleColors').on('value', (snapshot) => {
-            let data = snapshot.val();
-            if (data) {
-                roleColors = data;
-                applyThemeColors();
-            }
-            render();
-        });
-
         function save() {
             db.ref('orders').set(orders);
             db.ref('alerts').set(stockAlerts);
             db.ref('singleModeLines').set(singleModeLines);
             db.ref('singleModeCar').set(singleModeCar);
-            db.ref('roleColors').set(roleColors);
-        }
-
-        function applyThemeColors() {
-            let root = document.documentElement;
-            
-            root.style.setProperty('--active-line1', roleColors[currentRole][1].main);
-            root.style.setProperty('--active-line1-bg', roleColors[currentRole][1].bg);
-            root.style.setProperty('--active-line1-light', roleColors[currentRole][1].light);
-
-            root.style.setProperty('--active-line2', roleColors[currentRole][2].main);
-            root.style.setProperty('--active-line2-bg', roleColors[currentRole][2].bg);
-            root.style.setProperty('--active-line2-light', roleColors[currentRole][2].light);
-
-            let cp1 = document.getElementById('colorPickerLine1');
-            let cp2 = document.getElementById('colorPickerLine2');
-            if (cp1 && cp2) {
-                cp1.value = roleColors[currentRole][1].main;
-                cp2.value = roleColors[currentRole][2].main;
-            }
-        }
-
-        function updateLineColor(lineNum, hexColor) {
-            let darkBg = lineNum === 1 ? '#1e3a8a' : '#581c87';
-            let lightRgba = hexToRgba(hexColor, 0.25);
-            
-            roleColors[currentRole][lineNum] = {
-                main: hexColor,
-                bg: darkBg,
-                light: lightRgba
-            };
-            applyThemeColors();
-            save();
-        }
-
-        function hexToRgba(hex, alpha) {
-            let c = hex.replace('#', '');
-            if (c.length === 3) c = c.split('').map(x => x + x).join('');
-            let num = parseInt(c, 16);
-            return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
-        }
-
-        function resetDefaultColors() {
-            roleColors[currentRole] = {
-                1: { main: '#3b82f6', bg: '#1e3a8a', light: 'rgba(59, 130, 246, 0.25)' },
-                2: { main: '#a855f7', bg: '#581c87', light: 'rgba(168, 85, 247, 0.25)' }
-            };
-            applyThemeColors();
-            save();
-        }
-
-        function openSettingsModal() {
-            applyThemeColors();
-            document.getElementById('settingsModal').style.display = 'flex';
-        }
-
-        function closeSettingsModal() {
-            document.getElementById('settingsModal').style.display = 'none';
         }
 
         function setLoginMode(mode) {
@@ -485,7 +358,6 @@
             document.getElementById('appScreen').style.display = 'block';
             
             let savedTab = sessionStorage.getItem('active_tab') || selectedLoginMode || 'A';
-            currentRole = savedTab;
             
             document.getElementById('viewA').style.display = savedTab === 'A' ? 'block' : 'none';
             document.getElementById('viewB').style.display = savedTab === 'B' ? 'block' : 'none';
@@ -499,7 +371,6 @@
                 badge.className = 'role-badge b';
             }
 
-            applyThemeColors();
             render();
         }
 
@@ -509,14 +380,14 @@
 
         function toggleNotifications(enable) {
             notificationsEnabled = enable;
-            const btnYes = document.getElementById('setNotifYes');
-            const btnNo = document.getElementById('setNotifNo');
+            const btnYes = document.getElementById('btnNotifYes');
+            const btnNo = document.getElementById('btnNotifNo');
             if (enable) {
                 btnYes.className = 'btn-yn active-yes';
                 btnNo.className = 'btn-yn';
             } else {
                 btnYes.className = 'btn-yn';
-                btnNo.className = 'btn-yn';
+                btnNo.className = 'btn-yn active-no';
             }
         }
 
@@ -671,13 +542,8 @@
 
         function sendCustomStockAlert() {
             let variant = document.getElementById('vzvVariantSelect').value;
-            let count = document.getElementById('vzvCountInput').value;
-            if (!count) {
-                alert("Prosím zadejte počet obalů do pole 'Zde napiš počet'.");
-                return;
-            }
+            let count = document.getElementById('vzvCountInput').value || '5';
             stockAlerts.push({ id: Date.now(), variant: variant, count: count });
-            document.getElementById('vzvCountInput').value = '';
             save();
         }
 
@@ -721,6 +587,8 @@
                     let lineClass = o.line === 1 ? 'line-1' : 'line-2';
                     let noteHtml = o.note ? `<div class="note-tag ${lineClass}">📝 ${o.note}</div>` : '';
                     let remainingWRT = Math.max(0, o.stojany - o.done);
+                    
+                    // Rozlišení barvy odznaku WRT podle linky (Linka 1 = modrá, Linka 2 = fialová)
                     let wrtBadgeClass = o.line === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
 
                     listA.innerHTML += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
