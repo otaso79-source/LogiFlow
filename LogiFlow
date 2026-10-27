@@ -89,13 +89,8 @@
         .boxes-row { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
         .box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; }
         
-        /* Zelená = zavezeno */
         .box-unit.done { background: #065f46; color: #34d399; border-color: #059669; }
-        
-        /* Červená = dovést (čeká na zavezení) */
         .box-unit.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
-        
-        /* Neutrální (přebytečné pozice) */
         .box-unit.active { background: #0f172a; color: #f8fafc; border-color: #334155; }
 
         .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
@@ -130,7 +125,9 @@
         .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.80rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
         .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
         
-        .wrt-badge { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+        /* Barevné odznaky pro WRT podle linky v seznamu odeslaných */
+        .wrt-badge-1 { background: rgba(59, 130, 246, 0.25); border: 1px solid #3b82f6; color: #93c5fd; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+        .wrt-badge-2 { background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #d8b4fe; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
         
         .editable-progress {
             color: #f59e0b; font-weight: bold; white-space: nowrap; margin-left: 8px;
@@ -590,10 +587,13 @@
                     let lineClass = o.line === 1 ? 'line-1' : 'line-2';
                     let noteHtml = o.note ? `<div class="note-tag ${lineClass}">📝 ${o.note}</div>` : '';
                     let remainingWRT = Math.max(0, o.stojany - o.done);
+                    
+                    // Rozlišení barvy odznaku WRT podle linky (Linka 1 = modrá, Linka 2 = fialová)
+                    let wrtBadgeClass = o.line === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
 
                     listA.innerHTML += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="flex-grow:1;"><b>${o.car}</b> <span class="wrt-badge">Zbývá ${remainingWRT}/${o.stojany} WRT</span> - Linka ${o.line}</span>
+                            <span style="flex-grow:1;"><b>${o.car}</b> <span class="${wrtBadgeClass}">Zbývá ${remainingWRT}/${o.stojany} WRT</span> - Linka ${o.line}</span>
                             <span onclick="editOrderProgress(${o.id})" class="editable-progress" title="Kliknutím upravit/zkalibrovat stav obalů">📦 ${o.done}/${o.total} obalů</span>
                             <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
                         </div>
@@ -651,7 +651,6 @@
                             let cur = lOrders[0];
                             let boxes = '';
                             for (let i = 1; i <= cur.total; i++) {
-                                // Zelená = zavezeno (i <= done), Červená = dovést (i > done)
                                 let st = i <= cur.done ? 'done' : 'pending';
                                 boxes += `<div class="box-unit ${st}">#${i}</div>`;
                             }
