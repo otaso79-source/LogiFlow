@@ -142,7 +142,7 @@
         .note-tag.line-2 { background: rgba(168, 85, 247, 0.15); border-left: 3px solid #a855f7; color: #d8b4fe; }
 
         /* Upozornění pro VZV v jednovariantním režimu */
-        .vzv-single-mode-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.75rem; color: #fbbf24; font-weight: bold; text-align: center; line-height: 1.3; }
+        .vzv-single-mode-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.75rem; color: #fbbf24; font-weight: bold; text-align: center; line-height: 1.4; }
 
         .btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 8px; flex-shrink: 0; }
         .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
@@ -204,7 +204,7 @@
                 <div class="btn-opt" onclick="setCar('Seat', this)">Seat</div>
             </div>
 
-            <!-- JEDNOVARIANTNÍ REŽIM PŘEPÍNAČ (PŘESUNUT POD PRODUKT) -->
+            <!-- JEDNOVARIANTNÍ REŽIM PŘEPÍNAČ -->
             <div class="single-mode-panel line-1" id="singleModePanel">
                 <div class="single-mode-txt">🔒 Režim: Jede pouze 1 varianta</div>
                 <div class="banner-btns">
@@ -354,6 +354,7 @@
         let notificationsEnabled = true;
         let curLine = 1, curCar = 'Tiguan', curStojany = 3;
         let singleModeLines = { 1: false, 2: false };
+        let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' }; // Pamatuje si zvolený produkt pro jednovariantní režim
         let orders = [];
         let stockAlerts = [];
         let lastOrderCount = 0;
@@ -386,10 +387,17 @@
             render();
         });
 
+        db.ref('singleModeCar').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) singleModeCar = data;
+            render();
+        });
+
         function save() {
             db.ref('orders').set(orders);
             db.ref('alerts').set(stockAlerts);
             db.ref('singleModeLines').set(singleModeLines);
+            db.ref('singleModeCar').set(singleModeCar);
         }
 
         function setLoginMode(mode) {
@@ -486,8 +494,11 @@
 
         function toggleSingleMode(enable) {
             singleModeLines[curLine] = enable;
+            if (enable) {
+                singleModeCar[curLine] = curCar; // Uloží aktuálně zvolený produkt jako stálou jednovariantní výrobu
+            }
             save();
-            updateDynamicTheme(); // OKAMŽITÁ AKTUALIZACE VZHLEDU BEZ PROKLIKÁVÁNÍ
+            updateDynamicTheme();
             if (enable) {
                 alert(`Zapnutá funkce na Lince ${curLine}: Výroba jednoho produktu (${curCar})`);
             }
@@ -565,14 +576,14 @@
             let ob = Math.ceil(ks / 9);
             let note = document.getElementById('noteInput').value.trim();
 
+            // Automatické vypnutí jednovariantního režimu při zadání nové objednávky (změna výroby)
             if (singleModeLines[curLine]) {
-                let singleNote = `⚠️ JEDE POUZE JEDNA VARIANTA: ${curCar}`;
-                note = note ? `${singleNote} | ${note}` : singleNote;
+                singleModeLines[curLine] = false;
             }
 
             orders.push({ 
                 id: Date.now(), line: curLine, car: curCar, 
-                stojany: curStojany, total: ob, done: 0, note: note, singleMode: singleModeLines[curLine] 
+                stojany: curStojany, total: ob, done: 0, note: note 
             });
 
             document.getElementById('noteInput').value = '';
@@ -705,6 +716,11 @@
                 noteText += " | ⚠️ Neznámý stav za krytem, nutná kontrola VZV!";
             }
 
+            // Odesláním kalibrace také vypneme jednovariantní režim (změna toku)
+            if (singleModeLines[calibLine]) {
+                singleModeLines[calibLine] = false;
+            }
+
             orders.push({ 
                 id: Date.now(), 
                 line: calibLine, 
@@ -785,6 +801,7 @@
                 let next = document.getElementById(`l${l}Next`);
                 let body = document.getElementById(`l${l}Body`);
                 let isSingle = singleModeLines[l];
+                let currentSingleCar = singleModeCar[l] || 'Tiguan';
 
                 if (title && next && body) {
                     if (lOrders.length === 0 && !isSingle) {
@@ -794,7 +811,8 @@
                         body.innerHTML = '<div class="empty">Linka je volná</div>';
                     } else {
                         if (isSingle && lOrders.length === 0) {
-                            title.innerText = 'Stálý jednovariantní režim';
+                            // Zobrazení produktu a textu "výroba jedné varianty" pro VZV
+                            title.innerText = `${currentSingleCar} výroba jedné varianty`;
                             next.className = 'next-txt none';
                             next.innerText = 'Následuje ➔ Žádné';
                         } else {
@@ -815,6 +833,7 @@
                             }
                         }
 
+                        // Ponechání hlášky pod tím v jednovariantním režimu
                         let singleModeAlertHtml = isSingle ? `
                             <div class="vzv-single-mode-box">
                                 ⚠️ ZAVÁŽET POUZE JEDNOU VARIANTOU.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!
