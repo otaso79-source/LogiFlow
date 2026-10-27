@@ -195,15 +195,6 @@
                 <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.65rem; font-weight:normal;">BOX 2 - 1</span></div>
             </div>
 
-            <!-- JEDNOVARIANTNÍ REŽIM PŘEPÍNAČ -->
-            <div class="single-mode-panel line-1" id="singleModePanel">
-                <div class="single-mode-txt">🔒 Režim: Jede pouze 1 varianta</div>
-                <div class="banner-btns">
-                    <button class="btn-yn" id="btnSingleYes" onclick="toggleSingleMode(true)">ZAP</button>
-                    <button class="btn-yn active-no" id="btnSingleNo" onclick="toggleSingleMode(false)">VYP</button>
-                </div>
-            </div>
-
             <div class="lbl">Produkt</div>
             <div class="grid-3" id="carGrid">
                 <div class="btn-opt selected-1" onclick="setCar('Tiguan', this)">Tiguan</div>
@@ -211,6 +202,15 @@
                 <div class="btn-opt" onclick="setCar('Tayron', this)">Tayron</div>
                 <div class="btn-opt" onclick="setCar('Audi', this)">Audi</div>
                 <div class="btn-opt" onclick="setCar('Seat', this)">Seat</div>
+            </div>
+
+            <!-- JEDNOVARIANTNÍ REŽIM PŘEPÍNAČ (PŘESUNUT POD PRODUKT) -->
+            <div class="single-mode-panel line-1" id="singleModePanel">
+                <div class="single-mode-txt">🔒 Režim: Jede pouze 1 varianta</div>
+                <div class="banner-btns">
+                    <button class="btn-yn" id="btnSingleYes" onclick="toggleSingleMode(true)">ZAP</button>
+                    <button class="btn-yn active-no" id="btnSingleNo" onclick="toggleSingleMode(false)">VYP</button>
+                </div>
             </div>
 
             <div class="lbl">Počet Stojanů WRT</div>
@@ -353,7 +353,7 @@
         const SYSTEM_PASSWORD = '1234';
         let notificationsEnabled = true;
         let curLine = 1, curCar = 'Tiguan', curStojany = 3;
-        let singleModeLines = { 1: false, 2: false }; // Paměť pro jednovariantní režim linek
+        let singleModeLines = { 1: false, 2: false };
         let orders = [];
         let stockAlerts = [];
         let lastOrderCount = 0;
@@ -487,6 +487,7 @@
         function toggleSingleMode(enable) {
             singleModeLines[curLine] = enable;
             save();
+            updateDynamicTheme(); // OKAMŽITÁ AKTUALIZACE VZHLEDU BEZ PROKLIKÁVÁNÍ
             if (enable) {
                 alert(`Zapnutá funkce na Lince ${curLine}: Výroba jednoho produktu (${curCar})`);
             }
