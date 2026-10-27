@@ -90,9 +90,8 @@
         .box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; }
         .box-unit.done { background: #065f46; color: #34d399; border-color: #059669; }
         
-        /* Barvy aktivního boxu podle linky (Modrá pro Linku 1, Fialová pro Linku 2) */
-        .box-unit.active.line-1 { background: rgba(59, 130, 246, 0.3); color: #93c5fd; border-color: #3b82f6; }
-        .box-unit.active.line-2 { background: rgba(168, 85, 247, 0.3); color: #d8b4fe; border-color: #a855f7; }
+        /* Aktivní box bez barevného podsvícení (zůstává neutrální tmavý) */
+        .box-unit.active { background: #0f172a; color: #f8fafc; border-color: #334155; }
 
         .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
@@ -646,9 +645,8 @@
                         } else {
                             let cur = lOrders[0];
                             let boxes = '';
-                            let lineBoxClass = cur.line === 1 ? 'line-1' : 'line-2';
                             for (let i = 1; i <= cur.total; i++) {
-                                let st = i <= cur.done ? 'done' : (i === cur.done + 1 ? `active ${lineBoxClass}` : '');
+                                let st = i <= cur.done ? 'done' : (i === cur.done + 1 ? 'active' : '');
                                 boxes += `<div class="box-unit ${st}">#${i}</div>`;
                             }
 
