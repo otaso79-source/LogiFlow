@@ -58,9 +58,14 @@
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
         .btn-opt { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px 4px; border-radius: 8px; font-weight: bold; text-align: center; cursor: pointer; font-size: 0.85rem; }
         
-        /* Dynamické styly pro vybrané prvky podle linky */
         .btn-opt.selected-1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #93c5fd; }
         .btn-opt.selected-2 { border-color: #a855f7; background: rgba(168, 85, 247, 0.25); color: #d8b4fe; }
+
+        /* Panel pro jednovariantní režim */
+        .single-mode-panel { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .single-mode-panel.line-1 { border-color: #3b82f6; }
+        .single-mode-panel.line-2 { border-color: #a855f7; }
+        .single-mode-txt { font-size: 0.8rem; font-weight: bold; color: #f8fafc; }
 
         .custom-stojan-input { margin-top: 6px; display: none; gap: 6px; align-items: center; }
         .custom-stojan-input.active { display: flex; }
@@ -132,10 +137,12 @@
         .empty { text-align: center; color: #64748b; padding: 12px; font-size: 0.85rem; }
         .done-msg { background: #065f46; color: #34d399; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
         
-        /* Barevné rozlišení linek v poznámkách / štítcích */
         .note-tag { padding: 4px 8px; font-size: 0.75rem; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
         .note-tag.line-1 { background: rgba(59, 130, 246, 0.15); border-left: 3px solid #3b82f6; color: #93c5fd; }
         .note-tag.line-2 { background: rgba(168, 85, 247, 0.15); border-left: 3px solid #a855f7; color: #d8b4fe; }
+
+        /* Upozornění pro VZV v jednovariantním režimu */
+        .vzv-single-mode-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.75rem; color: #fbbf24; font-weight: bold; text-align: center; line-height: 1.3; }
 
         .btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 8px; flex-shrink: 0; }
         .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
@@ -186,6 +193,15 @@
             <div class="line-select">
                 <div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1<br><span style="font-size:0.65rem; font-weight:normal;">BOX 4 - 3</span></div>
                 <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.65rem; font-weight:normal;">BOX 2 - 1</span></div>
+            </div>
+
+            <!-- JEDNOVARIANTNÍ REŽIM PŘEPÍNAČ -->
+            <div class="single-mode-panel line-1" id="singleModePanel">
+                <div class="single-mode-txt">🔒 Režim: Jede pouze 1 varianta</div>
+                <div class="banner-btns">
+                    <button class="btn-yn" id="btnSingleYes" onclick="toggleSingleMode(true)">ZAP</button>
+                    <button class="btn-yn active-no" id="btnSingleNo" onclick="toggleSingleMode(false)">VYP</button>
+                </div>
             </div>
 
             <div class="lbl">Produkt</div>
@@ -337,6 +353,7 @@
         const SYSTEM_PASSWORD = '1234';
         let notificationsEnabled = true;
         let curLine = 1, curCar = 'Tiguan', curStojany = 3;
+        let singleModeLines = { 1: false, 2: false }; // Paměť pro jednovariantní režim linek
         let orders = [];
         let stockAlerts = [];
         let lastOrderCount = 0;
@@ -363,9 +380,16 @@
             render();
         });
 
+        db.ref('singleModeLines').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) singleModeLines = data;
+            render();
+        });
+
         function save() {
             db.ref('orders').set(orders);
             db.ref('alerts').set(stockAlerts);
+            db.ref('singleModeLines').set(singleModeLines);
         }
 
         function setLoginMode(mode) {
@@ -460,21 +484,30 @@
             setTimeout(() => { document.title = "Logistik - Systém Závozů"; }, 5000);
         }
 
+        function toggleSingleMode(enable) {
+            singleModeLines[curLine] = enable;
+            save();
+            if (enable) {
+                alert(`Zapnutá funkce na Lince ${curLine}: Výroba jednoho produktu (${curCar})`);
+            }
+            render();
+        }
+
         function updateDynamicTheme() {
             let activeClass = curLine === 1 ? 'selected-1' : 'selected-2';
+            let panelClass = curLine === 1 ? 'single-mode-panel line-1' : 'single-mode-panel line-2';
             let customBoxClass = curLine === 1 ? 'custom-stojan-input line-1 active' : 'custom-stojan-input line-2 active';
 
-            // Přeznačení produktů
+            document.getElementById('singleModePanel').className = panelClass;
+            
+            let isSingleActive = singleModeLines[curLine];
+            document.getElementById('btnSingleYes').className = 'btn-yn ' + (isSingleActive ? 'active-yes' : '');
+            document.getElementById('btnSingleNo').className = 'btn-yn ' + (!isSingleActive ? 'active-no' : '');
+
             document.querySelectorAll('#carGrid .btn-opt').forEach(b => {
                 b.classList.remove('selected-1', 'selected-2');
                 if (b.innerText === curCar) b.classList.add(activeClass);
             });
-
-            // Přeznačení stojanů
-            let isCustom = !document.getElementById('opt3WRT').classList.contains('selected-1') && 
-                           !document.getElementById('opt3WRT').classList.contains('selected-2') &&
-                           !document.getElementById('opt6WRT').classList.contains('selected-1') && 
-                           !document.getElementById('opt6WRT').classList.contains('selected-2');
 
             document.querySelectorAll('#opt3WRT, #opt6WRT, #optCustomWRT').forEach(b => b.classList.remove('selected-1', 'selected-2'));
             
@@ -531,9 +564,14 @@
             let ob = Math.ceil(ks / 9);
             let note = document.getElementById('noteInput').value.trim();
 
+            if (singleModeLines[curLine]) {
+                let singleNote = `⚠️ JEDE POUZE JEDNA VARIANTA: ${curCar}`;
+                note = note ? `${singleNote} | ${note}` : singleNote;
+            }
+
             orders.push({ 
                 id: Date.now(), line: curLine, car: curCar, 
-                stojany: curStojany, total: ob, done: 0, note: note 
+                stojany: curStojany, total: ob, done: 0, note: note, singleMode: singleModeLines[curLine] 
             });
 
             document.getElementById('noteInput').value = '';
@@ -725,10 +763,8 @@
             if (listA) {
                 listA.innerHTML = orders.length === 0 ? '<div class="empty">Žádné aktivní objednávky</div>' : '';
                 orders.forEach(o => {
-                    // Barevně odlišená poznámka / štítek podle linky (Linka 1 modře, Linka 2 fialově)
                     let lineClass = o.line === 1 ? 'line-1' : 'line-2';
                     let noteHtml = o.note ? `<div class="note-tag ${lineClass}">📝 ${o.note}</div>` : '';
-                    
                     let remainingWRT = Math.max(0, o.stojany - o.done);
 
                     listA.innerHTML += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
@@ -747,55 +783,74 @@
                 let title = document.getElementById(`l${l}Title`);
                 let next = document.getElementById(`l${l}Next`);
                 let body = document.getElementById(`l${l}Body`);
+                let isSingle = singleModeLines[l];
 
                 if (title && next && body) {
-                    if (lOrders.length === 0) {
+                    if (lOrders.length === 0 && !isSingle) {
                         title.innerText = 'Žádná objednávka';
                         next.className = 'next-txt none';
                         next.innerText = 'Následuje ➔ Žádné';
                         body.innerHTML = '<div class="empty">Linka je volná</div>';
                     } else {
-                        let cur = lOrders[0];
-                        let nxt1 = lOrders[1];
-                        let nxt2 = lOrders[2];
-                        
-                        title.innerText = `${cur.car} (${cur.stojany} WRT)`;
-                        
-                        if (nxt1) {
-                            next.className = 'next-txt';
-                            let queueText = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
-                            if (nxt2) queueText += ` ➔ <b>${nxt2.car}</b> (${nxt2.total} ob.)`;
-                            next.innerHTML = queueText;
-                        } else {
+                        if (isSingle && lOrders.length === 0) {
+                            title.innerText = 'Stálý jednovariantní režim';
                             next.className = 'next-txt none';
                             next.innerText = 'Následuje ➔ Žádné';
+                        } else {
+                            let cur = lOrders[0];
+                            let nxt1 = lOrders[1];
+                            let nxt2 = lOrders[2];
+                            
+                            title.innerText = `${cur.car} (${cur.stojany} WRT)`;
+                            
+                            if (nxt1) {
+                                next.className = 'next-txt';
+                                let queueText = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
+                                if (nxt2) queueText += ` ➔ <b>${nxt2.car}</b> (${nxt2.total} ob.)`;
+                                next.innerHTML = queueText;
+                            } else {
+                                next.className = 'next-txt none';
+                                next.innerText = 'Následuje ➔ Žádné';
+                            }
                         }
 
-                        let boxes = '';
-                        for (let i = 1; i <= cur.total; i++) {
-                            let st = i <= cur.done ? 'done' : (i === cur.done + 1 ? 'active' : '');
-                            boxes += `<div class="box-unit ${st}">#${i}</div>`;
-                        }
-
-                        let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
-                        let lineClass = cur.line === 1 ? 'line-1' : 'line-2';
-                        let noteHtml = cur.note ? `<div class="note-tag ${lineClass}">📝 Poznámka: ${cur.note}</div>` : '';
-
-                        body.innerHTML = `
-                            ${noteHtml}
-                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; color:#94a3b8;">
-                                <span>Zbývá zavezt: <b>${cur.total - cur.done} ob.</b></span>
+                        let singleModeAlertHtml = isSingle ? `
+                            <div class="vzv-single-mode-box">
+                                ⚠️ ZAVÁŽET POUZE JEDNOU VARIANTOU.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!
                             </div>
-                            <div class="boxes-row">${boxes}</div>
-                            <button class="btn-zavez" onclick="zavezt(${cur.id})">${btnText}</button>
-                        `;
+                        ` : '';
+
+                        if (lOrders.length === 0) {
+                            body.innerHTML = singleModeAlertHtml + '<div class="empty">Čeká se na zadání objednávky</div>';
+                        } else {
+                            let cur = lOrders[0];
+                            let boxes = '';
+                            for (let i = 1; i <= cur.total; i++) {
+                                let st = i <= cur.done ? 'done' : (i === cur.done + 1 ? 'active' : '');
+                                boxes += `<div class="box-unit ${st}">#${i}</div>`;
+                            }
+
+                            let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
+                            let lineClass = cur.line === 1 ? 'line-1' : 'line-2';
+                            let noteHtml = cur.note ? `<div class="note-tag ${lineClass}">📝 Poznámka: ${cur.note}</div>` : '';
+
+                            body.innerHTML = `
+                                ${singleModeAlertHtml}
+                                ${noteHtml}
+                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; color:#94a3b8;">
+                                    <span>Zbývá zavezt: <b>${cur.total - cur.done} ob.</b></span>
+                                </div>
+                                <div class="boxes-row">${boxes}</div>
+                                <button class="btn-zavez" onclick="zavezt(${cur.id})">${btnText}</button>
+                            `;
+                        }
                     }
                 }
             });
 
             let doneBanner = document.getElementById('doneBanner');
             if (doneBanner) {
-                doneBanner.style.display = orders.length === 0 ? 'block' : 'none';
+                doneBanner.style.display = (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2]) ? 'block' : 'none';
             }
         }
     </script>
