@@ -673,14 +673,13 @@
             let o = orders.find(x => x.id === id);
             if (!o) return;
             
-            let promptText = 
-                `Srovnaní obalů. Zadejte počet pro VZV.\n\n` +
-                `Info/TV: Ready - Připravený obal\n` +
-                `Ready - Plní se : 2 obaly\n` +
-                `Plná - Plní se : 3 obaly\n\n` +
-                `Vždy před zadáním se ujistěte zda počet sedí !\n\n` +
-                `Kalibrace / Úprava stavu obalů pro ${o.car} (Celkem: ${o.total} obalů):\n` +
-                `Zadejte aktuální počet zavezených obalů (0 až ${o.total}):`;
+            let promptText = "Srovnání obalů. Zadejte počet pro VZV.\n\n" +
+                             "Info/TV: Ready - Připravený obal\n" +
+                             "Ready - Plní se : 2 obaly\n" +
+                             "Plná - Plní se : 3 obaly\n\n" +
+                             "Vždy před zadáním se ujistěte zda počet sedí !\n\n" +
+                             "Kalibrace / Úprava stavu obalů pro " + o.car + " (Celkem: " + o.total + " obalů):\n" +
+                             "Zadejte aktuální počet zavezených obalů (0 až " + o.total + "):";
 
             let input = prompt(promptText, o.done);
             if (input === null) return;
