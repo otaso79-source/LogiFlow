@@ -237,7 +237,7 @@
             </div>
 
             <button class="btn-submit" onclick="addOrder()">POSLAT OBJEDNÁVKU VZV</button>
-            <div class="lbl" style="margin-top:16px;">Odesláno na VZV (Probíhají objednávky / Aktivní režimy)</div>
+            <div class="lbl" style="margin-top:16px;">Odesláno na VZV (Probíhající objednávky / Aktivní režimy)</div>
             <div id="listA"></div>
         </div>
 
