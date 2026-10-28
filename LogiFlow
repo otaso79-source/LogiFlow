@@ -237,7 +237,7 @@
             </div>
 
             <button class="btn-submit" onclick="addOrder()">POSLAT OBJEDNÁVKU VZV</button>
-            <div class="lbl" style="margin-top:16px;">Odesláno na VZV (Probíhá)</div>
+            <div class="lbl" style="margin-top:16px;">Odesláno na VZV (Probíhají objednávky / Aktivní režimy)</div>
             <div id="listA"></div>
         </div>
 
@@ -316,7 +316,7 @@
         let singleModeLines = { 1: false, 2: false };
         let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' };
         let twoVariantModeLines = { 1: false, 2: false };
-        let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
+        let twoVariantPair = { 1: 'Tiguan a Kodiaq', 2: 'Tiguan a Kodiaq' };
         
         let orders = [];
         let stockAlerts = [];
@@ -480,6 +480,8 @@
                 twoVariantModeLines[curLine] = false;
                 singleModeCar[curLine] = curCar;
                 alert("Funkce aktivována stisknutím OK");
+            } else {
+                singleModeLines[curLine] = false;
             }
             save();
             updateDynamicTheme();
@@ -491,6 +493,8 @@
             if (enable) {
                 singleModeLines[curLine] = false;
                 alert("Funkce aktivována stisknutím OK");
+            } else {
+                twoVariantModeLines[curLine] = false;
             }
             save();
             updateDynamicTheme();
@@ -513,17 +517,16 @@
             document.getElementById('btnTwoYes').className = 'btn-yn ' + (isTwoActive ? 'active-yes' : '');
             document.getElementById('btnTwoNo').className = 'btn-yn ' + (!isTwoActive ? 'active-no' : '');
 
-            // Dynamické vykreslení tlačítek produktů podle aktivního režimu
             let carGrid = document.getElementById('carGrid');
             let productLbl = document.getElementById('productLbl');
 
             if (isTwoActive) {
                 productLbl.innerText = "Vyberte dvojici variant pro kontrolu:";
                 carGrid.className = 'grid-2';
-                let currentPair = twoVariantPair[curLine] || 'Tiguan / Kodiaq';
+                let currentPair = twoVariantPair[curLine] || 'Tiguan a Kodiaq';
                 carGrid.innerHTML = `
-                    <div class="btn-opt ${currentPair === 'Tiguan / Kodiaq' ? activeClass : ''}" onclick="setTwoPair('Tiguan / Kodiaq', this)">Tiguan a Kodiaq</div>
-                    <div class="btn-opt ${currentPair === 'Audi / Seat' ? activeClass : ''}" onclick="setTwoPair('Audi / Seat', this)">Audi a Seat</div>
+                    <div class="btn-opt ${currentPair === 'Tiguan a Kodiaq' ? activeClass : ''}" onclick="setTwoPair('Tiguan a Kodiaq', this)">Tiguan a Kodiaq</div>
+                    <div class="btn-opt ${currentPair === 'Audi a Seat' ? activeClass : ''}" onclick="setTwoPair('Audi a Seat', this)">Audi a Seat</div>
                 `;
             } else {
                 productLbl.innerText = "Produkt";
@@ -601,13 +604,16 @@
             let ks = curStojany * 12;
             let ob = Math.ceil(ks / 9);
             let note = document.getElementById('noteInput').value.trim();
-            let orderCar = twoVariantModeLines[curLine] ? (twoVariantPair[curLine] || 'Tiguan / Kodiaq') : curCar;
+            
+            let orderCar = curCar;
+            let isSingle = singleModeLines[curLine];
+            let isTwo = twoVariantModeLines[curLine];
 
-            if (singleModeLines[curLine]) {
-                singleModeLines[curLine] = false;
-            }
-            if (twoVariantModeLines[curLine]) {
-                twoVariantModeLines[curLine] = false;
+            if (isSingle) {
+                orderCar = `${singleModeCar[curLine] || 'Tiguan'} (1 varianta)`;
+            } else if (isTwo) {
+                let pairText = twoVariantPair[curLine] || 'Tiguan a Kodiaq';
+                orderCar = `${pairText} (2 varianty)`;
             }
 
             orders.push({ 
@@ -615,9 +621,14 @@
                 stojany: curStojany, total: ob, done: 0, note: note 
             });
 
+            // Reset režimů po odeslání objednávky
+            singleModeLines[curLine] = false;
+            twoVariantModeLines[curLine] = false;
+
             document.getElementById('noteInput').value = '';
             lastOrderCount = orders.length;
             save();
+            updateDynamicTheme();
         }
 
         function cancelOrder(id) {
@@ -701,29 +712,7 @@
             if (listA) {
                 let htmlContent = '';
 
-                [1, 2].forEach(l => {
-                    let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
-                    if (singleModeLines[l]) {
-                        let cCar = singleModeCar[l] || 'Tiguan';
-                        htmlContent += `
-                            <div class="single-mode-info-card">
-                                <span>🔒 <b>Režim 1 varianta:</b> ${cCar} <span class="${badgeCls}">Linka ${l}</span></span>
-                                <span style="font-size:0.7rem; color:#f59e0b;">Aktivní</span>
-                            </div>
-                        `;
-                    }
-                    if (twoVariantModeLines[l]) {
-                        let cPair = twoVariantPair[l] || 'Tiguan / Kodiaq';
-                        htmlContent += `
-                            <div class="single-mode-info-card">
-                                <span>🔒 <b>Režim 2 varianty:</b> ${cPair} <span class="${badgeCls}">Linka ${l}</span></span>
-                                <span style="font-size:0.7rem; color:#f59e0b;">Aktivní</span>
-                            </div>
-                        `;
-                    }
-                });
-
-                if (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2] && !twoVariantModeLines[1] && !twoVariantModeLines[2]) {
+                if (orders.length === 0) {
                     htmlContent += '<div class="empty">Žádné aktivní objednávky</div>';
                 }
 
@@ -751,78 +740,64 @@
                 let title = document.getElementById(`l${l}Title`);
                 let next = document.getElementById(`l${l}Next`);
                 let body = document.getElementById(`l${l}Body`);
-                let isSingle = singleModeLines[l];
-                let isTwo = twoVariantModeLines[l];
-                let currentSingleCar = singleModeCar[l] || 'Tiguan';
-                let currentPair = twoVariantPair[l] || 'Tiguan / Kodiaq';
 
                 if (title && next && body) {
-                    if (lOrders.length === 0 && !isSingle && !isTwo) {
+                    if (lOrders.length === 0) {
                         title.innerText = 'Žádná objednávka';
                         next.className = 'next-txt none';
                         next.innerText = 'Následuje ➔ Žádné';
                         body.innerHTML = '<div class="empty">Linka je volná</div>';
                     } else {
-                        if ((isSingle || isTwo) && lOrders.length === 0) {
-                            title.innerText = isSingle ? `${currentSingleCar} (jedna varianta)` : `${currentPair} výroba 2 produktů ze stejným obalem`;
+                        let cur = lOrders[0];
+                        let nxt1 = lOrders[1];
+                        let nxt2 = lOrders[2];
+                        
+                        title.innerText = `${cur.car} (${cur.stojany} WRT)`;
+                        
+                        if (nxt1) {
+                            next.className = 'next-txt';
+                            let queueText = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
+                            if (nxt2) queueText += ` ➔ <b>${nxt2.car}</b> (${nxt2.total} ob.)`;
+                            next.innerHTML = queueText;
+                        } else {
                             next.className = 'next-txt none';
                             next.innerText = 'Následuje ➔ Žádné';
-                        } else {
-                            let cur = lOrders[0];
-                            let nxt1 = lOrders[1];
-                            let nxt2 = lOrders[2];
-                            
-                            title.innerText = `${cur.car} (${cur.stojany} WRT)`;
-                            
-                            if (nxt1) {
-                                next.className = 'next-txt';
-                                let queueText = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
-                                if (nxt2) queueText += ` ➔ <b>${nxt2.car}</b> (${nxt2.total} ob.)`;
-                                next.innerHTML = queueText;
-                            } else {
-                                next.className = 'next-txt none';
-                                next.innerText = 'Následuje ➔ Žádné';
-                            }
                         }
 
                         let modeAlertHtml = '';
-                        if (isSingle) {
+                        if (cur.car.includes('1 varianta')) {
                             modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE JEDNOU VARIANTOU.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
-                        } else if (isTwo) {
-                            modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ${currentPair} výroba 2 produktů se stejným obalem.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
+                        } else if (cur.car.includes('2 varianty')) {
+                            let extractedPair = cur.car.split(' (')[0];
+                            modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ${extractedPair} výroba 2 produktů se stejným obalem.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
                         }
 
-                        if (lOrders.length === 0) {
-                            body.innerHTML = modeAlertHtml + '<div class="empty">Čeká se na zadání objednávky</div>';
-                        } else {
-                            let cur = lOrders[0];
-                            let boxes = '';
-                            for (let i = 1; i <= cur.total; i++) {
-                                let st = i <= cur.done ? 'done' : 'pending';
-                                boxes += `<div class="box-unit ${st}">#${i}</div>`;
-                            }
-
-                            let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
-                            let lineClass = cur.line === 1 ? 'line-1' : 'line-2';
-                            let noteHtml = cur.note ? `<div class="note-tag ${lineClass}">📝 Poznámka: ${cur.note}</div>` : '';
-
-                            body.innerHTML = `
-                                ${modeAlertHtml}
-                                ${noteHtml}
-                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; color:#94a3b8;">
-                                    <span>Zbývá zavezt: <b>${cur.total - cur.done} ob.</b></span>
-                                </div>
-                                <div class="boxes-row">${boxes}</div>
-                                <button class="btn-zavez" onclick="zavezt(${cur.id})">${btnText}</button>
-                            `;
+                        let boxes = '';
+                        for (let i = 1; i <= cur.total; i++) {
+                            let st = i <= cur.done ? 'done' : 'pending';
+                            boxes += `<div class="box-unit ${st}">#${i}</div>`;
                         }
+
+                        let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
+                        let lineClass = cur.line === 1 ? 'line-1' : 'line-2';
+                        let noteHtml = cur.note ? `<div class="note-tag ${lineClass}">📝 Poznámka: ${cur.note}</div>` : '';
+
+                        body.innerHTML = `
+                            ${modeAlertHtml}
+                            ${noteHtml}
+                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; color:#94a3b8;">
+                                <span>Zbývá zavezt: <b>${cur.total - cur.done} ob.</b></span>
+                            </div>
+                            <div class="boxes-row">${boxes}</div>
+                            <button class="btn-zavez" onclick="zavezt(${cur.id})">${btnText}</button>
+                        `;
                     }
                 }
             });
 
             let doneBanner = document.getElementById('doneBanner');
             if (doneBanner) {
-                doneBanner.style.display = (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2] && !twoVariantModeLines[1] && !twoVariantModeLines[2]) ? 'block' : 'none';
+                doneBanner.style.display = (orders.length === 0) ? 'block' : 'none';
             }
         }
     </script>
