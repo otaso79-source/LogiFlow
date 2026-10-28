@@ -146,6 +146,12 @@
             background: rgba(245, 158, 11, 0.15); padding: 4px 8px; border-radius: 6px; cursor: pointer;
             border: 1px dashed #f59e0b;
         }
+
+        .single-mode-info-card {
+            background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px;
+            padding: 8px 10px; margin-bottom: 6px; font-size: 0.8rem; color: #fbbf24; font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -620,14 +626,33 @@
 
             let listA = document.getElementById('listA');
             if (listA) {
-                listA.innerHTML = orders.length === 0 ? '<div class="empty">Žádné aktivní objednávky</div>' : '';
+                let htmlContent = '';
+
+                // Pokud běží režim jedné varianty pro Linku 1 nebo 2, ukážeme to dole v seznamu
+                [1, 2].forEach(l => {
+                    if (singleModeLines[l]) {
+                        let cCar = singleModeCar[l] || 'Tiguan';
+                        let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
+                        htmlContent += `
+                            <div class="single-mode-info-card">
+                                <span>🔒 <b>Režim 1 varianta:</b> ${cCar} <span class="${badgeCls}">Linka ${l}</span></span>
+                                <span style="font-size:0.7rem; color:#f59e0b;">Aktivní režim</span>
+                            </div>
+                        `;
+                    }
+                });
+
+                if (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2]) {
+                    htmlContent += '<div class="empty">Žádné aktivní objednávky</div>';
+                }
+
                 orders.forEach(o => {
                     let lineClass = o.line === 1 ? 'line-1' : 'line-2';
                     let noteHtml = o.note ? `<div class="note-tag ${lineClass}">📝 ${o.note}</div>` : '';
                     let remainingWRT = Math.max(0, o.stojany - o.done);
                     let wrtBadgeClass = o.line === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
 
-                    listA.innerHTML += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
+                    htmlContent += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="flex-grow:1;"><b>${o.car}</b> <span class="${wrtBadgeClass}">Zbývá ${remainingWRT}/${o.stojany} WRT</span> - Linka ${o.line}</span>
                             <span onclick="editOrderProgress(${o.id})" class="editable-progress" title="Kliknutím upravit/zkalibrovat stav obalů">📦 ${o.done}/${o.total} obalů</span>
@@ -636,6 +661,8 @@
                         ${noteHtml}
                     </div>`;
                 });
+
+                listA.innerHTML = htmlContent;
             }
 
             [1, 2].forEach(l => {
