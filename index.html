@@ -57,6 +57,7 @@
 
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
         .btn-opt { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px 4px; border-radius: 8px; font-weight: bold; text-align: center; cursor: pointer; font-size: 0.85rem; }
         
         .btn-opt.selected-1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff; }
@@ -190,13 +191,12 @@
                 <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.65rem; font-weight:normal;">BOX 2 - 1</span></div>
             </div>
 
-            <div class="lbl">Produkt</div>
-            <div class="grid-3" id="carGrid">
-                <div class="btn-opt selected-1" onclick="setCar('Tiguan', this)">Tiguan</div>
-                <div class="btn-opt" onclick="setCar('Kodiaq', this)">Kodiaq</div>
+            <div class="lbl">Produkt (možnost výběru dvou variant se stejným obalem)</div>
+            <div class="grid-2" id="carGrid">
+                <div class="btn-opt selected-1" onclick="setCar('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
+                <div class="btn-opt" onclick="setCar('Audi / Seat', this)">Audi / Seat</div>
                 <div class="btn-opt" onclick="setCar('Tayron', this)">Tayron</div>
-                <div class="btn-opt" onclick="setCar('Audi', this)">Audi</div>
-                <div class="btn-opt" onclick="setCar('Seat', this)">Seat</div>
+                <div class="btn-opt" onclick="setCar('Kodiaq', this)">Kodiaq (Samostatně)</div>
             </div>
 
             <div class="single-mode-panel line-1" id="singleModePanel">
@@ -303,9 +303,9 @@
 
         const SYSTEM_PASSWORD = '1234';
         let notificationsEnabled = true;
-        let curLine = 1, curCar = 'Tiguan', curStojany = 3;
+        let curLine = 1, curCar = 'Tiguan / Kodiaq', curStojany = 3;
         let singleModeLines = { 1: false, 2: false };
-        let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' };
+        let singleModeCar = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
         
         let orders = [];
         let stockAlerts = [];
@@ -457,7 +457,7 @@
             save();
             updateDynamicTheme();
             if (enable) {
-                alert(`Zapnutá funkce na Lince ${curLine}: Výroba jednoho produktu (${curCar})`);
+                alert(`Zapnutá funkce na Lince ${curLine}: Výroba jedné varianty (${curCar})`);
             }
             render();
         }
@@ -628,10 +628,9 @@
             if (listA) {
                 let htmlContent = '';
 
-                // Pokud běží režim jedné varianty pro Linku 1 nebo 2, ukážeme to dole v seznamu
                 [1, 2].forEach(l => {
                     if (singleModeLines[l]) {
-                        let cCar = singleModeCar[l] || 'Tiguan';
+                        let cCar = singleModeCar[l] || 'Tiguan / Kodiaq';
                         let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
                         htmlContent += `
                             <div class="single-mode-info-card">
@@ -671,7 +670,7 @@
                 let next = document.getElementById(`l${l}Next`);
                 let body = document.getElementById(`l${l}Body`);
                 let isSingle = singleModeLines[l];
-                let currentSingleCar = singleModeCar[l] || 'Tiguan';
+                let currentSingleCar = singleModeCar[l] || 'Tiguan / Kodiaq';
 
                 if (title && next && body) {
                     if (lOrders.length === 0 && !isSingle) {
