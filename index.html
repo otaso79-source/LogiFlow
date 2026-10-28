@@ -124,6 +124,19 @@
         .btn-yn.active-yes { background: #10b981; color: #fff; }
         .btn-yn.active-no { background: #ef4444; color: #fff; }
 
+        /* BANNER AKTUALIZACE PŘES CELOU OBRAZOVKU */
+        #updateBannerOverlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95); z-index: 9999; align-items: center; justify-content: center; padding: 20px; text-align: center;
+        }
+        .update-banner-box {
+            background: #1e293b; border: 3px solid #ef4444; border-radius: 16px;
+            width: 100%; max-width: 380px; padding: 24px; box-shadow: 0 15px 40px rgba(239, 68, 68, 0.4);
+        }
+        .update-banner-title { font-size: 1.2rem; font-weight: bold; color: #ef4444; margin-bottom: 12px; text-transform: uppercase; }
+        .update-banner-text { font-size: 1rem; color: #f8fafc; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
+        .btn-update-ack { width: 100%; padding: 14px; background: #ef4444; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+
         .vzv-alert-panel { background: #1e293b; border: 1px solid #ef4444; border-radius: 8px; padding: 10px; margin-top: 16px; }
         .vzv-alert-title { font-size: 0.8rem; font-weight: bold; color: #ef4444; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
         .vzv-alert-row { display: flex; gap: 6px; margin-bottom: 8px; }
@@ -142,7 +155,7 @@
 
         .btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 8px; flex-shrink: 0; }
         .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.80rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-        .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.70rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
         
         .wrt-badge-1 { background: rgba(59, 130, 246, 0.25); border: 1px solid #3b82f6; color: #93c5fd; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
         .wrt-badge-2 { background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #d8b4fe; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
@@ -152,15 +165,18 @@
             background: rgba(245, 158, 11, 0.15); padding: 4px 8px; border-radius: 6px; cursor: pointer;
             border: 1px dashed #f59e0b;
         }
-
-        .single-mode-info-card {
-            background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px;
-            padding: 8px 10px; margin-bottom: 6px; font-size: 0.8rem; color: #fbbf24; font-weight: bold;
-            display: flex; justify-content: space-between; align-items: center;
-        }
     </style>
 </head>
 <body>
+
+    <!-- PŘEKRYVNÝ BANNER PRO AKTUALIZACI (PRO OBSLUHU A I VZV B) -->
+    <div id="updateBannerOverlay">
+        <div class="update-banner-box">
+            <div class="update-banner-title" id="bannerTitle">⚠️ Upozornění systému</div>
+            <div class="update-banner-text" id="bannerText">Načítání...</div>
+            <button class="btn-update-ack" id="bannerAckBtn" onclick="acknowledgeUpdate()">ROZUMÍM / POTVRDIT</button>
+        </div>
+    </div>
 
     <div id="loginScreen">
         <div class="login-box">
@@ -204,7 +220,6 @@
                 </div>
             </div>
 
-            <!-- Výběr varianty pro 1 variantu -->
             <div class="mode-selector-box line-1" id="singleModeSelectBox">
                 <div class="lbl" style="margin-top:0;">Vyberte variantu pro režim:</div>
                 <div class="grid-3" id="singleCarGrid" style="margin-bottom:0;">
@@ -224,7 +239,6 @@
                 </div>
             </div>
 
-            <!-- Výběr dvojice pro 2 varianty -->
             <div class="mode-selector-box line-1" id="twoModeSelectBox">
                 <div class="lbl" style="margin-top:0;">Vyberte dvojici variant pro kontrolu:</div>
                 <div class="grid-2" id="twoPairGrid" style="margin-bottom:0;">
@@ -329,6 +343,16 @@
                     <button class="btn-yn" id="setNotifNo" onclick="toggleNotifications(false)">NE</button>
                 </div>
             </div>
+
+            <!-- OVLÁDÁNÍ AKTUALIZACE V NASTAVENÍ -->
+            <div style="background:#0f172a; padding:12px; border-radius:8px; margin-top:12px; border:1px solid #ef4444;">
+                <div style="font-size:0.85rem; font-weight:bold; color:#ef4444; margin-bottom:8px;">🛠️ Režim údržby / Aktualizace</div>
+                <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Aktivuje výstrahu na všech zařízeních A i B. Po vypnutí vyzve k potvrzení OK.</div>
+                <div class="banner-btns" style="width:100%; display:grid; grid-template-columns:1fr 1fr;">
+                    <button class="btn-yn" id="setUpdateYes" onclick="toggleSystemUpdate(true)">ZAPNOUT</button>
+                    <button class="btn-yn active-no" id="setUpdateNo" onclick="toggleSystemUpdate(false)">VYPNOUT</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -347,6 +371,9 @@
         let twoVariantModeLines = { 1: false, 2: false };
         let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
         
+        let systemUpdateActive = false;
+        let systemUpdateCompletedState = false; // sledování fáze po vypnutí (výzva k potvrzení OK)
+
         let orders = [];
         let stockAlerts = [];
         let lastOrderCount = 0;
@@ -394,6 +421,13 @@
             render();
         });
 
+        db.ref('systemUpdate').on('value', (snapshot) => {
+            let val = snapshot.val();
+            systemUpdateActive = val ? val.active : false;
+            systemUpdateCompletedState = val ? val.completed : false;
+            renderUpdateOverlay();
+        });
+
         function save() {
             db.ref('orders').set(orders);
             db.ref('alerts').set(stockAlerts);
@@ -401,6 +435,58 @@
             db.ref('singleModeCar').set(singleModeCar);
             db.ref('twoVariantModeLines').set(twoVariantModeLines);
             db.ref('twoVariantPair').set(twoVariantPair);
+        }
+
+        function toggleSystemUpdate(enable) {
+            if (enable) {
+                db.ref('systemUpdate').set({ active: true, completed: false });
+            } else {
+                // Po vypnutí přepneme stav do fáze dokončeno (výzva k potvrzení OK)
+                db.ref('systemUpdate').set({ active: false, completed: true });
+            }
+        }
+
+        function acknowledgeUpdate() {
+            if (systemUpdateCompletedState) {
+                // Pokud uživatel potvrdil OK po aktualizaci, smažeme stav v databázi, aby okno zmizelo
+                db.ref('systemUpdate').set(null);
+            }
+            // V aktivním režimu údržby tlačítko slouží jako potvrzení, že zprávu registrovali
+            document.getElementById('updateBannerOverlay').style.display = 'none';
+        }
+
+        function renderUpdateOverlay() {
+            let overlay = document.getElementById('updateBannerOverlay');
+            let title = document.getElementById('bannerTitle');
+            let text = document.getElementById('bannerText');
+            let ackBtn = document.getElementById('bannerAckBtn');
+
+            if (systemUpdateActive) {
+                title.innerText = "⚠️ UPOZORNĚNÍ NA ÚDRŽBU";
+                text.innerText = "POZOR: Proběhne aktualizace programu připravte se na výpadek.\n\nNeřiďte se PROGRAMEM !!!";
+                ackBtn.innerText = "ROZUMÍM / POTVRDIT";
+                overlay.style.display = 'flex';
+            } else if (systemUpdateCompletedState) {
+                title.innerText = "✅ HOTOVO";
+                text.innerText = "Program aktualizován.\n\nPOTVRĎTE OK";
+                ackBtn.innerText = "OK";
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+            }
+
+            // Aktualizace přepínačů v nastavení
+            let btnYes = document.getElementById('setUpdateYes');
+            let btnNo = document.getElementById('setUpdateNo');
+            if (btnYes && btnNo) {
+                if (systemUpdateActive) {
+                    btnYes.className = 'btn-yn active-yes';
+                    btnNo.className = 'btn-yn';
+                } else {
+                    btnYes.className = 'btn-yn';
+                    btnNo.className = 'btn-yn active-no';
+                }
+            }
         }
 
         function openSettingsModal() {
@@ -480,7 +566,7 @@
                 if(setNo) setNo.className = 'btn-yn';
             } else {
                 if(setYes) setYes.className = 'btn-yn';
-                if(setNo) setYes.className = 'btn-yn active-no';
+                if(setNo) setNo.className = 'btn-yn active-no';
             }
         }
 
