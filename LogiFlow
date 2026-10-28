@@ -164,24 +164,30 @@
         .btn-admin-cancel { background: #334155; color: #94a3b8; }
         .btn-admin-ok { background: #f59e0b; color: #0f172a; }
 
-        /* PŘEKRYVNÉ BANNERY - KLIKNUTÍM NA NADPIS SE PŘIHLÁSÍ SPRÁVCE */
+        /* PŘEKRYVNÉ BANNERY */
         #updateBannerOverlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.95); z-index: 9999; align-items: center; justify-content: center; padding: 20px; text-align: center;
         }
         .update-banner-box {
             background: #1e293b; border: 3px solid #ef4444; border-radius: 16px;
-            width: 100%; max-width: 380px; padding: 28px 24px; box-shadow: 0 15px 40px rgba(239, 68, 68, 0.4);
+            width: 100%; max-width: 380px; padding: 24px; box-shadow: 0 15px 40px rgba(239, 68, 68, 0.4);
         }
-        .update-banner-title { font-size: 1.2rem; font-weight: bold; color: #ef4444; margin-bottom: 16px; text-transform: uppercase; cursor: pointer; user-select: none; }
-        .update-banner-text { font-size: 1rem; color: #f8fafc; font-weight: bold; line-height: 1.5; }
+        .update-banner-title { font-size: 1.2rem; font-weight: bold; color: #ef4444; margin-bottom: 12px; text-transform: uppercase; cursor: pointer; user-select: none; }
+        .update-banner-text { font-size: 0.95rem; color: #f8fafc; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
+        .btn-update-ack { width: 100%; padding: 14px; background: #ef4444; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; display: none; }
 
+        /* ZELENÝ STAV HOTOVO (ZELENÝ RÁMEČEK, ZELENÝ NADPIS A TLAČÍTKO OK) */
         .update-banner-box.completed-box {
             border: 3px solid #10b981;
             box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
         }
         .update-banner-box.completed-box .update-banner-title {
             color: #10b981;
+        }
+        .update-banner-box.completed-box .btn-update-ack {
+            background: #10b981;
+            display: block; /* U zelené hlášky se tlačítko OK zobrazí, aby šla odkliknout */
         }
 
         .vzv-alert-panel { background: #1e293b; border: 1px solid #ef4444; border-radius: 8px; padding: 10px; margin-top: 16px; }
@@ -216,11 +222,12 @@
 </head>
 <body>
 
-    <!-- PŘEKRYVNÝ BANNER PRO ÚDRŽBU (KLIKNUTÍM NA NADPIS SE MŮŽE PŘIHLÁSIT SPRÁVCE) -->
+    <!-- PŘEKRYVNÝ BANNER PRO ÚDRŽBU / HOTOVO -->
     <div id="updateBannerOverlay">
         <div class="update-banner-box" id="updateBannerBox">
             <div class="update-banner-title" id="bannerTitle" onclick="openAdminPasswordModal(true)" title="Kliknutím zadat heslo správce">⚠️ UPOZORNĚNÍ NA ÚDRŽBU</div>
-            <div class="update-banner-text" id="bannerText">POZOR: Proběhne aktualizace programu připravte se na výpadek.<br><br>Neřiďte se PROGRAMEM !!!</div>
+            <div class="update-banner-text" id="bannerText">Načítání...</div>
+            <button class="btn-update-ack" id="bannerAckBtn" onclick="acknowledgeUpdate()">OK</button>
         </div>
     </div>
 
@@ -370,7 +377,7 @@
         <div id="viewB" style="display:none;">
             <div class="lbl">Přehled linek</div>
              
-            <!-- VZV UPOZORNĚNÍ PRO CHYBĚJÍCÍ BEDNY NA ČIDLECH -->
+            <!-- VZV UPOZORNĚNÍ PRO CHYBĚJÍCÍ BEDNU NA ČIDLE -->
             <div id="vzvSensorAlertArea"></div>
 
             <div class="vzv-card l2">
@@ -463,7 +470,7 @@
         let systemUpdateActive = false;
         let systemUpdateCompletedState = false;
         let pendingUpdateState = false;
-        let adminBypassed = false; // Příznak, zda se správce dočasně prokliknul ven
+        let adminBypassed = false;
 
         let orders = [];
         let stockAlerts = [];
@@ -523,8 +530,9 @@
             let newActive = val ? val.active : false;
             let newCompleted = val ? val.completed : false;
 
-            if (newActive !== systemUpdateActive) {
-                adminBypassed = false; // Reset při změně stavu ze serveru
+            if (newActive !== systemUpdateActive || newCompleted !== systemUpdateCompletedState) {
+                adminBypassed = false;
+                localStorage.removeItem('ack_update_completed');
             }
 
             systemUpdateActive = newActive;
@@ -584,7 +592,6 @@
             closeAdminPasswordModal();
             closeSettingsModal();
 
-            // Pokud správce kliknul na nadpis pro nouzový vstup
             if (systemUpdateActive && pendingUpdateState === true && document.getElementById('updateBannerOverlay').style.display === 'flex') {
                 adminBypassed = true;
                 renderUpdateOverlay();
@@ -598,18 +605,25 @@
             }
         }
 
+        function acknowledgeUpdate() {
+            localStorage.setItem('ack_update_completed', 'true');
+            document.getElementById('updateBannerOverlay').style.display = 'none';
+        }
+
         function renderUpdateOverlay() {
             let overlay = document.getElementById('updateBannerOverlay');
             let bannerBox = document.getElementById('updateBannerBox');
             let title = document.getElementById('bannerTitle');
             let text = document.getElementById('bannerText');
 
+            let ackCompleted = localStorage.getItem('ack_update_completed') === 'true';
+
             if (systemUpdateActive && !adminBypassed) {
                 bannerBox.className = "update-banner-box";
                 title.innerText = "⚠️ UPOZORNĚNÍ NA ÚDRŽBU";
                 text.innerHTML = "POZOR: Proběhne aktualizace programu připravte se na výpadek.<br><br>Neřiďte se PROGRAMEM !!!";
                 overlay.style.display = 'flex';
-            } else if (systemUpdateCompletedState && !adminBypassed) {
+            } else if (systemUpdateCompletedState && !ackCompleted) {
                 bannerBox.className = "update-banner-box completed-box";
                 title.innerText = "✅ HOTOVO";
                 text.innerText = "Program aktualizován, proveďte reset a vymažte objednávky.";
@@ -965,7 +979,6 @@
 
             renderRepeatBoxesUI();
 
-            // Zobrazení VZV výstrahy pro chybějící bedny na čidlech
             let vzvSensorAlertArea = document.getElementById('vzvSensorAlertArea');
             if (vzvSensorAlertArea) {
                 let activeSensors = [];
