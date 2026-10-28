@@ -676,7 +676,7 @@
                     if (twoVariantModeLines[l]) {
                         htmlContent += `
                             <div class="single-mode-info-card">
-                                <span>🔒 <b>Režim 2 varianty (stejný obal):</b> Tiguan / Kodiaq nebo Audi / Seat <span class="${badgeCls}">Linka ${l}</span></span>
+                                <span>🔒 <b>Režim 2 varianty:</b> Tiguan/Kodiaq <span class="${badgeCls}">Linka ${l}</span></span>
                                 <span style="font-size:0.7rem; color:#f59e0b;">Aktivní</span>
                             </div>
                         `;
@@ -723,7 +723,7 @@
                         body.innerHTML = '<div class="empty">Linka je volná</div>';
                     } else {
                         if ((isSingle || isTwo) && lOrders.length === 0) {
-                            title.innerText = isSingle ? `${currentSingleCar} (jedna varianta)` : `2 varianty (stejný obal)`;
+                            title.innerText = isSingle ? `${currentSingleCar} (jedna varianta)` : `Tiguan/Kodiaq výroba 2 produktu ze stejným obalem`;
                             next.className = 'next-txt none';
                             next.innerText = 'Následuje ➔ Žádné';
                         } else {
@@ -748,7 +748,7 @@
                         if (isSingle) {
                             modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE JEDNOU VARIANTOU.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
                         } else if (isTwo) {
-                            modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET 2 VARIANTY SE STEJNÝM OBALEM.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
+                            modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ Tiguan/Kodiaq výroba 2 produktu ze stejným obalem.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
                         }
 
                         if (lOrders.length === 0) {
