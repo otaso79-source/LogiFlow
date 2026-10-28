@@ -63,10 +63,15 @@
         .btn-opt.selected-1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff; }
         .btn-opt.selected-2 { border-color: #a855f7; background: rgba(168, 85, 247, 0.25); color: #fff; }
 
-        .single-mode-panel { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .single-mode-panel { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .single-mode-panel.line-1 { border-color: #3b82f6; }
         .single-mode-panel.line-2 { border-color: #a855f7; }
         .single-mode-txt { font-size: 0.8rem; font-weight: bold; color: #f8fafc; }
+
+        .mode-selector-box { background: #1e293b; border: 1px dashed #334155; border-radius: 8px; padding: 8px; margin-bottom: 10px; display: none; }
+        .mode-selector-box.active { display: block; }
+        .mode-selector-box.line-1 { border-color: #3b82f6; }
+        .mode-selector-box.line-2 { border-color: #a855f7; }
 
         .custom-stojan-input { margin-top: 6px; display: none; gap: 6px; align-items: center; }
         .custom-stojan-input.active { display: flex; }
@@ -199,11 +204,32 @@
                 </div>
             </div>
 
+            <!-- Výběr varianty pro 1 variantu -->
+            <div class="mode-selector-box line-1" id="singleModeSelectBox">
+                <div class="lbl" style="margin-top:0;">Vyberte variantu pro režim:</div>
+                <div class="grid-3" id="singleCarGrid" style="margin-bottom:0;">
+                    <div class="btn-opt" onclick="setSingleCar('Tiguan', this)">Tiguan</div>
+                    <div class="btn-opt" onclick="setSingleCar('Kodiaq', this)">Kodiaq</div>
+                    <div class="btn-opt" onclick="setSingleCar('Tayron', this)">Tayron</div>
+                    <div class="btn-opt" onclick="setSingleCar('Audi', this)">Audi</div>
+                    <div class="btn-opt" onclick="setSingleCar('Seat', this)">Seat</div>
+                </div>
+            </div>
+
             <div class="single-mode-panel line-1" id="twoVariantPanel">
                 <div class="single-mode-txt">🔒 Režim: Jedou 2 varianty (stejný obal)</div>
                 <div class="banner-btns">
                     <button class="btn-yn" id="btnTwoYes" onclick="toggleTwoVariantMode(true)">ZAP</button>
                     <button class="btn-yn active-no" id="btnTwoNo" onclick="toggleTwoVariantMode(false)">VYP</button>
+                </div>
+            </div>
+
+            <!-- Výběr dvojice pro 2 varianty -->
+            <div class="mode-selector-box line-1" id="twoModeSelectBox">
+                <div class="lbl" style="margin-top:0;">Vyberte dvojici variant pro kontrolu:</div>
+                <div class="grid-2" id="twoPairGrid" style="margin-bottom:0;">
+                    <div class="btn-opt" onclick="setTwoPair('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
+                    <div class="btn-opt" onclick="setTwoPair('Audi / Seat', this)">Audi / Seat</div>
                 </div>
             </div>
 
@@ -454,7 +480,7 @@
                 if(setNo) setNo.className = 'btn-yn';
             } else {
                 if(setYes) setYes.className = 'btn-yn';
-                if(setNo) setYes.className = 'btn-yn active-no';
+                if(setNo) setNo.className = 'btn-yn active-no';
             }
         }
 
@@ -481,8 +507,7 @@
             singleModeLines[curLine] = enable;
             if (enable) {
                 twoVariantModeLines[curLine] = false;
-                singleModeCar[curLine] = curCar;
-                alert("Funkce aktivována stisknutím OK");
+                if (!singleModeCar[curLine]) singleModeCar[curLine] = 'Tiguan';
             } else {
                 singleModeLines[curLine] = false;
             }
@@ -495,7 +520,7 @@
             twoVariantModeLines[curLine] = enable;
             if (enable) {
                 singleModeLines[curLine] = false;
-                alert("Funkce aktivována stisknutím OK");
+                if (!twoVariantPair[curLine]) twoVariantPair[curLine] = 'Tiguan / Kodiaq';
             } else {
                 twoVariantModeLines[curLine] = false;
             }
@@ -504,13 +529,28 @@
             render();
         }
 
+        function setSingleCar(car, el) {
+            singleModeCar[curLine] = car;
+            save();
+            updateDynamicTheme();
+        }
+
+        function setTwoPair(pair, el) {
+            twoVariantPair[curLine] = pair;
+            save();
+            updateDynamicTheme();
+        }
+
         function updateDynamicTheme() {
             let activeClass = curLine === 1 ? 'selected-1' : 'selected-2';
             let panelClass = curLine === 1 ? 'single-mode-panel line-1' : 'single-mode-panel line-2';
+            let selectorBoxClass = curLine === 1 ? 'mode-selector-box line-1 active' : 'mode-selector-box line-2 active';
             let customBoxClass = curLine === 1 ? 'custom-stojan-input line-1 active' : 'custom-stojan-input line-2 active';
 
             document.getElementById('singleModePanel').className = panelClass;
             document.getElementById('twoVariantPanel').className = panelClass;
+            document.getElementById('singleModeSelectBox').className = selectorBoxClass;
+            document.getElementById('twoModeSelectBox').className = selectorBoxClass;
             
             let isSingleActive = singleModeLines[curLine];
             document.getElementById('btnSingleYes').className = 'btn-yn ' + (isSingleActive ? 'active-yes' : '');
@@ -520,40 +560,47 @@
             document.getElementById('btnTwoYes').className = 'btn-yn ' + (isTwoActive ? 'active-yes' : '');
             document.getElementById('btnTwoNo').className = 'btn-yn ' + (!isTwoActive ? 'active-no' : '');
 
-            // Skrytí sekce klasické objednávky, pokud je zapnutý některý zámek
+            // Zobrazení/skrytí boxů pro výběr variant podle stavu ZAP/VYP
+            let singleSelectBox = document.getElementById('singleModeSelectBox');
+            let twoSelectBox = document.getElementById('twoModeSelectBox');
             let standardSection = document.getElementById('standardOrderSection');
-            if (isSingleActive || isTwoActive) {
+
+            if (isSingleActive) {
+                singleSelectBox.style.display = 'block';
+                twoSelectBox.style.display = 'none';
+                standardSection.style.display = 'none';
+            } else if (isTwoActive) {
+                singleSelectBox.style.display = 'none';
+                twoSelectBox.style.display = 'block';
                 standardSection.style.display = 'none';
             } else {
+                singleSelectBox.style.display = 'none';
+                twoSelectBox.style.display = 'none';
                 standardSection.style.display = 'block';
             }
 
-            let carGrid = document.getElementById('carGrid');
-            let productLbl = document.getElementById('productLbl');
+            // Vykreslení tlačítek pro 1 variantu
+            let currentSingleCar = singleModeCar[curLine] || 'Tiguan';
+            let singleCarGrid = document.getElementById('singleCarGrid');
+            let cars = ['Tiguan', 'Kodiaq', 'Tayron', 'Audi', 'Seat'];
+            singleCarGrid.innerHTML = cars.map(c => `
+                <div class="btn-opt ${currentSingleCar === c ? activeClass : ''}" onclick="setSingleCar('${c}', this)">${c}</div>
+            `).join('');
 
-            if (isTwoActive) {
-                productLbl.innerText = "Vyberte dvojici variant pro kontrolu:";
-                carGrid.className = 'grid-2';
-                let currentPair = twoVariantPair[curLine] || 'Tiguan / Kodiaq';
-                carGrid.innerHTML = `
-                    <div class="btn-opt ${currentPair === 'Tiguan / Kodiaq' ? activeClass : ''}" onclick="setTwoPair('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
-                    <div class="btn-opt ${currentPair === 'Audi / Seat' ? activeClass : ''}" onclick="setTwoPair('Audi / Seat', this)">Audi / Seat</div>
-                `;
-            } else {
-                productLbl.innerText = "Produkt";
-                carGrid.className = 'grid-3';
-                carGrid.innerHTML = `
-                    <div class="btn-opt" onclick="setCar('Tiguan', this)">Tiguan</div>
-                    <div class="btn-opt" onclick="setCar('Kodiaq', this)">Kodiaq</div>
-                    <div class="btn-opt" onclick="setCar('Tayron', this)">Tayron</div>
-                    <div class="btn-opt" onclick="setCar('Audi', this)">Audi</div>
-                    <div class="btn-opt" onclick="setCar('Seat', this)">Seat</div>
-                `;
-                document.querySelectorAll('#carGrid .btn-opt').forEach(b => {
-                    b.classList.remove('selected-1', 'selected-2');
-                    if (b.innerText === curCar) b.classList.add(activeClass);
-                });
-            }
+            // Vykreslení tlačítek pro 2 varianty
+            let currentPair = twoVariantPair[curLine] || 'Tiguan / Kodiaq';
+            let twoPairGrid = document.getElementById('twoPairGrid');
+            let pairs = ['Tiguan / Kodiaq', 'Audi / Seat'];
+            twoPairGrid.innerHTML = pairs.map(p => `
+                <div class="btn-opt ${currentPair === p ? activeClass : ''}" onclick="setTwoPair('${p}', this)">${p}</div>
+            `).join('');
+
+            // Klasický produkt grid (pokud neběží žádný zámek)
+            let carGrid = document.getElementById('carGrid');
+            document.querySelectorAll('#carGrid .btn-opt').forEach(b => {
+                b.classList.remove('selected-1', 'selected-2');
+                if (b.innerText === curCar) b.classList.add(activeClass);
+            });
 
             document.querySelectorAll('#opt3WRT, #opt6WRT, #optCustomWRT').forEach(b => b.classList.remove('selected-1', 'selected-2'));
             
@@ -576,12 +623,6 @@
 
         function setCar(c, el) {
             curCar = c;
-            updateDynamicTheme();
-        }
-
-        function setTwoPair(pair, el) {
-            twoVariantPair[curLine] = pair;
-            save();
             updateDynamicTheme();
         }
 
@@ -793,7 +834,7 @@
 
                         let modeAlertHtml = '';
                         if (isSingle) {
-                            modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE JEDNOU VARIANTOU.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
+                            modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE: ${currentSingleCar.toUpperCase()}.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
                         } else if (isTwo) {
                             modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ${currentPair} výroba 2 produktů se stejným obalem.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
                         }
