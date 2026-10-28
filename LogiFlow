@@ -56,8 +56,8 @@
         .line-btn.active-2 { border-color: #a855f7; color: #fff; background: #581c87; }
 
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
         .btn-opt { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px 4px; border-radius: 8px; font-weight: bold; text-align: center; cursor: pointer; font-size: 0.85rem; }
         
         .btn-opt.selected-1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff; }
@@ -191,20 +191,28 @@
                 <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.65rem; font-weight:normal;">BOX 2 - 1</span></div>
             </div>
 
-            <div class="lbl">Produkt (možnost výběru dvou variant se stejným obalem)</div>
-            <div class="grid-2" id="carGrid">
-                <div class="btn-opt selected-1" onclick="setCar('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
-                <div class="btn-opt" onclick="setCar('Audi / Seat', this)">Audi / Seat</div>
-                <div class="btn-opt" onclick="setCar('Tayron', this)">Tayron</div>
-                <div class="btn-opt" onclick="setCar('Kodiaq', this)">Kodiaq (Samostatně)</div>
-            </div>
-
             <div class="single-mode-panel line-1" id="singleModePanel">
                 <div class="single-mode-txt">🔒 Režim: Jede pouze 1 varianta</div>
                 <div class="banner-btns">
                     <button class="btn-yn" id="btnSingleYes" onclick="toggleSingleMode(true)">ZAP</button>
                     <button class="btn-yn active-no" id="btnSingleNo" onclick="toggleSingleMode(false)">VYP</button>
                 </div>
+            </div>
+
+            <div class="single-mode-panel line-1" id="twoVariantPanel">
+                <div class="single-mode-txt">🔒 Režim: Jedou 2 varianty (stejný obal)</div>
+                <div class="banner-btns">
+                    <button class="btn-yn" id="btnTwoYes" onclick="toggleTwoVariantMode(true)">ZAP</button>
+                    <button class="btn-yn active-no" id="btnTwoNo" onclick="toggleTwoVariantMode(false)">VYP</button>
+                </div>
+            </div>
+
+            <div class="lbl">Produkt</div>
+            <div class="grid-2" id="carGrid">
+                <div class="btn-opt selected-1" onclick="setCar('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
+                <div class="btn-opt" onclick="setCar('Seat / Audi', this)">Seat / Audi</div>
+                <div class="btn-opt" onclick="setCar('Tayron', this)">Tayron</div>
+                <div class="btn-opt" onclick="setCar('Kodiaq (Samostatně)', this)">Kodiaq (Samostatně)</div>
             </div>
 
             <div class="lbl">Počet Stojanů WRT</div>
@@ -262,7 +270,7 @@
                 <div class="vzv-alert-row">
                     <select id="vzvVariantSelect" class="vzv-select">
                         <option value="Tiguan / Kodiaq">Tiguan / Kodiaq</option>
-                        <option value="Audi / Seat">Audi / Seat</option>
+                        <option value="Seat / Audi">Seat / Audi</option>
                         <option value="Tayron">Tayron</option>
                     </select>
                     <input type="number" id="vzvCountInput" class="vzv-num-input" placeholder="zde napiš počet obalu" value="" min="1" max="99">
@@ -306,6 +314,7 @@
         let curLine = 1, curCar = 'Tiguan / Kodiaq', curStojany = 3;
         let singleModeLines = { 1: false, 2: false };
         let singleModeCar = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
+        let twoVariantModeLines = { 1: false, 2: false };
         
         let orders = [];
         let stockAlerts = [];
@@ -342,11 +351,18 @@
             render();
         });
 
+        db.ref('twoVariantModeLines').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) twoVariantModeLines = data;
+            render();
+        });
+
         function save() {
             db.ref('orders').set(orders);
             db.ref('alerts').set(stockAlerts);
             db.ref('singleModeLines').set(singleModeLines);
             db.ref('singleModeCar').set(singleModeCar);
+            db.ref('twoVariantModeLines').set(twoVariantModeLines);
         }
 
         function openSettingsModal() {
@@ -452,13 +468,23 @@
         function toggleSingleMode(enable) {
             singleModeLines[curLine] = enable;
             if (enable) {
+                twoVariantModeLines[curLine] = false; // Vzájemně se vylučují
                 singleModeCar[curLine] = curCar;
+                alert("Funkce aktivována stisknutím OK");
             }
             save();
             updateDynamicTheme();
+            render();
+        }
+
+        function toggleTwoVariantMode(enable) {
+            twoVariantModeLines[curLine] = enable;
             if (enable) {
-                alert(`Zapnutá funkce na Lince ${curLine}: Výroba jedné varianty (${curCar})`);
+                singleModeLines[curLine] = false; // Vzájemně se vylučují
+                alert("Funkce aktivována stisknutím OK");
             }
+            save();
+            updateDynamicTheme();
             render();
         }
 
@@ -468,10 +494,15 @@
             let customBoxClass = curLine === 1 ? 'custom-stojan-input line-1 active' : 'custom-stojan-input line-2 active';
 
             document.getElementById('singleModePanel').className = panelClass;
+            document.getElementById('twoVariantPanel').className = panelClass;
             
             let isSingleActive = singleModeLines[curLine];
             document.getElementById('btnSingleYes').className = 'btn-yn ' + (isSingleActive ? 'active-yes' : '');
             document.getElementById('btnSingleNo').className = 'btn-yn ' + (!isSingleActive ? 'active-no' : '');
+
+            let isTwoActive = twoVariantModeLines[curLine];
+            document.getElementById('btnTwoYes').className = 'btn-yn ' + (isTwoActive ? 'active-yes' : '');
+            document.getElementById('btnTwoNo').className = 'btn-yn ' + (!isTwoActive ? 'active-no' : '');
 
             document.querySelectorAll('#carGrid .btn-opt').forEach(b => {
                 b.classList.remove('selected-1', 'selected-2');
@@ -535,6 +566,9 @@
 
             if (singleModeLines[curLine]) {
                 singleModeLines[curLine] = false;
+            }
+            if (twoVariantModeLines[curLine]) {
+                twoVariantModeLines[curLine] = false;
             }
 
             orders.push({ 
@@ -629,19 +663,27 @@
                 let htmlContent = '';
 
                 [1, 2].forEach(l => {
+                    let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
                     if (singleModeLines[l]) {
                         let cCar = singleModeCar[l] || 'Tiguan / Kodiaq';
-                        let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
                         htmlContent += `
                             <div class="single-mode-info-card">
                                 <span>🔒 <b>Režim 1 varianta:</b> ${cCar} <span class="${badgeCls}">Linka ${l}</span></span>
-                                <span style="font-size:0.7rem; color:#f59e0b;">Aktivní režim</span>
+                                <span style="font-size:0.7rem; color:#f59e0b;">Aktivní</span>
+                            </div>
+                        `;
+                    }
+                    if (twoVariantModeLines[l]) {
+                        htmlContent += `
+                            <div class="single-mode-info-card">
+                                <span>🔒 <b>Režim 2 varianty (stejný obal):</b> Tiguan / Kodiaq nebo Seat / Audi <span class="${badgeCls}">Linka ${l}</span></span>
+                                <span style="font-size:0.7rem; color:#f59e0b;">Aktivní</span>
                             </div>
                         `;
                     }
                 });
 
-                if (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2]) {
+                if (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2] && !twoVariantModeLines[1] && !twoVariantModeLines[2]) {
                     htmlContent += '<div class="empty">Žádné aktivní objednávky</div>';
                 }
 
@@ -670,17 +712,18 @@
                 let next = document.getElementById(`l${l}Next`);
                 let body = document.getElementById(`l${l}Body`);
                 let isSingle = singleModeLines[l];
+                let isTwo = twoVariantModeLines[l];
                 let currentSingleCar = singleModeCar[l] || 'Tiguan / Kodiaq';
 
                 if (title && next && body) {
-                    if (lOrders.length === 0 && !isSingle) {
+                    if (lOrders.length === 0 && !isSingle && !isTwo) {
                         title.innerText = 'Žádná objednávka';
                         next.className = 'next-txt none';
                         next.innerText = 'Následuje ➔ Žádné';
                         body.innerHTML = '<div class="empty">Linka je volná</div>';
                     } else {
-                        if (isSingle && lOrders.length === 0) {
-                            title.innerText = `${currentSingleCar} výroba jedné varianty`;
+                        if ((isSingle || isTwo) && lOrders.length === 0) {
+                            title.innerText = isSingle ? `${currentSingleCar} (jedna varianta)` : `2 varianty (stejný obal)`;
                             next.className = 'next-txt none';
                             next.innerText = 'Následuje ➔ Žádné';
                         } else {
@@ -701,14 +744,15 @@
                             }
                         }
 
-                        let singleModeAlertHtml = isSingle ? `
-                            <div class="vzv-single-mode-box">
-                                ⚠️ ZAVÁŽET POUZE JEDNOU VARIANTOU.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!
-                            </div>
-                        ` : '';
+                        let modeAlertHtml = '';
+                        if (isSingle) {
+                            modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE JEDNOU VARIANTOU.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
+                        } else if (isTwo) {
+                            modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET 2 VARIANTY SE STEJNÝM OBALEM.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
+                        }
 
                         if (lOrders.length === 0) {
-                            body.innerHTML = singleModeAlertHtml + '<div class="empty">Čeká se na zadání objednávky</div>';
+                            body.innerHTML = modeAlertHtml + '<div class="empty">Čeká se na zadání objednávky</div>';
                         } else {
                             let cur = lOrders[0];
                             let boxes = '';
@@ -722,7 +766,7 @@
                             let noteHtml = cur.note ? `<div class="note-tag ${lineClass}">📝 Poznámka: ${cur.note}</div>` : '';
 
                             body.innerHTML = `
-                                ${singleModeAlertHtml}
+                                ${modeAlertHtml}
                                 ${noteHtml}
                                 <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; color:#94a3b8;">
                                     <span>Zbývá zavezt: <b>${cur.total - cur.done} ob.</b></span>
@@ -737,7 +781,7 @@
 
             let doneBanner = document.getElementById('doneBanner');
             if (doneBanner) {
-                doneBanner.style.display = (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2]) ? 'block' : 'none';
+                doneBanner.style.display = (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2] && !twoVariantModeLines[1] && !twoVariantModeLines[2]) ? 'block' : 'none';
             }
         }
     </script>
