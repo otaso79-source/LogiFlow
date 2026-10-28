@@ -124,6 +124,26 @@
         .btn-yn.active-yes { background: #10b981; color: #fff; }
         .btn-yn.active-no { background: #ef4444; color: #fff; }
 
+        /* VLASTNÍ MODÁLNÍ OKNO PRO HESLO (ZAMASKOVANÉ TEČKY) */
+        #adminPasswordModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85); z-index: 10000; align-items: center; justify-content: center; padding: 15px;
+        }
+        .admin-pwd-box {
+            background: #1e293b; border: 2px solid #f59e0b; border-radius: 12px;
+            width: 100%; max-width: 320px; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+        .admin-pwd-input {
+            width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
+            border-radius: 8px; color: #fff; font-size: 1.2rem; text-align: center;
+            letter-spacing: 4px; margin: 15px 0; outline: none;
+        }
+        .admin-pwd-input:focus { border-color: #f59e0b; }
+        .admin-pwd-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn-admin-action { padding: 10px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; font-size: 0.9rem; }
+        .btn-admin-cancel { background: #334155; color: #94a3b8; }
+        .btn-admin-ok { background: #f59e0b; color: #0f172a; }
+
         /* PŘEKRYVNÉ BANNERY */
         #updateBannerOverlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -137,7 +157,6 @@
         .update-banner-text { font-size: 0.95rem; color: #f8fafc; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
         .btn-update-ack { width: 100%; padding: 14px; background: #ef4444; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
 
-        /* STYL PRO HOTOVOU AKTUALIZACI (ZELENÝ RÁMEČEK A ZELENÉ PRVKY) */
         .update-banner-box.completed-box {
             border: 3px solid #10b981;
             box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
@@ -181,12 +200,26 @@
 </head>
 <body>
 
-    <!-- PŘEKRYVNÝ BANNER PRO AKTUALIZACI -->
+    <!-- PŘEKRYVNÝ BANNER PRO AKTUALIZACI (ZŮSTANE, DOKUD HO DANÝ TELEFON NEODKLIKNE) -->
     <div id="updateBannerOverlay">
         <div class="update-banner-box" id="updateBannerBox">
             <div class="update-banner-title" id="bannerTitle">⚠️ Upozornění systému</div>
             <div class="update-banner-text" id="bannerText">Načítání...</div>
             <button class="btn-update-ack" id="bannerAckBtn" onclick="acknowledgeUpdate()">ROZUMÍM / POTVRDIT</button>
+        </div>
+    </div>
+
+    <!-- VLASTNÍ OKNO PRO ZADÁNÍ HESLA SPRÁVCE (SCHOVANÉ TEČKY) -->
+    <div id="adminPasswordModal">
+        <div class="admin-pwd-box">
+            <div style="font-size: 1rem; font-weight: bold; color: #f59e0b;">🔒 Zadejte heslo správce</div>
+            <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Pro změnu režimu údržby</div>
+            <input type="password" id="adminPassInput" class="admin-pwd-input" placeholder="••••••" autofocus onkeydown="if(event.key==='Enter') verifyAdminPassword()">
+            <div id="adminPassError" style="color: #ef4444; font-size: 0.75rem; margin-bottom: 8px; display: none;">⚠️ Nesprávné heslo!</div>
+            <div class="admin-pwd-btns">
+                <button class="btn-admin-action btn-admin-cancel" onclick="closeAdminPasswordModal()">Zrušit</button>
+                <button class="btn-admin-action btn-admin-ok" onclick="verifyAdminPassword()">Potvrdit</button>
+            </div>
         </div>
     </div>
 
@@ -362,8 +395,8 @@
                 </div>
                 <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Aktivuje výstrahu na všech zařízeních A i B. Vyžaduje heslo správce.</div>
                 <div class="banner-btns" style="width:100%; display:grid; grid-template-columns:1fr 1fr;">
-                    <button class="btn-yn" id="setUpdateYes" onclick="requestUpdateToggle(true)">ZAPNOUT</button>
-                    <button class="btn-yn active-no" id="setUpdateNo" onclick="requestUpdateToggle(false)">VYPNOUT</button>
+                    <button class="btn-yn" id="setUpdateYes" onclick="openAdminPasswordModal(true)">ZAPNOUT</button>
+                    <button class="btn-yn active-no" id="setUpdateNo" onclick="openAdminPasswordModal(false)">VYPNOUT</button>
                 </div>
             </div>
         </div>
@@ -387,6 +420,7 @@
         
         let systemUpdateActive = false;
         let systemUpdateCompletedState = false;
+        let pendingUpdateState = false; // pamatuje si, co chtěl admin zapnout/vypnout
 
         let orders = [];
         let stockAlerts = [];
@@ -437,8 +471,17 @@
 
         db.ref('systemUpdate').on('value', (snapshot) => {
             let val = snapshot.val();
-            systemUpdateActive = val ? val.active : false;
-            systemUpdateCompletedState = val ? val.completed : false;
+            let newActive = val ? val.active : false;
+            let newCompleted = val ? val.completed : false;
+
+            // Pokud se změnil stav ze serveru, zrušíme lokální příznak odkliknutí, aby hláška naskočila znovu
+            if (newActive !== systemUpdateActive || newCompleted !== systemUpdateCompletedState) {
+                if (newActive) localStorage.removeItem('ack_update_active');
+                if (newCompleted) localStorage.removeItem('ack_update_completed');
+            }
+
+            systemUpdateActive = newActive;
+            systemUpdateCompletedState = newCompleted;
             renderUpdateOverlay();
         });
 
@@ -451,15 +494,28 @@
             db.ref('twoVariantPair').set(twoVariantPair);
         }
 
-        function requestUpdateToggle(enable) {
-            let pass = prompt("🔒 Zadejte administrátorské heslo (704517) pro změnu režimu aktualizace:");
-            if (pass === null) return;
+        function openAdminPasswordModal(enable) {
+            pendingUpdateState = enable;
+            document.getElementById('adminPassInput').value = '';
+            document.getElementById('adminPassError').style.display = 'none';
+            document.getElementById('adminPasswordModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
+        }
+
+        function closeAdminPasswordModal() {
+            document.getElementById('adminPasswordModal').style.display = 'none';
+        }
+
+        function verifyAdminPassword() {
+            let pass = document.getElementById('adminPassInput').value;
             if (pass !== ADMIN_PASSWORD) {
-                alert("⚠️ Nesprávné heslo správce!");
+                document.getElementById('adminPassError').style.display = 'block';
                 return;
             }
+            closeAdminPasswordModal();
+            closeSettingsModal();
 
-            if (enable) {
+            if (pendingUpdateState) {
                 db.ref('systemUpdate').set({ active: true, completed: false });
             } else {
                 db.ref('systemUpdate').set({ active: false, completed: true });
@@ -468,7 +524,9 @@
 
         function acknowledgeUpdate() {
             if (systemUpdateCompletedState) {
-                db.ref('systemUpdate').set(null);
+                localStorage.setItem('ack_update_completed', 'true');
+            } else if (systemUpdateActive) {
+                localStorage.setItem('ack_update_active', 'true');
             }
             document.getElementById('updateBannerOverlay').style.display = 'none';
         }
@@ -480,13 +538,16 @@
             let text = document.getElementById('bannerText');
             let ackBtn = document.getElementById('bannerAckBtn');
 
-            if (systemUpdateActive) {
+            let ackActive = localStorage.getItem('ack_update_active') === 'true';
+            let ackCompleted = localStorage.getItem('ack_update_completed') === 'true';
+
+            if (systemUpdateActive && !ackActive) {
                 bannerBox.className = "update-banner-box";
                 title.innerText = "⚠️ UPOZORNĚNÍ NA ÚDRŽBU";
                 text.innerText = "POZOR: Proběhne aktualizace programu připravte se na výpadek.\n\nNeřiďte se PROGRAMEM !!!";
                 ackBtn.innerText = "ROZUMÍM / POTVRDIT";
                 overlay.style.display = 'flex';
-            } else if (systemUpdateCompletedState) {
+            } else if (systemUpdateCompletedState && !ackCompleted) {
                 bannerBox.className = "update-banner-box completed-box";
                 title.innerText = "✅ HOTOVO";
                 text.innerText = "Program aktualizován, proveďte reset a vymažte objednávky.";
