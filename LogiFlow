@@ -237,7 +237,7 @@
             </div>
 
             <button class="btn-submit" onclick="addOrder()">POSLAT OBJEDNÁVKU VZV</button>
-            <div class="lbl" style="margin-top:16px;">Odesláno na VZV (Probíhající objednávky / Aktivní režimy)</div>
+            <div class="lbl" style="margin-top:16px;">Odesláno na VZV (Probíhají objednávky / Aktivní režimy)</div>
             <div id="listA"></div>
         </div>
 
@@ -523,10 +523,10 @@
             if (isTwoActive) {
                 productLbl.innerText = "Vyberte dvojici variant pro kontrolu:";
                 carGrid.className = 'grid-2';
-                let currentPair = twoVariantPair[curLine] || 'Tiguan a Kodiaq';
+                let currentPair = twoVariantPair[curLine] || 'Tiguan / Kodiaq';
                 carGrid.innerHTML = `
-                    <div class="btn-opt ${currentPair === 'Tiguan a Kodiaq' ? activeClass : ''}" onclick="setTwoPair('Tiguan a Kodiaq', this)">Tiguan a Kodiaq</div>
-                    <div class="btn-opt ${currentPair === 'Audi a Seat' ? activeClass : ''}" onclick="setTwoPair('Audi a Seat', this)">Audi a Seat</div>
+                    <div class="btn-opt ${currentPair === 'Tiguan / Kodiaq' ? activeClass : ''}" onclick="setTwoPair('Tiguan / Kodiaq', this)">Tiguan a Kodiaq</div>
+                    <div class="btn-opt ${currentPair === 'Audi / Seat' ? activeClass : ''}" onclick="setTwoPair('Audi / Seat', this)">Audi a Seat</div>
                 `;
             } else {
                 productLbl.innerText = "Produkt";
@@ -610,10 +610,10 @@
             let isTwo = twoVariantModeLines[curLine];
 
             if (isSingle) {
-                orderCar = `${singleModeCar[curLine] || 'Tiguan'} (1 varianta)`;
+                orderCar = `🔒 Režim 1 varianta: ${singleModeCar[curLine] || 'Tiguan'}`;
             } else if (isTwo) {
-                let pairText = twoVariantPair[curLine] || 'Tiguan a Kodiaq';
-                orderCar = `${pairText} (2 varianty)`;
+                let pairText = twoVariantPair[curLine] || 'Tiguan / Kodiaq';
+                orderCar = `🔒 Režim 2 varianty: ${pairText}`;
             }
 
             orders.push({ 
@@ -765,10 +765,10 @@
                         }
 
                         let modeAlertHtml = '';
-                        if (cur.car.includes('1 varianta')) {
+                        if (cur.car.includes('Režim 1 varianta')) {
                             modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE JEDNOU VARIANTOU.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
-                        } else if (cur.car.includes('2 varianty')) {
-                            let extractedPair = cur.car.split(' (')[0];
+                        } else if (cur.car.includes('Režim 2 varianty')) {
+                            let extractedPair = cur.car.split(': ')[1];
                             modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ${extractedPair} výroba 2 produktů se stejným obalem.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
                         }
 
