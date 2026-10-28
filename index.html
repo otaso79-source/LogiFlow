@@ -56,7 +56,6 @@
         .line-btn.active-2 { border-color: #a855f7; color: #fff; background: #581c87; }
 
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
-        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
         .btn-opt { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px 4px; border-radius: 8px; font-weight: bold; text-align: center; cursor: pointer; font-size: 0.85rem; }
         
@@ -208,11 +207,12 @@
             </div>
 
             <div class="lbl">Produkt</div>
-            <div class="grid-2" id="carGrid">
-                <div class="btn-opt selected-1" onclick="setCar('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
-                <div class="btn-opt" onclick="setCar('Seat / Audi', this)">Seat / Audi</div>
+            <div class="grid-3" id="carGrid">
+                <div class="btn-opt selected-1" onclick="setCar('Tiguan', this)">Tiguan</div>
+                <div class="btn-opt" onclick="setCar('Kodiaq', this)">Kodiaq</div>
                 <div class="btn-opt" onclick="setCar('Tayron', this)">Tayron</div>
-                <div class="btn-opt" onclick="setCar('Kodiaq (Samostatně)', this)">Kodiaq (Samostatně)</div>
+                <div class="btn-opt" onclick="setCar('Audi', this)">Audi</div>
+                <div class="btn-opt" onclick="setCar('Seat', this)">Seat</div>
             </div>
 
             <div class="lbl">Počet Stojanů WRT</div>
@@ -311,9 +311,9 @@
 
         const SYSTEM_PASSWORD = '1234';
         let notificationsEnabled = true;
-        let curLine = 1, curCar = 'Tiguan / Kodiaq', curStojany = 3;
+        let curLine = 1, curCar = 'Tiguan', curStojany = 3;
         let singleModeLines = { 1: false, 2: false };
-        let singleModeCar = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
+        let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' };
         let twoVariantModeLines = { 1: false, 2: false };
         
         let orders = [];
@@ -468,7 +468,7 @@
         function toggleSingleMode(enable) {
             singleModeLines[curLine] = enable;
             if (enable) {
-                twoVariantModeLines[curLine] = false; // Vzájemně se vylučují
+                twoVariantModeLines[curLine] = false;
                 singleModeCar[curLine] = curCar;
                 alert("Funkce aktivována stisknutím OK");
             }
@@ -480,7 +480,7 @@
         function toggleTwoVariantMode(enable) {
             twoVariantModeLines[curLine] = enable;
             if (enable) {
-                singleModeLines[curLine] = false; // Vzájemně se vylučují
+                singleModeLines[curLine] = false;
                 alert("Funkce aktivována stisknutím OK");
             }
             save();
@@ -665,7 +665,7 @@
                 [1, 2].forEach(l => {
                     let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
                     if (singleModeLines[l]) {
-                        let cCar = singleModeCar[l] || 'Tiguan / Kodiaq';
+                        let cCar = singleModeCar[l] || 'Tiguan';
                         htmlContent += `
                             <div class="single-mode-info-card">
                                 <span>🔒 <b>Režim 1 varianta:</b> ${cCar} <span class="${badgeCls}">Linka ${l}</span></span>
@@ -676,7 +676,7 @@
                     if (twoVariantModeLines[l]) {
                         htmlContent += `
                             <div class="single-mode-info-card">
-                                <span>🔒 <b>Režim 2 varianty (stejný obal):</b> Tiguan / Kodiaq nebo Seat / Audi <span class="${badgeCls}">Linka ${l}</span></span>
+                                <span>🔒 <b>Režim 2 varianty (stejný obal):</b> Tiguan / Kodiaq nebo Audi / Seat <span class="${badgeCls}">Linka ${l}</span></span>
                                 <span style="font-size:0.7rem; color:#f59e0b;">Aktivní</span>
                             </div>
                         `;
@@ -713,7 +713,7 @@
                 let body = document.getElementById(`l${l}Body`);
                 let isSingle = singleModeLines[l];
                 let isTwo = twoVariantModeLines[l];
-                let currentSingleCar = singleModeCar[l] || 'Tiguan / Kodiaq';
+                let currentSingleCar = singleModeCar[l] || 'Tiguan';
 
                 if (title && next && body) {
                     if (lOrders.length === 0 && !isSingle && !isTwo) {
