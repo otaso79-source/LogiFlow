@@ -73,6 +73,15 @@
         .mode-selector-box.line-1 { border-color: #3b82f6; }
         .mode-selector-box.line-2 { border-color: #a855f7; }
 
+        /* NOVÝ PANEL PRO OPAKOVÁNÍ ZAVĚŠENÍ / NEUPNUTÝ OBAL */
+        .repeat-panel { background: #1e293b; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+        .repeat-title { font-size: 0.8rem; font-weight: bold; color: #f59e0b; text-align: center; margin-bottom: 8px; }
+        .box-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
+        .box-col { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 6px 2px; }
+        .box-col-lbl { font-size: 0.7rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; }
+        .box-col-btn { width: 100%; padding: 6px 2px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; }
+        .box-col-btn.active { background: #f59e0b; color: #0f172a; border-color: #f59e0b; }
+
         .custom-stojan-input { margin-top: 6px; display: none; gap: 6px; align-items: center; }
         .custom-stojan-input.active { display: flex; }
         .custom-stojan-input input { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.9rem; width: 100%; font-weight: bold; }
@@ -124,7 +133,7 @@
         .btn-yn.active-yes { background: #10b981; color: #fff; }
         .btn-yn.active-no { background: #ef4444; color: #fff; }
 
-        /* VLASTNÍ MODÁLNÍ OKNO PRO HESLO (ZAMASKOVANÉ TEČKY) */
+        /* VLASTNÍ OKNO PRO HESLO SPRÁVCE */
         #adminPasswordModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.85); z-index: 10000; align-items: center; justify-content: center; padding: 15px;
@@ -200,7 +209,7 @@
 </head>
 <body>
 
-    <!-- PŘEKRYVNÝ BANNER PRO AKTUALIZACI (ZŮSTANE, DOKUD HO DANÝ TELEFON NEODKLIKNE) -->
+    <!-- PŘEKRYVNÝ BANNER PRO AKTUALIZACI -->
     <div id="updateBannerOverlay">
         <div class="update-banner-box" id="updateBannerBox">
             <div class="update-banner-title" id="bannerTitle">⚠️ Upozornění systému</div>
@@ -209,7 +218,7 @@
         </div>
     </div>
 
-    <!-- VLASTNÍ OKNO PRO ZADÁNÍ HESLA SPRÁVCE (SCHOVANÉ TEČKY) -->
+    <!-- VLASTNÍ OKNO PRO HESLO SPRÁVCE (ZAMASKOVANÉ TEČKY) -->
     <div id="adminPasswordModal">
         <div class="admin-pwd-box">
             <div style="font-size: 1rem; font-weight: bold; color: #f59e0b;">🔒 Zadejte heslo správce</div>
@@ -289,6 +298,29 @@
                 <div class="grid-2" id="twoPairGrid" style="margin-bottom:0;">
                     <div class="btn-opt" onclick="setTwoPair('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
                     <div class="btn-opt" onclick="setTwoPair('Audi / Seat', this)">Audi / Seat</div>
+                </div>
+            </div>
+
+            <!-- NOVÝ ŘÁDEK / PANEL: OPAKUJ ZAVEZENÍ, NEUPNUTÝ OBAL (BOX 4, 3, 2, 1) -->
+            <div class="repeat-panel">
+                <div class="repeat-title">Opakuj zavezení, neupnutý obal</div>
+                <div class="box-grid-4">
+                    <div class="box-col">
+                        <div class="box-col-lbl">Box 4</div>
+                        <button class="box-col-btn" id="repeatBox4" onclick="toggleRepeatBox(4)">VYP</button>
+                    </div>
+                    <div class="box-col">
+                        <div class="box-col-lbl">Box 3</div>
+                        <button class="box-col-btn" id="repeatBox3" onclick="toggleRepeatBox(3)">VYP</button>
+                    </div>
+                    <div class="box-col">
+                        <div class="box-col-lbl">Box 2</div>
+                        <button class="box-col-btn" id="repeatBox2" onclick="toggleRepeatBox(2)">VYP</button>
+                    </div>
+                    <div class="box-col">
+                        <div class="box-col-lbl">Box 1</div>
+                        <button class="box-col-btn" id="repeatBox1" onclick="toggleRepeatBox(1)">VYP</button>
+                    </div>
                 </div>
             </div>
 
@@ -417,10 +449,11 @@
         let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' };
         let twoVariantModeLines = { 1: false, 2: false };
         let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
+        let repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
         
         let systemUpdateActive = false;
         let systemUpdateCompletedState = false;
-        let pendingUpdateState = false; // pamatuje si, co chtěl admin zapnout/vypnout
+        let pendingUpdateState = false;
 
         let orders = [];
         let stockAlerts = [];
@@ -469,12 +502,17 @@
             render();
         });
 
+        db.ref('repeatBoxes').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) repeatBoxes = data;
+            render();
+        });
+
         db.ref('systemUpdate').on('value', (snapshot) => {
             let val = snapshot.val();
             let newActive = val ? val.active : false;
             let newCompleted = val ? val.completed : false;
 
-            // Pokud se změnil stav ze serveru, zrušíme lokální příznak odkliknutí, aby hláška naskočila znovu
             if (newActive !== systemUpdateActive || newCompleted !== systemUpdateCompletedState) {
                 if (newActive) localStorage.removeItem('ack_update_active');
                 if (newCompleted) localStorage.removeItem('ack_update_completed');
@@ -492,6 +530,28 @@
             db.ref('singleModeCar').set(singleModeCar);
             db.ref('twoVariantModeLines').set(twoVariantModeLines);
             db.ref('twoVariantPair').set(twoVariantPair);
+            db.ref('repeatBoxes').set(repeatBoxes);
+        }
+
+        function toggleRepeatBox(boxNum) {
+            repeatBoxes[boxNum] = !repeatBoxes[boxNum];
+            save();
+            renderRepeatBoxesUI();
+        }
+
+        function renderRepeatBoxesUI() {
+            for (let i = 1; i <= 4; i++) {
+                let btn = document.getElementById(`repeatBox${i}`);
+                if (btn) {
+                    if (repeatBoxes[i]) {
+                        btn.innerText = "ZAP";
+                        btn.className = "box-col-btn active";
+                    } else {
+                        btn.innerText = "VYP";
+                        btn.className = "box-col-btn";
+                    }
+                }
+            }
         }
 
         function openAdminPasswordModal(enable) {
@@ -901,6 +961,8 @@
 
         function render() {
             if (sessionStorage.getItem('device_authenticated') !== 'true') return;
+
+            renderRepeatBoxesUI();
 
             let alertArea = document.getElementById('alertAreaA');
             if (alertArea) {
