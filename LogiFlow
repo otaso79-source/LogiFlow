@@ -63,6 +63,31 @@
         .btn-opt.selected-1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff; }
         .btn-opt.selected-2 { border-color: #a855f7; background: rgba(168, 85, 247, 0.25); color: #fff; }
 
+        /* AKORDEONY / ROZBALOVACÍ LIŠTY */
+        .accordion-wrapper {
+            background: #1e293b; border: 1px solid #334155; border-radius: 8px; margin-bottom: 10px; overflow: hidden;
+        }
+        .accordion-header {
+            padding: 12px; background: #1e293b; font-size: 0.85rem; font-weight: bold; color: #f8fafc;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;
+        }
+        .accordion-header .arrow { font-size: 0.8rem; color: #94a3b8; transition: transform 0.2s; }
+        .accordion-header.open .arrow { transform: rotate(180deg); }
+        .accordion-content {
+            display: none; padding: 10px; border-top: 1px solid #334155; background: #0f172a;
+        }
+
+        /* ČERVENÉ BLIKÁNÍ PRO AKTIIVNÍ ČIDLO */
+        .accordion-header.alarm-active {
+            background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #ef4444;
+            animation: pulseHeaderAlarm 1.5s infinite;
+        }
+        @keyframes pulseHeaderAlarm {
+            0% { background: rgba(239, 68, 68, 0.35); }
+            50% { background: rgba(239, 68, 68, 0.1); }
+            100% { background: rgba(239, 68, 68, 0.35); }
+        }
+
         .single-mode-panel { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .single-mode-panel.line-1 { border-color: #3b82f6; }
         .single-mode-panel.line-2 { border-color: #a855f7; }
@@ -74,7 +99,7 @@
         .mode-selector-box.line-2 { border-color: #a855f7; }
 
         /* PANEL PRO OPAKOVÁNÍ ZAVEZENÍ / BEDNA NENÍ NA ČIDLE */
-        .repeat-panel { background: #1e293b; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+        .repeat-panel { background: #1e293b; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; }
         .repeat-title { font-size: 0.8rem; font-weight: bold; color: #f59e0b; text-align: center; margin-bottom: 8px; }
         .box-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
         .box-col { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 6px 2px; }
@@ -144,6 +169,14 @@
         .btn-yn.active-yes { background: #10b981; color: #fff; }
         .btn-yn.active-no { background: #ef4444; color: #fff; }
 
+        /* UŽIVATELÉ ONLINE V NASTAVENÍ */
+        .settings-online-counter {
+            background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px;
+            display: flex; justify-content: space-around; text-align: center; font-size: 0.8rem;
+        }
+        .online-val-a { color: #3b82f6; font-weight: bold; font-size: 1rem; }
+        .online-val-b { color: #a855f7; font-weight: bold; font-size: 1rem; }
+
         /* VLASTNÍ OKNO PRO HESLO SPRÁVCE */
         #adminPasswordModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -177,7 +210,6 @@
         .update-banner-text { font-size: 0.95rem; color: #f8fafc; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
         .btn-update-ack { width: 100%; padding: 14px; background: #ef4444; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; display: none; }
 
-        /* ZELENÝ STAV HOTOVO (ZELENÝ RÁMEČEK, ZELENÝ NADPIS A TLAČÍTKO OK) */
         .update-banner-box.completed-box {
             border: 3px solid #10b981;
             box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
@@ -187,7 +219,7 @@
         }
         .update-banner-box.completed-box .btn-update-ack {
             background: #10b981;
-            display: block; /* U zelené hlášky se tlačítko OK zobrazí, aby šla odkliknout */
+            display: block;
         }
 
         .vzv-alert-panel { background: #1e293b; border: 1px solid #ef4444; border-radius: 8px; padding: 10px; margin-top: 16px; }
@@ -279,60 +311,77 @@
                 <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.65rem; font-weight:normal;">BOX 2 - 1</span></div>
             </div>
 
-            <div class="single-mode-panel line-1" id="singleModePanel">
-                <div class="single-mode-txt">🔒 Režim: Jede pouze 1 varianta</div>
-                <div class="banner-btns">
-                    <button class="btn-yn" id="btnSingleYes" onclick="toggleSingleMode(true)">ZAP</button>
-                    <button class="btn-yn active-no" id="btnSingleNo" onclick="toggleSingleMode(false)">VYP</button>
+            <!-- ROZBALOVACÍ LIŠTA 1: REŽIMY VARIANT -->
+            <div class="accordion-wrapper">
+                <div class="accordion-header" id="modesAccordionHeader" onclick="toggleAccordion('modesAccordionContent', 'modesAccordionHeader')">
+                    <span>Výroba jedné nebo dvou variant se stejným obalem. Vyber možnosti</span>
+                    <span class="arrow">▼</span>
                 </div>
-            </div>
-
-            <div class="mode-selector-box line-1" id="singleModeSelectBox">
-                <div class="lbl" style="margin-top:0;">Vyberte variantu pro režim:</div>
-                <div class="grid-3" id="singleCarGrid" style="margin-bottom:0;">
-                    <div class="btn-opt" onclick="setSingleCar('Tiguan', this)">Tiguan</div>
-                    <div class="btn-opt" onclick="setSingleCar('Kodiaq', this)">Kodiaq</div>
-                    <div class="btn-opt" onclick="setSingleCar('Tayron', this)">Tayron</div>
-                    <div class="btn-opt" onclick="setSingleCar('Audi', this)">Audi</div>
-                    <div class="btn-opt" onclick="setSingleCar('Seat', this)">Seat</div>
-                </div>
-            </div>
-
-            <div class="single-mode-panel line-1" id="twoVariantPanel">
-                <div class="single-mode-txt">🔒 Režim: Jedou 2 varianty (stejný obal)</div>
-                <div class="banner-btns">
-                    <button class="btn-yn" id="btnTwoYes" onclick="toggleTwoVariantMode(true)">ZAP</button>
-                    <button class="btn-yn active-no" id="btnTwoNo" onclick="toggleTwoVariantMode(false)">VYP</button>
-                </div>
-            </div>
-
-            <div class="mode-selector-box line-1" id="twoModeSelectBox">
-                <div class="lbl" style="margin-top:0;">Vyberte dvojici variant pro kontrolu:</div>
-                <div class="grid-2" id="twoPairGrid" style="margin-bottom:0;">
-                    <div class="btn-opt" onclick="setTwoPair('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
-                    <div class="btn-opt" onclick="setTwoPair('Audi / Seat', this)">Audi / Seat</div>
-                </div>
-            </div>
-
-            <!-- PANEL: OPAKUJ ZAVEZENÍ, BEDNA NENÍ NA ČIDLE (BOX 4, 3, 2, 1) -->
-            <div class="repeat-panel">
-                <div class="repeat-title">Opakuj zavezení, bedna není na čidle</div>
-                <div class="box-grid-4">
-                    <div class="box-col">
-                        <div class="box-col-lbl">Box 4</div>
-                        <button class="box-col-btn" id="repeatBox4" onclick="toggleRepeatBox(4)">VYP</button>
+                <div class="accordion-content" id="modesAccordionContent">
+                    <div class="single-mode-panel line-1" id="singleModePanel">
+                        <div class="single-mode-txt">🔒 Režim: Jede pouze 1 varianta</div>
+                        <div class="banner-btns">
+                            <button class="btn-yn" id="btnSingleYes" onclick="toggleSingleMode(true)">ZAP</button>
+                            <button class="btn-yn active-no" id="btnSingleNo" onclick="toggleSingleMode(false)">VYP</button>
+                        </div>
                     </div>
-                    <div class="box-col">
-                        <div class="box-col-lbl">Box 3</div>
-                        <button class="box-col-btn" id="repeatBox3" onclick="toggleRepeatBox(3)">VYP</button>
+
+                    <div class="mode-selector-box line-1" id="singleModeSelectBox">
+                        <div class="lbl" style="margin-top:0;">Vyberte variantu pro režim:</div>
+                        <div class="grid-3" id="singleCarGrid" style="margin-bottom:0;">
+                            <div class="btn-opt" onclick="setSingleCar('Tiguan', this)">Tiguan</div>
+                            <div class="btn-opt" onclick="setSingleCar('Kodiaq', this)">Kodiaq</div>
+                            <div class="btn-opt" onclick="setSingleCar('Tayron', this)">Tayron</div>
+                            <div class="btn-opt" onclick="setSingleCar('Audi', this)">Audi</div>
+                            <div class="btn-opt" onclick="setSingleCar('Seat', this)">Seat</div>
+                        </div>
                     </div>
-                    <div class="box-col">
-                        <div class="box-col-lbl">Box 2</div>
-                        <button class="box-col-btn" id="repeatBox2" onclick="toggleRepeatBox(2)">VYP</button>
+
+                    <div class="single-mode-panel line-1" id="twoVariantPanel">
+                        <div class="single-mode-txt">🔒 Režim: Jedou 2 varianty (stejný obal)</div>
+                        <div class="banner-btns">
+                            <button class="btn-yn" id="btnTwoYes" onclick="toggleTwoVariantMode(true)">ZAP</button>
+                            <button class="btn-yn active-no" id="btnTwoNo" onclick="toggleTwoVariantMode(false)">VYP</button>
+                        </div>
                     </div>
-                    <div class="box-col">
-                        <div class="box-col-lbl">Box 1</div>
-                        <button class="box-col-btn" id="repeatBox1" onclick="toggleRepeatBox(1)">VYP</button>
+
+                    <div class="mode-selector-box line-1" id="twoModeSelectBox">
+                        <div class="lbl" style="margin-top:0;">Vyberte dvojici variant pro kontrolu:</div>
+                        <div class="grid-2" id="twoPairGrid" style="margin-bottom:0;">
+                            <div class="btn-opt" onclick="setTwoPair('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
+                            <div class="btn-opt" onclick="setTwoPair('Audi / Seat', this)">Audi / Seat</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROZBALOVACÍ LIŠTA 2: OPAKUJ ZAVEZENÍ / ČIDLA -->
+            <div class="accordion-wrapper">
+                <div class="accordion-header" id="sensorAccordionHeader" onclick="toggleAccordion('sensorAccordionContent', 'sensorAccordionHeader')">
+                    <span id="sensorAccordionTitle">Opakuj zavezení, bedna není na čidle</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="accordion-content" id="sensorAccordionContent">
+                    <div class="repeat-panel">
+                        <div class="repeat-title">Opakuj zavezení, bedna není na čidle</div>
+                        <div class="box-grid-4">
+                            <div class="box-col">
+                                <div class="box-col-lbl">Box 4</div>
+                                <button class="box-col-btn" id="repeatBox4" onclick="toggleRepeatBox(4)">VYP</button>
+                            </div>
+                            <div class="box-col">
+                                <div class="box-col-lbl">Box 3</div>
+                                <button class="box-col-btn" id="repeatBox3" onclick="toggleRepeatBox(3)">VYP</button>
+                            </div>
+                            <div class="box-col">
+                                <div class="box-col-lbl">Box 2</div>
+                                <button class="box-col-btn" id="repeatBox2" onclick="toggleRepeatBox(2)">VYP</button>
+                            </div>
+                            <div class="box-col">
+                                <div class="box-col-lbl">Box 1</div>
+                                <button class="box-col-btn" id="repeatBox1" onclick="toggleRepeatBox(1)">VYP</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -377,7 +426,7 @@
         <div id="viewB" style="display:none;">
             <div class="lbl">Přehled linek</div>
              
-            <!-- VZV UPOZORNĚNÍ PRO CHYBĚJÍCÍ BEDNU NA ČIDLE -->
+            <!-- VZV UPOZORNĚNÍ PRO CHYBĚJÍCÍ BEDNY NA ČIDLECH -->
             <div id="vzvSensorAlertArea"></div>
 
             <div class="vzv-card l2">
@@ -429,6 +478,12 @@
                 <button class="btn-close" onclick="closeSettingsModal()">✕</button>
             </div>
 
+            <!-- PŘEHLED AKTIVNÍCH UŽIVATELŮ V NASTAVENÍ -->
+            <div class="settings-online-counter">
+                <div>Obsluha A online: <br><span id="countOnlineA" class="online-val-a">0</span></div>
+                <div style="border-left: 1px solid #334155; padding-left: 10px;">VZV B online: <br><span id="countOnlineB" class="online-val-b">0</span></div>
+            </div>
+
             <div class="settings-row">
                 <span style="font-size:0.85rem; font-weight:bold;">🔔 Zvukové notifikace</span>
                 <div class="banner-btns">
@@ -470,12 +525,65 @@
         let systemUpdateActive = false;
         let systemUpdateCompletedState = false;
         let pendingUpdateState = false;
-        let adminBypassed = false;
 
         let orders = [];
         let stockAlerts = [];
         let lastOrderCount = 0;
         let selectedLoginMode = 'A';
+
+        let deviceId = sessionStorage.getItem('device_id');
+        if (!deviceId) {
+            deviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
+            sessionStorage.setItem('device_id', deviceId);
+        }
+
+        function toggleAccordion(contentId, headerId) {
+            let content = document.getElementById(contentId);
+            let header = document.getElementById(headerId);
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                header.classList.remove('open');
+            } else {
+                content.style.display = 'block';
+                header.classList.add('open');
+            }
+        }
+
+        function updatePresence() {
+            let isAuth = sessionStorage.getItem('device_authenticated') === 'true';
+            if (isAuth) {
+                let role = sessionStorage.getItem('active_tab') || 'A';
+                db.ref('presence/' + deviceId).set({
+                    role: role,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+            } else {
+                db.ref('presence/' + deviceId).remove();
+            }
+        }
+
+        setInterval(updatePresence, 5000);
+
+        window.addEventListener('beforeunload', () => {
+            db.ref('presence/' + deviceId).remove();
+        });
+
+        db.ref('presence').on('value', (snapshot) => {
+            let data = snapshot.val() || {};
+            let countA = 0;
+            let countB = 0;
+            let now = Date.now();
+
+            Object.values(data).forEach(item => {
+                if (item && item.timestamp && (now - item.timestamp < 15000)) {
+                    if (item.role === 'A') countA++;
+                    if (item.role === 'B') countB++;
+                }
+            });
+
+            document.getElementById('countOnlineA').innerText = countA;
+            document.getElementById('countOnlineB').innerText = countB;
+        });
 
         db.ref('orders').on('value', (snapshot) => {
             let rawOrders = snapshot.val() || [];
@@ -531,7 +639,6 @@
             let newCompleted = val ? val.completed : false;
 
             if (newActive !== systemUpdateActive || newCompleted !== systemUpdateCompletedState) {
-                adminBypassed = false;
                 localStorage.removeItem('ack_update_completed');
             }
 
@@ -557,16 +664,31 @@
         }
 
         function renderRepeatBoxesUI() {
+            let activeSensors = [];
             for (let i = 1; i <= 4; i++) {
                 let btn = document.getElementById(`repeatBox${i}`);
                 if (btn) {
                     if (repeatBoxes[i]) {
                         btn.innerText = "ZAP";
                         btn.className = "box-col-btn active";
+                        activeSensors.push(i);
                     } else {
                         btn.innerText = "VYP";
                         btn.className = "box-col-btn";
                     }
+                }
+            }
+
+            // Pokud je nějaký box aktivní (ZAP), rozbalovací lišta bude červeně blikat
+            let sensorHeader = document.getElementById('sensorAccordionHeader');
+            let sensorTitle = document.getElementById('sensorAccordionTitle');
+            if (sensorHeader && sensorTitle) {
+                if (activeSensors.length > 0) {
+                    sensorHeader.classList.add('alarm-active');
+                    sensorTitle.innerHTML = `⚠️ Opakuj zavezení, bedna není na čidle (Box ${activeSensors.join(', ')})`;
+                } else {
+                    sensorHeader.classList.remove('alarm-active');
+                    sensorTitle.innerText = "Opakuj zavezení, bedna není na čidle";
                 }
             }
         }
@@ -593,8 +715,7 @@
             closeSettingsModal();
 
             if (systemUpdateActive && pendingUpdateState === true && document.getElementById('updateBannerOverlay').style.display === 'flex') {
-                adminBypassed = true;
-                renderUpdateOverlay();
+                logout();
                 return;
             }
 
@@ -618,7 +739,7 @@
 
             let ackCompleted = localStorage.getItem('ack_update_completed') === 'true';
 
-            if (systemUpdateActive && !adminBypassed) {
+            if (systemUpdateActive) {
                 bannerBox.className = "update-banner-box";
                 title.innerText = "⚠️ UPOZORNĚNÍ NA ÚDRŽBU";
                 text.innerHTML = "POZOR: Proběhne aktualizace programu připravte se na výpadek.<br><br>Neřiďte se PROGRAMEM !!!";
@@ -672,6 +793,7 @@
                 sessionStorage.setItem('device_authenticated', 'true');
                 sessionStorage.setItem('active_tab', selectedLoginMode);
                 document.getElementById('loginError').style.display = 'none';
+                updatePresence();
                 showApp();
             } else {
                 document.getElementById('loginError').style.display = 'block';
@@ -679,12 +801,14 @@
         }
 
         function logout() {
+            db.ref('presence/' + deviceId).remove();
             sessionStorage.removeItem('device_authenticated');
             sessionStorage.removeItem('active_tab');
             document.getElementById('passInput').value = '';
             document.getElementById('loginError').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('appScreen').style.display = 'none';
+            document.getElementById('updateBannerOverlay').style.display = 'none';
         }
 
         function showApp() {
@@ -709,6 +833,7 @@
         }
 
         if (sessionStorage.getItem('device_authenticated') === 'true') {
+            updatePresence();
             showApp();
         }
 
