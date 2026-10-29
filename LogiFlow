@@ -735,9 +735,10 @@
             render();
         });
 
+        // OPRAVA ZDE: Opraveno načítání mismatchBoxes, aby se při smazání správně aktualizovalo i na prázdno
         db.ref('mismatchBoxes').on('value', (snapshot) => {
             let data = snapshot.val();
-            if (data) mismatchBoxes = data;
+            mismatchBoxes = data || {};
             render();
         });
 
@@ -848,7 +849,7 @@
             if (alertObj) {
                 if (alertObj.type === 'mismatch') {
                     let key = `l${alertObj.line}_b${alertObj.box}_${alertObj.variant}`;
-                    delete mismatchBoxes[key]; // Zde se úspěšně vymaže blikání u obsluhy A
+                    delete mismatchBoxes[key];
                 } else if (alertObj.type === 'defect') {
                     if (defectBoxes[alertObj.line]) defectBoxes[alertObj.line][alertObj.box] = false;
                 }
