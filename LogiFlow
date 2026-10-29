@@ -113,7 +113,7 @@
             100% { opacity: 1; }
         }
 
-        /* VZV UPOZORNĚNÍ NA CHYBĚJÍCÍ BEDNU NA ČIDLE / JINÝ OBAL */
+        /* VZV UPOZORNĚNÍ */
         .vzv-sensor-alert { background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center; animation: pulseAlarm 1.5s infinite; }
         .vzv-sensor-title { font-size: 0.85rem; font-weight: bold; color: #ef4444; margin-bottom: 6px; text-transform: uppercase; }
         .btn-resolve-sensor { background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-top: 4px; }
@@ -251,14 +251,18 @@
             border: 1px dashed #f59e0b;
         }
 
-        /* STYLY PRO NOVÉ ROZBALOVACÍ MENU ÚPRAV U OBSLUHY A */
+        /* STYLY PRO ROZBALOVACÍ MENU ÚPRAV U OBSLUHY A */
         .order-expand-menu { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px; margin-top: 8px; }
         .expand-menu-title { font-size: 0.75rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; text-align: center; }
         .expand-menu-btns { display: grid; grid-template-columns: 1.2fr 1.2fr; gap: 6px; margin-bottom: 6px; }
         .btn-expand-action { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; text-align: center; cursor: pointer; }
         .btn-expand-action.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
-        .variant-change-box { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px; margin-top: 6px; display: none; }
-        .variant-change-box.active { display: block; }
+        
+        /* STYLY PRO MŘÍŽKU BOXŮ PŘI JINÉM OBALU */
+        .mismatch-box-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; margin-top: 6px; }
+        .mismatch-box-col { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 4px; }
+        .mismatch-box-lbl { font-size: 0.7rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; }
+        .mismatch-box-select { width: 100%; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 4px 2px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; outline: none; text-align: center; }
     </style>
 </head>
 <body>
@@ -435,7 +439,7 @@
         <div id="viewB" style="display:none;">
             <div class="lbl">Přehled linek</div>
              
-            <!-- VZV UPOZORNĚNÍ PRO CHYBĚJÍCÍ BEDNY / JINÝ OBAL -->
+            <!-- VZV UPOZORNĚNÍ -->
             <div id="vzvSensorAlertArea"></div>
 
             <div class="vzv-card l2">
@@ -529,7 +533,7 @@
         let twoVariantModeLines = { 1: false, 2: false };
         let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
         let repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
-        let vzvMismatchAlerts = []; // Upozornění pro VZV o jiném obalu
+        let vzvMismatchAlerts = [];
         
         let systemUpdateActive = false;
         let systemUpdateCompletedState = false;
@@ -540,7 +544,7 @@
         let lastOrderCount = 0;
         let selectedLoginMode = 'A';
         let expandedOrderId = null;
-        let activeExpandSubTab = {}; // 'srovnat' nebo 'jiny' pro každou objednávku
+        let activeExpandSubTab = {};
 
         let deviceId = sessionStorage.getItem('device_id');
         if (!deviceId) {
@@ -1055,7 +1059,7 @@
                 expandedOrderId = null;
             } else {
                 expandedOrderId = id;
-                activeExpandSubTab[id] = 'srovnat'; // Výchozí pod-záložka
+                activeExpandSubTab[id] = 'srovnat';
             }
             render();
         }
@@ -1078,19 +1082,18 @@
             save();
         }
 
-        function changeOrderVariant(id, newCar) {
+        function changeBoxVariant(id, boxIndex, newCar) {
             let o = orders.find(x => x.id === id);
             if (!o) return;
-            
+
             let oldCar = o.car;
             o.car = newCar;
-            o.note = (o.note ? o.note + " | " : "") + `Změna varianty z ${oldCar} na ${newCar} (V boxu je jiný obal)`;
+            o.note = (o.note ? o.note + " | " : "") + `V boxu #${boxIndex} je jiný obal (změněno na ${newCar})`;
 
-            // Přidáme varování pro VZV B
             vzvMismatchAlerts.push({
                 id: Date.now(),
                 line: o.line,
-                text: `V boxu na lince ${o.line} je jiný obal! Obsluha A změnila variantu z ${oldCar} na ${newCar}.`
+                text: `V boxu #${boxIndex} na lince ${o.line} je jiný obal! Obsluha A nastavila variantu: ${newCar}.`
             });
 
             expandedOrderId = null;
@@ -1229,11 +1232,19 @@
                             subContentHtml += `<div style="font-size:0.65rem; color:#94a3b8; text-align:center; margin-top:2px;">Obsluha A srovnala počet obalů (zaklikněte čtvereček)</div>`;
                         } else {
                             let cars = ['Tiguan', 'Kodiaq', 'Tayron', 'Audi', 'Seat'];
-                            subContentHtml += `<div class="lbl" style="margin:4px 0;">Vyberte správnou variantu v boxu:</div>`;
-                            subContentHtml += `<div class="grid-3" style="margin-bottom:0;">`;
-                            cars.forEach(c => {
-                                subContentHtml += `<div class="btn-opt" onclick="changeOrderVariant(${o.id}, '${c}')">${c}</div>`;
-                            });
+                            subContentHtml += `<div class="lbl" style="margin:4px 0;">Zaklikněte box a zvolte variantu:</div>`;
+                            subContentHtml += `<div class="mismatch-box-grid">`;
+                            for (let i = 1; i <= o.total; i++) {
+                                subContentHtml += `
+                                    <div class="mismatch-box-col">
+                                        <div class="mismatch-box-lbl">Box #${i}</div>
+                                        <select class="mismatch-box-select" onchange="changeBoxVariant(${o.id}, ${i}, this.value)">
+                                            <option value="" disabled selected>Zvolit</option>
+                                            ${cars.map(c => `<option value="${c}">${c}</option>`).join('')}
+                                        </select>
+                                    </div>
+                                `;
+                            }
                             subContentHtml += `</div>`;
                         }
 
