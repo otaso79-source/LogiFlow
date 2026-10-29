@@ -776,7 +776,6 @@
             renderRepeatBoxesUI();
         }
 
-        // Převedení názvu auta na 4. pád (koho, co?) a velká písmena s doplňkem "vyměň za"
         function getAccusativeCar(car) {
             let upper = car.toUpperCase();
             if (upper === 'TIGUAN') return 'TIGUANA';
@@ -849,7 +848,7 @@
             if (alertObj) {
                 if (alertObj.type === 'mismatch') {
                     let key = `l${alertObj.line}_b${alertObj.box}_${alertObj.variant}`;
-                    delete mismatchBoxes[key];
+                    delete mismatchBoxes[key]; // Zde se úspěšně vymaže blikání u obsluhy A
                 } else if (alertObj.type === 'defect') {
                     if (defectBoxes[alertObj.line]) defectBoxes[alertObj.line][alertObj.box] = false;
                 }
