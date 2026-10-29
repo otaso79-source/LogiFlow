@@ -530,7 +530,7 @@
         let stockAlerts = [];
         let lastOrderCount = 0;
         let selectedLoginMode = 'A';
-        let expandedOrderId = null; // Uchovává ID rozbalené objednávky u obsluhy A
+        let expandedOrderId = null;
 
         let deviceId = sessionStorage.getItem('device_id');
         if (!deviceId) {
@@ -702,7 +702,7 @@
         }
 
         function verifyAdminPassword() {
-            let pass = document.getElementById('adminPassInput'].value;
+            let pass = document.getElementById('adminPassInput').value;
             if (pass !== ADMIN_PASSWORD) {
                 document.getElementById('adminPassError').style.display = 'block';
                 return;
