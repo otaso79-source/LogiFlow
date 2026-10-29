@@ -77,7 +77,6 @@
             display: none; padding: 10px; border-top: 1px solid #334155; background: #0f172a;
         }
 
-        /* ČERVENÉ BLIKÁNÍ PRO AKTIVNÍ ČIDLO */
         .accordion-header.alarm-active {
             background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #ef4444;
             animation: pulseHeaderAlarm 1.5s infinite;
@@ -98,7 +97,6 @@
         .mode-selector-box.line-1 { border-color: #3b82f6; }
         .mode-selector-box.line-2 { border-color: #a855f7; }
 
-        /* PANEL PRO OPAKOVÁNÍ ZAVEZENÍ / BEDNA NENÍ NA ČIDLE */
         .repeat-panel { background: #1e293b; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; }
         .repeat-title { font-size: 0.8rem; font-weight: bold; color: #f59e0b; text-align: center; margin-bottom: 8px; }
         .box-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
@@ -113,7 +111,6 @@
             100% { opacity: 1; }
         }
 
-        /* VZV UPOZORNĚNÍ */
         .vzv-sensor-alert { background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center; animation: pulseAlarm 1.5s infinite; }
         .vzv-sensor-title { font-size: 0.85rem; font-weight: bold; color: #ef4444; margin-bottom: 6px; text-transform: uppercase; }
         .btn-resolve-sensor { background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-top: 4px; }
@@ -148,7 +145,6 @@
 
         .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        /* MODAL NASTAVENÍ */
         #settingsModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px;
@@ -169,7 +165,6 @@
         .btn-yn.active-yes { background: #10b981; color: #fff; }
         .btn-yn.active-no { background: #ef4444; color: #fff; }
 
-        /* UŽIVATELÉ ONLINE V NASTAVENÍ */
         .settings-online-counter {
             background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px;
             display: flex; justify-content: space-around; text-align: center; font-size: 0.8rem;
@@ -177,7 +172,6 @@
         .online-val-a { color: #3b82f6; font-weight: bold; font-size: 1rem; }
         .online-val-b { color: #a855f7; font-weight: bold; font-size: 1rem; }
 
-        /* VLASTNÍ OKNO PRO HESLO SPRÁVCE */
         #adminPasswordModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.85); z-index: 10000; align-items: center; justify-content: center; padding: 15px;
@@ -197,7 +191,6 @@
         .btn-admin-cancel { background: #334155; color: #94a3b8; }
         .btn-admin-ok { background: #f59e0b; color: #0f172a; }
 
-        /* PŘEKRYVNÉ BANNERY */
         #updateBannerOverlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.95); z-index: 9999; align-items: center; justify-content: center; padding: 20px; text-align: center;
@@ -254,15 +247,17 @@
         /* STYLY PRO ROZBALOVACÍ MENU ÚPRAV U OBSLUHY A */
         .order-expand-menu { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px; margin-top: 8px; }
         .expand-menu-title { font-size: 0.75rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; text-align: center; }
-        .expand-menu-btns { display: grid; grid-template-columns: 1.2fr 1.2fr; gap: 6px; margin-bottom: 6px; }
+        .expand-menu-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
         .btn-expand-action { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; text-align: center; cursor: pointer; }
         .btn-expand-action.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
         
-        /* STYLY PRO MŘÍŽKU BOXŮ PŘI JINÉM OBALU */
-        .mismatch-box-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; margin-top: 6px; }
-        .mismatch-box-col { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 4px; }
-        .mismatch-box-lbl { font-size: 0.7rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; }
-        .mismatch-box-select { width: 100%; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 4px 2px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; outline: none; text-align: center; }
+        /* STYLY PRO MŘÍŽKU VÝBĚRU VARIANTY V BOXU (PODLE VZORU ČIDEL) */
+        .mismatch-box-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 6px; }
+        .mismatch-box-card { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px; }
+        .mismatch-box-title { font-size: 0.75rem; color: #f59e0b; font-weight: bold; margin-bottom: 6px; text-align: center; }
+        .mismatch-car-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+        .btn-car-choice { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 6px 2px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-align: center; cursor: pointer; }
+        .btn-car-choice:hover { border-color: #f59e0b; color: #fff; background: rgba(245, 158, 11, 0.15); }
     </style>
 </head>
 <body>
@@ -1236,12 +1231,11 @@
                             subContentHtml += `<div class="mismatch-box-grid">`;
                             for (let i = 1; i <= o.total; i++) {
                                 subContentHtml += `
-                                    <div class="mismatch-box-col">
-                                        <div class="mismatch-box-lbl">Box #${i}</div>
-                                        <select class="mismatch-box-select" onchange="changeBoxVariant(${o.id}, ${i}, this.value)">
-                                            <option value="" disabled selected>Zvolit</option>
-                                            ${cars.map(c => `<option value="${c}">${c}</option>`).join('')}
-                                        </select>
+                                    <div class="mismatch-box-card">
+                                        <div class="mismatch-box-title">Box #${i}</div>
+                                        <div class="mismatch-car-grid">
+                                            ${cars.map(c => `<div class="btn-car-choice" onclick="changeBoxVariant(${o.id}, ${i}, '${c}')">${c}</div>`).join('')}
+                                        </div>
                                     </div>
                                 `;
                             }
