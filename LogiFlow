@@ -776,6 +776,17 @@
             renderRepeatBoxesUI();
         }
 
+        // Převedení názvu auta na 4. pád (koho, co?) a velká písmena
+        function getAccusativeCar(car) {
+            let upper = car.toUpperCase();
+            if (upper === 'TIGUAN') return 'TIGUANA';
+            if (upper === 'KODIAQ') return 'KODIAQA';
+            if (upper === 'TAYRON') return 'TAYRONA';
+            if (upper === 'AUDI') return 'AUDI';
+            if (upper === 'SEAT') return 'SEAT';
+            return upper;
+        }
+
         function toggleMismatchReport(boxNum, variant) {
             let key = `l${curLine}_b${boxNum}_${variant}`;
             let isActive = !!mismatchBoxes[key];
@@ -784,13 +795,14 @@
                 vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'mismatch' && a.variant === variant));
             } else {
                 mismatchBoxes[key] = true;
+                let variantAcc = getAccusativeCar(variant);
                 vzvVatAlerts.push({
                     id: Date.now() + Math.random(),
                     line: curLine,
                     box: boxNum,
                     type: 'mismatch',
                     variant: variant,
-                    text: `Na lince ${curLine}, Box #${boxNum}: Jiný obal (${variant}).`
+                    text: `Na lince ${curLine}, Box #${boxNum}: Jiný obal (${variantAcc}).`
                 });
             }
             save();
@@ -821,11 +833,12 @@
             if (!count) {
                 return;
             }
+            let variantAcc = getAccusativeCar(variant);
             vzvVatAlerts.push({
                 id: Date.now() + Math.random(),
                 line: curLine,
                 type: 'empty',
-                text: `Na lince ${curLine}: Přivez prázdný obal na pracoviště (${variant}, ${count} ks).`
+                text: `Na lince ${curLine}: Přivez prázdný obal na pracoviště (${variantAcc}, ${count} ks).`
             });
             document.getElementById('emptyCountInput').value = '';
             save();
@@ -1223,8 +1236,9 @@
             let o = orders.find(x => x.id === id);
             if (!o) return;
             o.car = newCar;
-            o.note = (o.note ? o.note + " | " : "") + `V boxu #${boxIndex} je jiný obal (${newCar})`;
-            vzvVatAlerts.push({ id: Date.now() + Math.random(), line: o.line, box: boxIndex, type: 'mismatch', variant: newCar, text: `V boxu #${boxIndex} na lince ${o.line} je jiný obal (${newCar}).` });
+            let newCarAcc = getAccusativeCar(newCar);
+            o.note = (o.note ? o.note + " | " : "") + `V boxu #${boxIndex} je jiný obal (${newCarAcc})`;
+            vzvVatAlerts.push({ id: Date.now() + Math.random(), line: o.line, box: boxIndex, type: 'mismatch', variant: newCar, text: `V boxu #${boxIndex} na lince ${o.line} je jiný obal (${newCarAcc}).` });
             expandedOrderId = null;
             save();
         }
