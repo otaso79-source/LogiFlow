@@ -597,7 +597,7 @@
         let twoVariantModeLines = { 1: false, 2: false };
         let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
         let repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
-        let mismatchBoxes = {}; // { 'l1_b3_Tiguan': true, ... }
+        let mismatchBoxes = {}; 
         let defectBoxes = { 1: {1:false, 2:false, 3:false, 4:false}, 2: {1:false, 2:false, 3:false, 4:false} };
         
         let activeReportSubTab = 'sensors';
@@ -861,7 +861,6 @@
                 }
             }
 
-            // Vykreslení stavů tlačítek pro 2. Jiný obal
             for (let b = 1; b <= 4; b++) {
                 let grid = document.getElementById(`mismatchGrid${b}`);
                 if (grid) {
@@ -878,7 +877,6 @@
                 }
             }
 
-            // Vykreslení stavů tlačítek pro 3. Vadný obal
             for (let b = 1; b <= 4; b++) {
                 let defBtn = document.getElementById(`defectBox${b}`);
                 if (defBtn) {
