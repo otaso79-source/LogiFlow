@@ -776,7 +776,7 @@
             renderRepeatBoxesUI();
         }
 
-        // Převedení názvu auta na 4. pád (koho, co?) a velká písmena
+        // Převedení názvu auta na 4. pád (koho, co?) a velká písmena s doplňkem "vyměň za"
         function getAccusativeCar(car) {
             let upper = car.toUpperCase();
             if (upper === 'TIGUAN') return 'TIGUANA';
@@ -802,7 +802,7 @@
                     box: boxNum,
                     type: 'mismatch',
                     variant: variant,
-                    text: `Na lince ${curLine}, Box #${boxNum}: Jiný obal (${variantAcc}).`
+                    text: `Na lince ${curLine}, Box #${boxNum}: Jiný obal (vyměň za ${variantAcc}).`
                 });
             }
             save();
@@ -1237,8 +1237,8 @@
             if (!o) return;
             o.car = newCar;
             let newCarAcc = getAccusativeCar(newCar);
-            o.note = (o.note ? o.note + " | " : "") + `V boxu #${boxIndex} je jiný obal (${newCarAcc})`;
-            vzvVatAlerts.push({ id: Date.now() + Math.random(), line: o.line, box: boxIndex, type: 'mismatch', variant: newCar, text: `V boxu #${boxIndex} na lince ${o.line} je jiný obal (${newCarAcc}).` });
+            o.note = (o.note ? o.note + " | " : "") + `V boxu #${boxIndex} je jiný obal (vyměň za ${newCarAcc})`;
+            vzvVatAlerts.push({ id: Date.now() + Math.random(), line: o.line, box: boxIndex, type: 'mismatch', variant: newCar, text: `V boxu #${boxIndex} na lince ${o.line} je jiný obal (vyměň za ${newCarAcc}).` });
             expandedOrderId = null;
             save();
         }
