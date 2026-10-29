@@ -140,7 +140,7 @@
         .next-txt.none { color: #64748b; font-weight: normal; }
         
         .boxes-row { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
-        .box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; }
+        .box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; cursor: pointer; }
         
         .box-unit.done { background: #065f46; color: #34d399; border-color: #059669; }
         .box-unit.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
@@ -208,7 +208,7 @@
         }
         .update-banner-title { font-size: 1.2rem; font-weight: bold; color: #ef4444; margin-bottom: 12px; text-transform: uppercase; cursor: pointer; user-select: none; }
         .update-banner-text { font-size: 0.95rem; color: #f8fafc; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
-        .btn-update-ack { width: 100%; padding: 14px; background: #ef4444; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; display: none; }
+        .btn-update-ack { width: 100%; padding: 14px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; display: none; }
 
         .update-banner-box.completed-box {
             border: 3px solid #10b981;
@@ -530,6 +530,7 @@
         let stockAlerts = [];
         let lastOrderCount = 0;
         let selectedLoginMode = 'A';
+        let expandedOrderId = null; // Uchovává ID rozbalené objednávky u obsluhy A
 
         let deviceId = sessionStorage.getItem('device_id');
         if (!deviceId) {
@@ -679,7 +680,7 @@
             let sensorTitle = document.getElementById('sensorAccordionTitle');
             if (sensorHeader && sensorTitle) {
                 if (activeSensors.length > 0) {
-                    sensorHeader.classList.add('alarm-alarm-active', 'alarm-active');
+                    sensorHeader.classList.add('alarm-active');
                     sensorTitle.innerHTML = `⚠️ Opakuj zavezení, bedna není na čidlech : (Box ${activeSensors.join(', ')})`;
                 } else {
                     sensorHeader.classList.remove('alarm-active');
@@ -701,7 +702,7 @@
         }
 
         function verifyAdminPassword() {
-            let pass = document.getElementById('adminPassInput').value;
+            let pass = document.getElementById('adminPassInput'].value;
             if (pass !== ADMIN_PASSWORD) {
                 document.getElementById('adminPassError').style.display = 'block';
                 return;
@@ -743,7 +744,7 @@
             } else if (systemUpdateCompletedState && !isAlreadyAcked) {
                 bannerBox.className = "update-banner-box completed-box";
                 title.innerText = "✅ HOTOVO";
-                text.innerText = "Program aktualizován, proveďte reset a vymažte objednávky.";
+                text.innerText = "Program aktualizován, potvrzením dojde k resetu objednávek z důvodu aktualizace.";
                 overlay.style.display = 'flex';
             } else {
                 overlay.style.display = 'none';
@@ -1032,36 +1033,23 @@
             save();
         }
 
-        function editOrderProgress(id) {
+        function toggleOrderExpand(id) {
+            if (expandedOrderId === id) {
+                expandedOrderId = null;
+            } else {
+                expandedOrderId = id;
+            }
+            render();
+        }
+
+        function setBoxProgress(id, count) {
             let o = orders.find(x => x.id === id);
             if (!o) return;
-            
-            let promptText = "Srovnání obalů. Zadejte počet pro VZV.\n\n" +
-                             "Info/TV: Ready - Připravený obal\n" +
-                             "Ready - Plní se : 2 obaly\n" +
-                             "Plná - Plní se : 3 obaly\n\n" +
-                             "Vždy před zadáním se ujistěte zda počet sedí !\n\n" +
-                             "Kalibrace / Úprava stavu obalů pro " + o.car + " (Celkem: " + o.total + " obalů):\n" +
-                             "Zadejte aktuální počet zavezených obalů (0 až " + o.total + "):";
-
-            let input = prompt(promptText, o.done);
-            if (input === null) return;
-            
-            let newVal = parseInt(input);
-            if (isNaN(newVal) || newVal < 0) {
-                alert("Zadejte platné číslo od 0 do " + o.total);
-                return;
-            }
-            
-            if (newVal > o.total) newVal = o.total;
-            
-            o.done = newVal;
-            o.note = (o.note ? o.note + " | " : "") + `Kalibrace (Ručně upraveno na ${newVal}/${o.total} obalů)`;
-            
+            o.done = count;
             if (o.done >= o.total) {
                 orders = orders.filter(x => x.id !== id);
+                expandedOrderId = null;
             }
-            
             lastOrderCount = orders.length;
             save();
         }
@@ -1167,14 +1155,27 @@
                     let noteHtml = o.note ? `<div class="note-tag ${lineClass}">📝 ${o.note}</div>` : '';
                     let remainingWRT = Math.max(0, o.stojany - o.done);
                     let wrtBadgeClass = o.line === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
+                    let isExpanded = (expandedOrderId === o.id);
+
+                    let boxesHtml = '';
+                    if (isExpanded) {
+                        boxesHtml += `<div class="boxes-row" style="margin-top:8px;">`;
+                        for (let i = 1; i <= o.total; i++) {
+                            let st = i <= o.done ? 'done' : 'pending';
+                            boxesHtml += `<div class="box-unit ${st}" onclick="setBoxProgress(${o.id}, ${i})">#${i}</div>`;
+                        }
+                        boxesHtml += `</div>`;
+                        boxesHtml += `<div style="font-size:0.65rem; color:#94a3b8; text-align:center; margin-top:2px;">Kliknutím na čtvereček upravíte stav obalů</div>`;
+                    }
 
                     htmlContent += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="flex-grow:1;"><b>${o.car}</b> <span class="${wrtBadgeClass}">Zbývá ${remainingWRT}/${o.stojany} WRT</span> - Linka ${o.line}</span>
-                            <span onclick="editOrderProgress(${o.id})" class="editable-progress" title="Kliknutím upravit/zkalibrovat stav obalů">📦 ${o.done}/${o.total} obalů</span>
+                            <span onclick="toggleOrderExpand(${o.id})" class="editable-progress" title="Kliknutím otevřít vizuální správu obalů">📦 ${o.done}/${o.total} obalů</span>
                             <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
                         </div>
                         ${noteHtml}
+                        ${boxesHtml}
                     </div>`;
                 });
 
