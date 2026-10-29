@@ -113,7 +113,7 @@
             100% { opacity: 1; }
         }
 
-        /* VZV UPOZORNĚNÍ NA CHYBĚJÍCÍ BEDNU NA ČIDLE */
+        /* VZV UPOZORNĚNÍ NA CHYBĚJÍCÍ BEDNU NA ČIDLE / JINÝ OBAL */
         .vzv-sensor-alert { background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center; animation: pulseAlarm 1.5s infinite; }
         .vzv-sensor-title { font-size: 0.85rem; font-weight: bold; color: #ef4444; margin-bottom: 6px; text-transform: uppercase; }
         .btn-resolve-sensor { background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-top: 4px; }
@@ -250,6 +250,15 @@
             background: rgba(245, 158, 11, 0.15); padding: 4px 8px; border-radius: 6px; cursor: pointer;
             border: 1px dashed #f59e0b;
         }
+
+        /* STYLY PRO NOVÉ ROZBALOVACÍ MENU ÚPRAV U OBSLUHY A */
+        .order-expand-menu { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px; margin-top: 8px; }
+        .expand-menu-title { font-size: 0.75rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; text-align: center; }
+        .expand-menu-btns { display: grid; grid-template-columns: 1.2fr 1.2fr; gap: 6px; margin-bottom: 6px; }
+        .btn-expand-action { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; text-align: center; cursor: pointer; }
+        .btn-expand-action.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .variant-change-box { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px; margin-top: 6px; display: none; }
+        .variant-change-box.active { display: block; }
     </style>
 </head>
 <body>
@@ -426,7 +435,7 @@
         <div id="viewB" style="display:none;">
             <div class="lbl">Přehled linek</div>
              
-            <!-- VZV UPOZORNĚNÍ PRO CHYBĚJÍCÍ BEDNY NA ČIDLECH -->
+            <!-- VZV UPOZORNĚNÍ PRO CHYBĚJÍCÍ BEDNY / JINÝ OBAL -->
             <div id="vzvSensorAlertArea"></div>
 
             <div class="vzv-card l2">
@@ -478,7 +487,6 @@
                 <button class="btn-close" onclick="closeSettingsModal()">✕</button>
             </div>
 
-            <!-- PŘEHLED AKTIVNÍCH UŽIVATELŮ V NASTAVENÍ -->
             <div class="settings-online-counter">
                 <div>Obsluha A online: <br><span id="countOnlineA" class="online-val-a">0</span></div>
                 <div style="border-left: 1px solid #334155; padding-left: 10px;">VZV B online: <br><span id="countOnlineB" class="online-val-b">0</span></div>
@@ -521,6 +529,7 @@
         let twoVariantModeLines = { 1: false, 2: false };
         let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
         let repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
+        let vzvMismatchAlerts = []; // Upozornění pro VZV o jiném obalu
         
         let systemUpdateActive = false;
         let systemUpdateCompletedState = false;
@@ -531,6 +540,7 @@
         let lastOrderCount = 0;
         let selectedLoginMode = 'A';
         let expandedOrderId = null;
+        let activeExpandSubTab = {}; // 'srovnat' nebo 'jiny' pro každou objednávku
 
         let deviceId = sessionStorage.getItem('device_id');
         if (!deviceId) {
@@ -604,6 +614,12 @@
             render();
         });
 
+        db.ref('vzvMismatchAlerts').on('value', (snapshot) => {
+            let raw = snapshot.val() || [];
+            vzvMismatchAlerts = Array.isArray(raw) ? raw : Object.values(raw);
+            render();
+        });
+
         db.ref('singleModeLines').on('value', (snapshot) => {
             let data = snapshot.val();
             if (data) singleModeLines = data;
@@ -647,6 +663,7 @@
         function save() {
             db.ref('orders').set(orders);
             db.ref('alerts').set(stockAlerts);
+            db.ref('vzvMismatchAlerts').set(vzvMismatchAlerts);
             db.ref('singleModeLines').set(singleModeLines);
             db.ref('singleModeCar').set(singleModeCar);
             db.ref('twoVariantModeLines').set(twoVariantModeLines);
@@ -1038,7 +1055,13 @@
                 expandedOrderId = null;
             } else {
                 expandedOrderId = id;
+                activeExpandSubTab[id] = 'srovnat'; // Výchozí pod-záložka
             }
+            render();
+        }
+
+        function setExpandSubTab(id, tab) {
+            activeExpandSubTab[id] = tab;
             render();
         }
 
@@ -1046,11 +1069,36 @@
             let o = orders.find(x => x.id === id);
             if (!o) return;
             o.done = count;
+            o.note = (o.note ? o.note + " | " : "") + "Obsluha A srovnala počet obalů";
             if (o.done >= o.total) {
                 orders = orders.filter(x => x.id !== id);
                 expandedOrderId = null;
             }
             lastOrderCount = orders.length;
+            save();
+        }
+
+        function changeOrderVariant(id, newCar) {
+            let o = orders.find(x => x.id === id);
+            if (!o) return;
+            
+            let oldCar = o.car;
+            o.car = newCar;
+            o.note = (o.note ? o.note + " | " : "") + `Změna varianty z ${oldCar} na ${newCar} (V boxu je jiný obal)`;
+
+            // Přidáme varování pro VZV B
+            vzvMismatchAlerts.push({
+                id: Date.now(),
+                line: o.line,
+                text: `V boxu na lince ${o.line} je jiný obal! Obsluha A změnila variantu z ${oldCar} na ${newCar}.`
+            });
+
+            expandedOrderId = null;
+            save();
+        }
+
+        function dismissVzvMismatch(alertId) {
+            vzvMismatchAlerts = vzvMismatchAlerts.filter(a => a.id !== alertId);
             save();
         }
 
@@ -1094,14 +1142,21 @@
                 for (let i = 1; i <= 4; i++) {
                     if (repeatBoxes[i]) activeSensors.push(i);
                 }
-                if (activeSensors.length > 0) {
-                    vzvSensorAlertArea.innerHTML = `
-                        <div class="vzv-sensor-alert">
-                            <div class="vzv-sensor-title">⚠️ Opakuj zavezení, bedna není na čidlech !</div>
-                            <div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">Týká se boxů: ${activeSensors.join(', ')}</div>
-                            <button class="btn-resolve-sensor" onclick="clearAllRepeatBoxes()">✓ OK / VYŘEŠENO</button>
+
+                let mismatchHtml = '';
+                vzvMismatchAlerts.forEach(m => {
+                    mismatchHtml += `
+                        <div class="vzv-sensor-alert" style="margin-bottom:8px;">
+                            <div class="vzv-sensor-title">⚠️ V boxu je jiný obal!</div>
+                            <div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">${m.text}</div>
+                            <button class="btn-resolve-sensor" onclick="dismissVzvMismatch(${m.id})">✓ OK / ROZUMÍM</button>
                         </div>
                     `;
+                });
+
+                if (activeSensors.length > 0 || vzvMismatchAlerts.length > 0) {
+                    let sensorText = activeSensors.length > 0 ? `<div class="vzv-sensor-alert"><div class="vzv-sensor-title">⚠️ Opakuj zavezení, bedna není na čidlech !</div><div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">Týká se boxů: ${activeSensors.join(', ')}</div><button class="btn-resolve-sensor" onclick="clearAllRepeatBoxes()">✓ OK / VYŘEŠENO</button></div>` : '';
+                    vzvSensorAlertArea.innerHTML = mismatchHtml + sensorText;
                 } else {
                     vzvSensorAlertArea.innerHTML = '';
                 }
@@ -1156,26 +1211,52 @@
                     let remainingWRT = Math.max(0, o.stojany - o.done);
                     let wrtBadgeClass = o.line === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
                     let isExpanded = (expandedOrderId === o.id);
+                    let subTab = activeExpandSubTab[o.id] || 'srovnat';
 
-                    let boxesHtml = '';
+                    let expandMenuHtml = '';
                     if (isExpanded) {
-                        boxesHtml += `<div class="boxes-row" style="margin-top:8px;">`;
-                        for (let i = 1; i <= o.total; i++) {
-                            let st = i <= o.done ? 'done' : 'pending';
-                            boxesHtml += `<div class="box-unit ${st}" onclick="setBoxProgress(${o.id}, ${i})">#${i}</div>`;
+                        let srovnatActive = subTab === 'srovnat' ? 'active' : '';
+                        let jinyActive = subTab === 'jiny' ? 'active' : '';
+
+                        let subContentHtml = '';
+                        if (subTab === 'srovnat') {
+                            subContentHtml += `<div class="boxes-row" style="margin-top:6px;">`;
+                            for (let i = 1; i <= o.total; i++) {
+                                let st = i <= o.done ? 'done' : 'pending';
+                                subContentHtml += `<div class="box-unit ${st}" onclick="setBoxProgress(${o.id}, ${i})">#${i}</div>`;
+                            }
+                            subContentHtml += `</div>`;
+                            subContentHtml += `<div style="font-size:0.65rem; color:#94a3b8; text-align:center; margin-top:2px;">Obsluha A srovnala počet obalů (zaklikněte čtvereček)</div>`;
+                        } else {
+                            let cars = ['Tiguan', 'Kodiaq', 'Tayron', 'Audi', 'Seat'];
+                            subContentHtml += `<div class="lbl" style="margin:4px 0;">Vyberte správnou variantu v boxu:</div>`;
+                            subContentHtml += `<div class="grid-3" style="margin-bottom:0;">`;
+                            cars.forEach(c => {
+                                subContentHtml += `<div class="btn-opt" onclick="changeOrderVariant(${o.id}, '${c}')">${c}</div>`;
+                            });
+                            subContentHtml += `</div>`;
                         }
-                        boxesHtml += `</div>`;
-                        boxesHtml += `<div style="font-size:0.65rem; color:#94a3b8; text-align:center; margin-top:2px;">Kliknutím na čtvereček upravíte stav obalů</div>`;
+
+                        expandMenuHtml = `
+                            <div class="order-expand-menu">
+                                <div class="expand-menu-title">⚠️ SPRÁVA STAVU OBALU</div>
+                                <div class="expand-menu-btns">
+                                    <button class="btn-expand-action ${srovnatActive}" onclick="setExpandSubTab(${o.id}, 'srovnat')">1. Srovnat počet obalů</button>
+                                    <button class="btn-expand-action ${jinyActive}" onclick="setExpandSubTab(${o.id}, 'jiny')">2. V boxu je jiný obal</button>
+                                </div>
+                                ${subContentHtml}
+                            </div>
+                        `;
                     }
 
                     htmlContent += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="flex-grow:1;"><b>${o.car}</b> <span class="${wrtBadgeClass}">Zbývá ${remainingWRT}/${o.stojany} WRT</span> - Linka ${o.line}</span>
-                            <span onclick="toggleOrderExpand(${o.id})" class="editable-progress" title="Kliknutím otevřít vizuální správu obalů">📦 ${o.done}/${o.total} obalů</span>
+                            <span onclick="toggleOrderExpand(${o.id})" class="editable-progress" title="Kliknutím upravit obaly">📦 ${o.done}/${o.total} obalů</span>
                             <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
                         </div>
                         ${noteHtml}
-                        ${boxesHtml}
+                        ${expandMenuHtml}
                     </div>`;
                 });
 
