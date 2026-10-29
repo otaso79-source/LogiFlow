@@ -447,12 +447,17 @@
 
                         <!-- PODSEKCE 4: PŘIVEZ PRÁZDNÝ NA PRACOVIŠTĚ -->
                         <div id="reportSubEmpty" style="display:none;">
-                            <div class="repeat-title" style="margin-top:4px; color:#10b981;">Přivez prázdný obal na pracoviště (vyberte box):</div>
-                            <div class="box-grid-4">
-                                <div class="box-col"><div class="box-col-lbl">Box 4</div><button class="box-col-btn" onclick="sendEmptyReport(4)" style="background:#10b981; color:#fff; border-color:#10b981;">Přivézt</button></div>
-                                <div class="box-col"><div class="box-col-lbl">Box 3</div><button class="box-col-btn" onclick="sendEmptyReport(3)" style="background:#10b981; color:#fff; border-color:#10b981;">Přivézt</button></div>
-                                <div class="box-col"><div class="box-col-lbl">Box 2</div><button class="box-col-btn" onclick="sendEmptyReport(2)" style="background:#10b981; color:#fff; border-color:#10b981;">Přivézt</button></div>
-                                <div class="box-col"><div class="box-col-lbl">Box 1</div><button class="box-col-btn" onclick="sendEmptyReport(1)" style="background:#10b981; color:#fff; border-color:#10b981;">Přivézt</button></div>
+                            <div class="repeat-title" style="margin-top:4px; color:#10b981;">Přivez prázdný obal na pracoviště (vyberte variantu a počet):</div>
+                            <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; align-items:center;">
+                                <select id="emptyVariantSelect" class="vzv-select" style="flex:1; min-width:130px;">
+                                    <option value="Tiguan">Tiguan</option>
+                                    <option value="Kodiaq">Kodiaq</option>
+                                    <option value="Tayron">Tayron</option>
+                                    <option value="Audi">Audi</option>
+                                    <option value="Seat">Seat</option>
+                                </select>
+                                <input type="number" id="emptyCountInput" class="vzv-num-input" placeholder="počet obalů" min="1" max="99" style="width:110px;">
+                                <button class="btn-send-alert" onclick="sendEmptyReport()" style="background:#10b981; margin-top:0; width:100%;">📢 ODESLAT POŽADAVEK NA VZV</button>
                             </div>
                         </div>
                     </div>
@@ -774,14 +779,21 @@
             alert(`Hlášení: Vadný obal pro Box #${boxNum} bylo odesláno na VZV.`);
         }
 
-        function sendEmptyReport(boxNum) {
+        function sendEmptyReport() {
+            let variant = document.getElementById('emptyVariantSelect').value;
+            let count = document.getElementById('emptyCountInput').value;
+            if (!count) {
+                alert("Zadejte prosím počet obalů.");
+                return;
+            }
             vzvVatAlerts.push({
                 id: Date.now(),
                 line: curLine,
-                text: `Na lince ${curLine}, Box #${boxNum}: Přivez prázdný obal na pracoviště.`
+                text: `Na lince ${curLine}: Přivez prázdný obal na pracoviště (${variant}, ${count} ks).`
             });
+            document.getElementById('emptyCountInput').value = '';
             save();
-            alert(`Hlášení: Přivézt prázdný obal pro Box #${boxNum} bylo odesláno na VZV.`);
+            alert(`Požadavek na přivezení prázdného obalu (${variant}, ${count} ks) byl odeslán na VZV.`);
         }
 
         function dismissVzvVatAlert(alertId) {
