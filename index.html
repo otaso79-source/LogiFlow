@@ -99,7 +99,7 @@
 
         /* VÍCEÚROVŇOVÝ PANEL HLÁŠENÍ */
         .report-panel { background: #1e293b; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; }
-        .report-sub-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-bottom: 8px; }
+        .report-sub-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; margin-bottom: 8px; }
         .btn-report-tab { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 6px 2px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; text-align: center; cursor: pointer; }
         .btn-report-tab.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
 
@@ -114,11 +114,6 @@
             50% { opacity: 0.6; }
             100% { opacity: 1; }
         }
-
-        .mismatch-box-card { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 6px; text-align: center; }
-        .mismatch-car-grid { display: grid; grid-template-columns: 1fr; gap: 3px; margin-top: 4px; }
-        .btn-car-choice { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 4px 2px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
-        .btn-car-choice.active-green { background: #10b981 !important; color: #fff !important; border-color: #059669 !important; animation: pulseAlarm 1.5s infinite; }
 
         .vzv-sensor-alert { background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center; animation: pulseAlarm 1.5s infinite; }
         .vzv-sensor-title { font-size: 0.85rem; font-weight: bold; color: #ef4444; margin-bottom: 6px; text-transform: uppercase; }
@@ -146,11 +141,10 @@
         .next-txt.none { color: #64748b; font-weight: normal; }
         
         .boxes-row { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
-        .box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; cursor: pointer; }
+        .box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; }
         
         .box-unit.done { background: #065f46; color: #34d399; border-color: #059669; }
         .box-unit.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
-        .box-unit.active { background: #0f172a; color: #f8fafc; border-color: #334155; }
 
         .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
@@ -255,9 +249,12 @@
 
         .order-expand-menu { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px; margin-top: 8px; }
         .expand-menu-title { font-size: 0.75rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; text-align: center; }
-        .expand-menu-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-        .btn-expand-action { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; text-align: center; cursor: pointer; }
-        .btn-expand-action.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        
+        /* Nové ovládání +/- pro srovnání počtu */
+        .counter-control { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
+        .btn-counter { background: #1e293b; border: 1px solid #334155; color: #fff; width: 36px; height: 36px; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-counter:active { background: #334155; }
+        .counter-val { font-size: 0.95rem; font-weight: bold; color: #f59e0b; min-width: 60px; text-align: center; }
     </style>
 </head>
 <body>
@@ -364,16 +361,15 @@
             <!-- JEDNOTNÁ ROZBALOVACÍ LIŠTA: INFO PRO VZV -->
             <div class="accordion-wrapper">
                 <div class="accordion-header" id="sensorAccordionHeader" onclick="toggleAccordion('sensorAccordionContent', 'sensorAccordionHeader')">
-                    <span id="sensorAccordionTitle">Info pro VZV: čidla, jiný obal, vadný obal, přivez prázdný</span>
+                    <span id="sensorAccordionTitle">Info pro VZV: čidla, vadný obal, přivez prázdný</span>
                     <span class="arrow">▼</span>
                 </div>
                 <div class="accordion-content" id="sensorAccordionContent">
                     <div class="report-panel">
                         <div class="report-sub-tabs">
                             <button class="btn-report-tab active" id="tabReportSensors" onclick="setReportTab('sensors')">1. Čidla</button>
-                            <button class="btn-report-tab" id="tabReportMismatch" onclick="setReportTab('mismatch')">2. Jiný obal</button>
-                            <button class="btn-report-tab" id="tabReportDefect" onclick="setReportTab('defect')">3. Vadný obal</button>
-                            <button class="btn-report-tab" id="tabReportEmpty" onclick="setReportTab('empty')">4. Přivez prázdný</button>
+                            <button class="btn-report-tab" id="tabReportDefect" onclick="setReportTab('defect')">2. Vadný obal</button>
+                            <button class="btn-report-tab" id="tabReportEmpty" onclick="setReportTab('empty')">3. Přivez prázdný</button>
                         </div>
 
                         <!-- PODSEKCE 1: ČIDLA -->
@@ -387,54 +383,7 @@
                             </div>
                         </div>
 
-                        <!-- PODSEKCE 2: JINÝ OBAL -->
-                        <div id="reportSubMismatch" style="display:none;">
-                            <div class="repeat-title" style="margin-top:4px; color:#3b82f6;">Obal se neshoduje s variantou (vyberte box a variantu):</div>
-                            <div class="box-grid-4">
-                                <div class="mismatch-box-card">
-                                    <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 4</div>
-                                    <div class="mismatch-car-grid" id="mismatchGrid4">
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(4, 'Tiguan')">Tiguan</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(4, 'Kodiaq')">Kodiaq</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(4, 'Tayron')">Tayron</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(4, 'Audi')">Audi</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(4, 'Seat')">Seat</button>
-                                    </div>
-                                </div>
-                                <div class="mismatch-box-card">
-                                    <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 3</div>
-                                    <div class="mismatch-car-grid" id="mismatchGrid3">
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(3, 'Tiguan')">Tiguan</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(3, 'Kodiaq')">Kodiaq</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(3, 'Tayron')">Tayron</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(3, 'Audi')">Audi</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(3, 'Seat')">Seat</button>
-                                    </div>
-                                </div>
-                                <div class="mismatch-box-card">
-                                    <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 2</div>
-                                    <div class="mismatch-car-grid" id="mismatchGrid2">
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(2, 'Tiguan')">Tiguan</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(2, 'Kodiaq')">Kodiaq</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(2, 'Tayron')">Tayron</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(2, 'Audi')">Audi</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(2, 'Seat')">Seat</button>
-                                    </div>
-                                </div>
-                                <div class="mismatch-box-card">
-                                    <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 1</div>
-                                    <div class="mismatch-car-grid" id="mismatchGrid1">
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(1, 'Tiguan')">Tiguan</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(1, 'Kodiaq')">Kodiaq</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(1, 'Tayron')">Tayron</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(1, 'Audi')">Audi</button>
-                                        <button class="btn-car-choice" onclick="toggleMismatchReport(1, 'Seat')">Seat</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PODSEKCE 3: VADNÝ OBAL -->
+                        <!-- PODSEKCE 2: VADNÝ OBAL -->
                         <div id="reportSubDefect" style="display:none;">
                             <div class="repeat-title" style="margin-top:4px; color:#ef4444;">Obal je vadný, křivý. Vyměň ho (vyberte box):</div>
                             <div class="box-grid-4">
@@ -445,7 +394,7 @@
                             </div>
                         </div>
 
-                        <!-- PODSEKCE 4: PŘIVEZ PRÁZDNÝ NA PRACOVIŠTĚ -->
+                        <!-- PODSEKCE 3: PŘIVEZ PRÁZDNÝ NA PRACOVIŠTĚ -->
                         <div id="reportSubEmpty" style="display:none;">
                             <div class="repeat-title" style="margin-top:4px; color:#10b981;">Přivez prázdný obal na pracoviště (vyberte variantu a počet):</div>
                             <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; align-items:center;">
@@ -597,7 +546,6 @@
         let twoVariantModeLines = { 1: false, 2: false };
         let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
         let repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
-        let mismatchBoxes = {}; 
         let defectBoxes = { 1: {1:false, 2:false, 3:false, 4:false}, 2: {1:false, 2:false, 3:false, 4:false} };
         
         let activeReportSubTab = 'sensors';
@@ -612,7 +560,6 @@
         let lastOrderCount = 0;
         let selectedLoginMode = 'A';
         let expandedOrderId = null;
-        let activeExpandSubTab = {};
 
         let deviceId = sessionStorage.getItem('device_id');
         if (!deviceId) {
@@ -635,12 +582,10 @@
         function setReportTab(tab) {
             activeReportSubTab = tab;
             document.getElementById('tabReportSensors').className = 'btn-report-tab ' + (tab === 'sensors' ? 'active' : '');
-            document.getElementById('tabReportMismatch').className = 'btn-report-tab ' + (tab === 'mismatch' ? 'active' : '');
             document.getElementById('tabReportDefect').className = 'btn-report-tab ' + (tab === 'defect' ? 'active' : '');
             document.getElementById('tabReportEmpty').className = 'btn-report-tab ' + (tab === 'empty' ? 'active' : '');
 
             document.getElementById('reportSubSensors').style.display = tab === 'sensors' ? 'block' : 'none';
-            document.getElementById('reportSubMismatch').style.display = tab === 'mismatch' ? 'block' : 'none';
             document.getElementById('reportSubDefect').style.display = tab === 'defect' ? 'block' : 'none';
             document.getElementById('reportSubEmpty').style.display = tab === 'empty' ? 'block' : 'none';
         }
@@ -735,13 +680,6 @@
             render();
         });
 
-        // OPRAVA ZDE: Opraveno načítání mismatchBoxes, aby se při smazání správně aktualizovalo i na prázdno
-        db.ref('mismatchBoxes').on('value', (snapshot) => {
-            let data = snapshot.val();
-            mismatchBoxes = data || {};
-            render();
-        });
-
         db.ref('defectBoxes').on('value', (snapshot) => {
             let data = snapshot.val();
             if (data) defectBoxes = data;
@@ -767,7 +705,6 @@
             db.ref('twoVariantModeLines').set(twoVariantModeLines);
             db.ref('twoVariantPair').set(twoVariantPair);
             db.ref('repeatBoxes').set(repeatBoxes);
-            db.ref('mismatchBoxes').set(mismatchBoxes);
             db.ref('defectBoxes').set(defectBoxes);
         }
 
@@ -785,27 +722,6 @@
             if (upper === 'AUDI') return 'AUDI';
             if (upper === 'SEAT') return 'SEAT';
             return upper;
-        }
-
-        function toggleMismatchReport(boxNum, variant) {
-            let key = `l${curLine}_b${boxNum}_${variant}`;
-            let isActive = !!mismatchBoxes[key];
-            if (isActive) {
-                delete mismatchBoxes[key];
-                vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'mismatch' && a.variant === variant));
-            } else {
-                mismatchBoxes[key] = true;
-                let variantAcc = getAccusativeCar(variant);
-                vzvVatAlerts.push({
-                    id: Date.now() + Math.random(),
-                    line: curLine,
-                    box: boxNum,
-                    type: 'mismatch',
-                    variant: variant,
-                    text: `Na lince ${curLine}, Box #${boxNum}: Jiný obal (vyměň za ${variantAcc}).`
-                });
-            }
-            save();
         }
 
         function toggleDefectReport(boxNum) {
@@ -847,10 +763,7 @@
         function dismissVzvVatAlert(alertId) {
             let alertObj = vzvVatAlerts.find(a => a.id === alertId);
             if (alertObj) {
-                if (alertObj.type === 'mismatch') {
-                    let key = `l${alertObj.line}_b${alertObj.box}_${alertObj.variant}`;
-                    delete mismatchBoxes[key];
-                } else if (alertObj.type === 'defect') {
+                if (alertObj.type === 'defect') {
                     if (defectBoxes[alertObj.line]) defectBoxes[alertObj.line][alertObj.box] = false;
                 }
             }
@@ -875,22 +788,6 @@
             }
 
             for (let b = 1; b <= 4; b++) {
-                let grid = document.getElementById(`mismatchGrid${b}`);
-                if (grid) {
-                    let buttons = grid.querySelectorAll('.btn-car-choice');
-                    buttons.forEach(btn => {
-                        let carName = btn.innerText;
-                        let key = `l${curLine}_b${b}_${carName}`;
-                        if (mismatchBoxes[key]) {
-                            btn.className = "btn-car-choice active-green";
-                        } else {
-                            btn.className = "btn-car-choice";
-                        }
-                    });
-                }
-            }
-
-            for (let b = 1; b <= 4; b++) {
                 let defBtn = document.getElementById(`defectBox${b}`);
                 if (defBtn) {
                     let isDef = defectBoxes[curLine] && defectBoxes[curLine][b];
@@ -910,17 +807,16 @@
             let sensorHeader = document.getElementById('sensorAccordionHeader');
             let sensorTitle = document.getElementById('sensorAccordionTitle');
             if (sensorHeader && sensorTitle) {
-                let hasActiveMismatch = Object.keys(mismatchBoxes).length > 0;
                 let hasActiveDefect = false;
                 if (defectBoxes[1]) { Object.values(defectBoxes[1]).forEach(v => { if(v) hasActiveDefect = true; }); }
                 if (defectBoxes[2]) { Object.values(defectBoxes[2]).forEach(v => { if(v) hasActiveDefect = true; }); }
 
-                if (activeSensors.length > 0 || vzvVatAlerts.length > 0 || hasActiveMismatch || hasActiveDefect) {
+                if (activeSensors.length > 0 || vzvVatAlerts.length > 0 || hasActiveDefect) {
                     sensorHeader.classList.add('alarm-active');
                     sensorTitle.innerHTML = `⚠️ Info pro VZV (Aktivní hlášení...)`;
                 } else {
                     sensorHeader.classList.remove('alarm-active');
-                    sensorTitle.innerText = "Info pro VZV: čidla, jiný obal, vadný obal, přivez prázdný";
+                    sensorTitle.innerText = "Info pro VZV: čidla, vadný obal, přivez prázdný";
                 }
             }
         }
@@ -1219,27 +1115,24 @@
         }
 
         function cancelOrder(id) { orders = orders.filter(x => x.id !== id); lastOrderCount = orders.length; save(); }
-        function toggleOrderExpand(id) { expandedOrderId = (expandedOrderId === id ? null : id); activeExpandSubTab[id] = 'srovnat'; render(); }
-        function setExpandSubTab(id, tab) { activeExpandSubTab[id] = tab; render(); }
+        function toggleOrderExpand(id) { expandedOrderId = (expandedOrderId === id ? null : id); render(); }
 
-        function setBoxProgress(id, count) {
+        // Srovnání počtu pomocí tlačítek - a +
+        function adjustOrderProgress(id, delta) {
             let o = orders.find(x => x.id === id);
             if (!o) return;
-            o.done = count;
+            let newDone = o.done + delta;
+            if (newDone < 0) newDone = 0;
+            if (newDone > o.total) newDone = o.total;
+            
+            o.done = newDone;
             o.note = (o.note ? o.note + " | " : "") + "Obsluha A srovnala počet obalů";
-            if (o.done >= o.total) { orders = orders.filter(x => x.id !== id); expandedOrderId = null; }
+            
+            if (o.done >= o.total) {
+                orders = orders.filter(x => x.id !== id);
+                expandedOrderId = null;
+            }
             lastOrderCount = orders.length;
-            save();
-        }
-
-        function changeBoxVariant(id, boxIndex, newCar) {
-            let o = orders.find(x => x.id === id);
-            if (!o) return;
-            o.car = newCar;
-            let newCarAcc = getAccusativeCar(newCar);
-            o.note = (o.note ? o.note + " | " : "") + `V boxu #${boxIndex} je jiný obal (vyměň za ${newCarAcc})`;
-            vzvVatAlerts.push({ id: Date.now() + Math.random(), line: o.line, box: boxIndex, type: 'mismatch', variant: newCar, text: `V boxu #${boxIndex} na lince ${o.line} je jiný obal (vyměň za ${newCarAcc}).` });
-            expandedOrderId = null;
             save();
         }
 
@@ -1278,7 +1171,7 @@
                         <div class="vzv-sensor-alert" style="margin-bottom:8px;">
                             <div class="vzv-sensor-title">⚠️ Upozornění od obsluhy A</div>
                             <div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">${v.text}</div>
-                            <button class="btn-resolve-sensor" onclick="dismissVzvVatAlert(${v.id})">✓ OK / ROZUMÍM</button>
+                            <button class="btn-resolve-sensor" onclick="dismissVzvVatAlert(${v.id})">✓ OK / POTVRĎ</button>
                         </div>
                     `;
                 });
@@ -1327,45 +1220,17 @@
                     let remainingWRT = Math.max(0, o.stojany - o.done);
                     let wrtBadgeClass = o.line === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
                     let isExpanded = (expandedOrderId === o.id);
-                    let subTab = activeExpandSubTab[o.id] || 'srovnat';
 
                     let expandMenuHtml = '';
                     if (isExpanded) {
-                        let srovActive = subTab === 'srovnat' ? 'active' : '';
-                        let jinyActive = subTab === 'jiny' ? 'active' : '';
-                        let subContentHtml = '';
-
-                        if (subTab === 'srovnat') {
-                            subContentHtml += `<div class="boxes-row" style="margin-top:6px;">`;
-                            for (let i = 1; i <= o.total; i++) {
-                                let st = i <= o.done ? 'done' : 'pending';
-                                subContentHtml += `<div class="box-unit ${st}" onclick="setBoxProgress(${o.id}, ${i})">#${i}</div>`;
-                            }
-                            subContentHtml += `</div><div style="font-size:0.65rem; color:#94a3b8; text-align:center;">Zaklikněte čtvereček pro srovnání počtu</div>`;
-                        } else {
-                            let cars = ['Tiguan', 'Kodiaq', 'Tayron', 'Audi', 'Seat'];
-                            subContentHtml += `<div class="lbl" style="margin:4px 0;">Zvolte box a novou variantu:</div><div class="box-grid-4">`;
-                            for (let i = 1; i <= o.total; i++) {
-                                subContentHtml += `
-                                    <div class="mismatch-box-card">
-                                        <div style="font-size:0.7rem; font-weight:bold; color:#f59e0b;">Box #${i}</div>
-                                        <div class="mismatch-car-grid">
-                                            ${cars.map(c => `<button class="btn-car-choice" onclick="changeBoxVariant(${o.id}, ${i}, '${c}')">${c}</button>`).join('')}
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                            subContentHtml += `</div>`;
-                        }
-
                         expandMenuHtml = `
                             <div class="order-expand-menu">
-                                <div class="expand-menu-title">⚠️ SPRÁVA STAVU OBALU</div>
-                                <div class="expand-menu-btns">
-                                    <button class="btn-expand-action ${srovActive}" onclick="setExpandSubTab(${o.id}, 'srovnat')">1. Srovnat počet</button>
-                                    <button class="btn-expand-action ${jinyActive}" onclick="setExpandSubTab(${o.id}, 'jiny')">2. V boxu jiný obal</button>
+                                <div class="expand-menu-title">⚠️ SROVNÁT POČET</div>
+                                <div class="counter-control">
+                                    <button class="btn-counter" onclick="adjustOrderProgress(${o.id}, -1)">−</button>
+                                    <div class="counter-val">${o.done} / ${o.total} obalů</div>
+                                    <button class="btn-counter" onclick="adjustOrderProgress(${o.id}, 1)">＋</button>
                                 </div>
-                                ${subContentHtml}
                             </div>
                         `;
                     }
@@ -1424,7 +1289,8 @@
                             for (let i = 1; i <= cur.total; i++) {
                                 boxes += `<div class="box-unit ${i <= cur.done ? 'done' : 'pending'}">#${i}</div>`;
                             }
-                            let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
+                            // Text hlášení pro VZV B upraven na váš požadavek
+                            let btnText = '✓ OBAL ZAVES DO BOXU 1 NEBO 2 ! POTÉ POTVRĎ !';
                             body.innerHTML = `${modeAlertHtml}${cur.note ? `<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>` : ''}<div class="boxes-row">${boxes}</div><button class="btn-zavez" onclick="zavezt(${cur.id})">${btnText}</button>`;
                         }
                     }
@@ -1434,7 +1300,6 @@
 
         function clearAllRepeatBoxes() {
             repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
-            mismatchBoxes = {};
             defectBoxes = { 1: {1:false, 2:false, 3:false, 4:false}, 2: {1:false, 2:false, 3:false, 4:false} };
             vzvVatAlerts = [];
             save();
