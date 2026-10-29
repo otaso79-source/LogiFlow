@@ -97,8 +97,12 @@
         .mode-selector-box.line-1 { border-color: #3b82f6; }
         .mode-selector-box.line-2 { border-color: #a855f7; }
 
-        .repeat-panel { background: #1e293b; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; }
-        .repeat-title { font-size: 0.8rem; font-weight: bold; color: #f59e0b; text-align: center; margin-bottom: 8px; }
+        /* VÍCEÚROVŇOVÝ PANEL HLÁŠENÍ */
+        .report-panel { background: #1e293b; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; }
+        .report-sub-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 8px; }
+        .btn-report-tab { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 6px 2px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-align: center; cursor: pointer; }
+        .btn-report-tab.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
         .box-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
         .box-col { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 6px 2px; }
         .box-col-lbl { font-size: 0.7rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; }
@@ -110,6 +114,11 @@
             50% { opacity: 0.6; }
             100% { opacity: 1; }
         }
+
+        .mismatch-box-card { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 6px; text-align: center; }
+        .mismatch-car-grid { display: grid; grid-template-columns: 1fr; gap: 3px; margin-top: 4px; }
+        .btn-car-choice { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 4px 2px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
+        .btn-car-choice:hover { border-color: #f59e0b; color: #fff; background: rgba(245, 158, 11, 0.2); }
 
         .vzv-sensor-alert { background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center; animation: pulseAlarm 1.5s infinite; }
         .vzv-sensor-title { font-size: 0.85rem; font-weight: bold; color: #ef4444; margin-bottom: 6px; text-transform: uppercase; }
@@ -244,25 +253,15 @@
             border: 1px dashed #f59e0b;
         }
 
-        /* STYLY PRO ROZBALOVACÍ MENU ÚPRAV U OBSLUHY A */
         .order-expand-menu { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px; margin-top: 8px; }
         .expand-menu-title { font-size: 0.75rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; text-align: center; }
         .expand-menu-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
         .btn-expand-action { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; text-align: center; cursor: pointer; }
         .btn-expand-action.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
-        
-        /* STYLY PRO MŘÍŽKU VÝBĚRU VARIANTY V BOXU (PODLE VZORU ČIDEL) */
-        .mismatch-box-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 6px; }
-        .mismatch-box-card { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px; }
-        .mismatch-box-title { font-size: 0.75rem; color: #f59e0b; font-weight: bold; margin-bottom: 6px; text-align: center; }
-        .mismatch-car-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
-        .btn-car-choice { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 6px 2px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-align: center; cursor: pointer; }
-        .btn-car-choice:hover { border-color: #f59e0b; color: #fff; background: rgba(245, 158, 11, 0.15); }
     </style>
 </head>
 <body>
 
-    <!-- PŘEKRYVNÝ BANNER PRO ÚDRŽBU / HOTOVO -->
     <div id="updateBannerOverlay">
         <div class="update-banner-box" id="updateBannerBox">
             <div class="update-banner-title" id="bannerTitle" onclick="openAdminPasswordModal(true)" title="Kliknutím zadat heslo správce">⚠️ UPOZORNĚNÍ NA ÚDRŽBU</div>
@@ -271,7 +270,6 @@
         </div>
     </div>
 
-    <!-- VLASTNÍ OKNO PRO HESLO SPRÁVCE -->
     <div id="adminPasswordModal">
         <div class="admin-pwd-box">
             <div style="font-size: 1rem; font-weight: bold; color: #f59e0b;">🔒 Zadejte heslo správce</div>
@@ -363,31 +361,86 @@
                 </div>
             </div>
 
-            <!-- ROZBALOVACÍ LIŠTA 2: OPAKUJ ZAVEZENÍ / ČIDLA -->
+            <!-- JEDNOTNÁ ROZBALOVACÍ LIŠTA PRO HLAŠENÍ / ČIDLA / VADY -->
             <div class="accordion-wrapper">
                 <div class="accordion-header" id="sensorAccordionHeader" onclick="toggleAccordion('sensorAccordionContent', 'sensorAccordionHeader')">
                     <span id="sensorAccordionTitle">Opakuj zavezení, bedna není na čidlech :</span>
                     <span class="arrow">▼</span>
                 </div>
                 <div class="accordion-content" id="sensorAccordionContent">
-                    <div class="repeat-panel">
-                        <div class="repeat-title">Opakuj zavezení, bedna není na čidlech :</div>
-                        <div class="box-grid-4">
-                            <div class="box-col">
-                                <div class="box-col-lbl">Box 4</div>
-                                <button class="box-col-btn" id="repeatBox4" onclick="toggleRepeatBox(4)">VYP</button>
+                    <div class="report-panel">
+                        <div class="report-sub-tabs">
+                            <button class="btn-report-tab active" id="tabReportSensors" onclick="setReportTab('sensors')">1. Čidla</button>
+                            <button class="btn-report-tab" id="tabReportMismatch" onclick="setReportTab('mismatch')">2. Jiný obal</button>
+                            <button class="btn-report-tab" id="tabReportDefect" onclick="setReportTab('defect')">3. Vadný obal</button>
+                        </div>
+
+                        <!-- PODSEKCE 1: ČIDLA -->
+                        <div id="reportSubSensors">
+                            <div class="repeat-title" style="margin-top:4px;">Opakuj zavezení, bedna není na čidlech :</div>
+                            <div class="box-grid-4">
+                                <div class="box-col"><div class="box-col-lbl">Box 4</div><button class="box-col-btn" id="repeatBox4" onclick="toggleRepeatBox(4)">VYP</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 3</div><button class="box-col-btn" id="repeatBox3" onclick="toggleRepeatBox(3)">VYP</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 2</div><button class="box-col-btn" id="repeatBox2" onclick="toggleRepeatBox(2)">VYP</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 1</div><button class="box-col-btn" id="repeatBox1" onclick="toggleRepeatBox(1)">VYP</button></div>
                             </div>
-                            <div class="box-col">
-                                <div class="box-col-lbl">Box 3</div>
-                                <button class="box-col-btn" id="repeatBox3" onclick="toggleRepeatBox(3)">VYP</button>
+                        </div>
+
+                        <!-- PODSEKCE 2: JINÝ OBAL -->
+                        <div id="reportSubMismatch" style="display:none;">
+                            <div class="repeat-title" style="margin-top:4px; color:#3b82f6;">Obal se neshoduje s variantou (vyberte box a variantu):</div>
+                            <div class="box-grid-4">
+                                <div class="mismatch-box-card">
+                                    <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 4</div>
+                                    <div class="mismatch-car-grid">
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(4, 'Tiguan')">Tiguan</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(4, 'Kodiaq')">Kodiaq</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(4, 'Tayron')">Tayron</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(4, 'Audi')">Audi</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(4, 'Seat')">Seat</button>
+                                    </div>
+                                </div>
+                                <div class="mismatch-box-card">
+                                    <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 3</div>
+                                    <div class="mismatch-car-grid">
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(3, 'Tiguan')">Tiguan</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(3, 'Kodiaq')">Kodiaq</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(3, 'Tayron')">Tayron</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(3, 'Audi')">Audi</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(3, 'Seat')">Seat</button>
+                                    </div>
+                                </div>
+                                <div class="mismatch-box-card">
+                                    <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 2</div>
+                                    <div class="mismatch-car-grid">
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(2, 'Tiguan')">Tiguan</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(2, 'Kodiaq')">Kodiaq</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(2, 'Tayron')">Tayron</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(2, 'Audi')">Audi</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(2, 'Seat')">Seat</button>
+                                    </div>
+                                </div>
+                                <div class="mismatch-box-card">
+                                    <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 1</div>
+                                    <div class="mismatch-car-grid">
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(1, 'Tiguan')">Tiguan</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(1, 'Kodiaq')">Kodiaq</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(1, 'Tayron')">Tayron</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(1, 'Audi')">Audi</button>
+                                        <button class="btn-car-choice" onclick="sendMismatchReport(1, 'Seat')">Seat</button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="box-col">
-                                <div class="box-col-lbl">Box 2</div>
-                                <button class="box-col-btn" id="repeatBox2" onclick="toggleRepeatBox(2)">VYP</button>
-                            </div>
-                            <div class="box-col">
-                                <div class="box-col-lbl">Box 1</div>
-                                <button class="box-col-btn" id="repeatBox1" onclick="toggleRepeatBox(1)">VYP</button>
+                        </div>
+
+                        <!-- PODSEKCE 3: VADNÝ OBAL -->
+                        <div id="reportSubDefect" style="display:none;">
+                            <div class="repeat-title" style="margin-top:4px; color:#ef4444;">Obal je vadný, křivý. Vyměň ho (vyberte box):</div>
+                            <div class="box-grid-4">
+                                <div class="box-col"><div class="box-col-lbl">Box 4</div><button class="box-col-btn" onclick="sendDefectReport(4)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 3</div><button class="box-col-btn" onclick="sendDefectReport(3)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 2</div><button class="box-col-btn" onclick="sendDefectReport(2)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 1</div><button class="box-col-btn" onclick="sendDefectReport(1)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
                             </div>
                         </div>
                     </div>
@@ -434,7 +487,6 @@
         <div id="viewB" style="display:none;">
             <div class="lbl">Přehled linek</div>
              
-            <!-- VZV UPOZORNĚNÍ -->
             <div id="vzvSensorAlertArea"></div>
 
             <div class="vzv-card l2">
@@ -528,7 +580,8 @@
         let twoVariantModeLines = { 1: false, 2: false };
         let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
         let repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
-        let vzvMismatchAlerts = [];
+        let activeReportSubTab = 'sensors';
+        let vzvVatAlerts = []; // Upozornění pro VZV (jiný obal / vadný obal)
         
         let systemUpdateActive = false;
         let systemUpdateCompletedState = false;
@@ -557,6 +610,17 @@
                 content.style.display = 'block';
                 header.classList.add('open');
             }
+        }
+
+        function setReportTab(tab) {
+            activeReportSubTab = tab;
+            document.getElementById('tabReportSensors').className = 'btn-report-tab ' + (tab === 'sensors' ? 'active' : '');
+            document.getElementById('tabReportMismatch').className = 'btn-report-tab ' + (tab === 'mismatch' ? 'active' : '');
+            document.getElementById('tabReportDefect').className = 'btn-report-tab ' + (tab === 'defect' ? 'active' : '');
+
+            document.getElementById('reportSubSensors').style.display = tab === 'sensors' ? 'block' : 'none';
+            document.getElementById('reportSubMismatch').style.display = tab === 'mismatch' ? 'block' : 'none';
+            document.getElementById('reportSubDefect').style.display = tab === 'defect' ? 'block' : 'none';
         }
 
         function updatePresence() {
@@ -613,9 +677,9 @@
             render();
         });
 
-        db.ref('vzvMismatchAlerts').on('value', (snapshot) => {
+        db.ref('vzvVatAlerts').on('value', (snapshot) => {
             let raw = snapshot.val() || [];
-            vzvMismatchAlerts = Array.isArray(raw) ? raw : Object.values(raw);
+            vzvVatAlerts = Array.isArray(raw) ? raw : Object.values(raw);
             render();
         });
 
@@ -662,7 +726,7 @@
         function save() {
             db.ref('orders').set(orders);
             db.ref('alerts').set(stockAlerts);
-            db.ref('vzvMismatchAlerts').set(vzvMismatchAlerts);
+            db.ref('vzvVatAlerts').set(vzvVatAlerts);
             db.ref('singleModeLines').set(singleModeLines);
             db.ref('singleModeCar').set(singleModeCar);
             db.ref('twoVariantModeLines').set(twoVariantModeLines);
@@ -674,6 +738,31 @@
             repeatBoxes[boxNum] = !repeatBoxes[boxNum];
             save();
             renderRepeatBoxesUI();
+        }
+
+        function sendMismatchReport(boxNum, variant) {
+            vzvVatAlerts.push({
+                id: Date.now(),
+                line: curLine,
+                text: `Na lince ${curLine}, Box #${boxNum}: Obal se neshoduje s variantou. Obsluha A vybrala: ${variant}.`
+            });
+            save();
+            alert(`Hlášení o odlišné variantě pro Box #${boxNum} (${variant}) bylo odesláno na VZV.`);
+        }
+
+        function sendDefectReport(boxNum) {
+            vzvVatAlerts.push({
+                id: Date.now(),
+                line: curLine,
+                text: `Na lince ${curLine}, Box #${boxNum}: Obal je vadný, křivý. Vyměň ho!`
+            });
+            save();
+            alert(`Hlášení o vadném obalu pro Box #${boxNum} bylo odesláno na VZV.`);
+        }
+
+        function dismissVzvVatAlert(alertId) {
+            vzvVatAlerts = vzvVatAlerts.filter(a => a.id !== alertId);
+            save();
         }
 
         function renderRepeatBoxesUI() {
@@ -695,9 +784,9 @@
             let sensorHeader = document.getElementById('sensorAccordionHeader');
             let sensorTitle = document.getElementById('sensorAccordionTitle');
             if (sensorHeader && sensorTitle) {
-                if (activeSensors.length > 0) {
+                if (activeSensors.length > 0 || vzvVatAlerts.length > 0) {
                     sensorHeader.classList.add('alarm-active');
-                    sensorTitle.innerHTML = `⚠️ Opakuj zavezení, bedna není na čidlech : (Box ${activeSensors.join(', ')})`;
+                    sensorTitle.innerHTML = `⚠️ Hlášení a výstrahy na lince...`;
                 } else {
                     sensorHeader.classList.remove('alarm-active');
                     sensorTitle.innerText = "Opakuj zavezení, bedna není na čidlech :";
@@ -779,13 +868,8 @@
             }
         }
 
-        function openSettingsModal() {
-            document.getElementById('settingsModal').style.display = 'flex';
-        }
-
-        function closeSettingsModal() {
-            document.getElementById('settingsModal').style.display = 'none';
-        }
+        function openSettingsModal() { document.getElementById('settingsModal').style.display = 'flex'; }
+        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
 
         function setLoginMode(mode) {
             selectedLoginMode = mode;
@@ -827,9 +911,7 @@
         function showApp() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appScreen').style.display = 'block';
-            
             let savedTab = sessionStorage.getItem('active_tab') || selectedLoginMode || 'A';
-            
             document.getElementById('viewA').style.display = savedTab === 'A' ? 'block' : 'none';
             document.getElementById('viewB').style.display = savedTab === 'B' ? 'block' : 'none';
 
@@ -841,7 +923,6 @@
                 badge.innerText = 'VZV B';
                 badge.className = 'role-badge b';
             }
-
             render();
         }
 
@@ -854,7 +935,6 @@
             notificationsEnabled = enable;
             const setYes = document.getElementById('setNotifYes');
             const setNo = document.getElementById('setNotifNo');
-
             if (enable) {
                 if(setYes) setYes.className = 'btn-yn active-yes';
                 if(setNo) setNo.className = 'btn-yn';
@@ -879,8 +959,6 @@
                 osc.start();
                 osc.stop(ctx.currentTime + 0.4);
             } catch(e){}
-            document.title = "🔔 NOVÁ OBJEDNÁVKA!";
-            setTimeout(() => { document.title = "Logistik - Systém Závozů"; }, 5000);
         }
 
         function toggleSingleMode(enable) {
@@ -909,17 +987,8 @@
             render();
         }
 
-        function setSingleCar(car, el) {
-            singleModeCar[curLine] = car;
-            save();
-            updateDynamicTheme();
-        }
-
-        function setTwoPair(pair, el) {
-            twoVariantPair[curLine] = pair;
-            save();
-            updateDynamicTheme();
-        }
+        function setSingleCar(car, el) { singleModeCar[curLine] = car; save(); updateDynamicTheme(); }
+        function setTwoPair(pair, el) { twoVariantPair[curLine] = pair; save(); updateDynamicTheme(); }
 
         function updateDynamicTheme() {
             let activeClass = curLine === 1 ? 'selected-1' : 'selected-2';
@@ -972,14 +1041,12 @@
                 <div class="btn-opt ${currentPair === p ? activeClass : ''}" onclick="setTwoPair('${p}', this)">${p}</div>
             `).join('');
 
-            let carGrid = document.getElementById('carGrid');
             document.querySelectorAll('#carGrid .btn-opt').forEach(b => {
                 b.classList.remove('selected-1', 'selected-2');
                 if (b.innerText === curCar) b.classList.add(activeClass);
             });
 
             document.querySelectorAll('#opt3WRT, #opt6WRT, #optCustomWRT').forEach(b => b.classList.remove('selected-1', 'selected-2'));
-            
             if (curStojany === 3) {
                 document.getElementById('opt3WRT').classList.add(activeClass);
             } else if (curStojany === 6) {
@@ -997,30 +1064,11 @@
             updateDynamicTheme();
         }
 
-        function setCar(c, el) {
-            curCar = c;
-            updateDynamicTheme();
-        }
-
-        function setStojany(s, el) {
-            curStojany = s;
-            document.getElementById('customStojanBox').classList.remove('active');
-            updateDynamicTheme();
-            updateCalculations();
-        }
-
-        function enableCustomStojany(el) {
-            document.getElementById('customStojanBox').classList.add('active');
-            curStojany = parseInt(document.getElementById('customInput').value) || 1;
-            updateDynamicTheme();
-            updateCalculations();
-        }
-
-        function onCustomStojanyInput(val) {
-            curStojany = parseInt(val) || 0;
-            updateCalculations();
-        }
-
+        function setCar(c, el) { curCar = c; updateDynamicTheme(); }
+        function setStojany(s, el) { curStojany = s; document.getElementById('customStojanBox').classList.remove('active'); updateDynamicTheme(); updateCalculations(); }
+        function enableCustomStojany(el) { document.getElementById('customStojanBox').classList.add('active'); curStojany = parseInt(document.getElementById('customInput').value) || 1; updateDynamicTheme(); updateCalculations(); }
+        function onCustomStojanyInput(val) { curStojany = parseInt(val) || 0; updateCalculations(); }
+        
         function updateCalculations() {
             let ks = curStojany * 12;
             let ob = Math.ceil(ks / 9);
@@ -1032,47 +1080,22 @@
             let ks = curStojany * 12;
             let ob = Math.ceil(ks / 9);
             let note = document.getElementById('noteInput').value.trim();
-            
-            orders.push({ 
-                id: Date.now(), line: curLine, car: curCar, 
-                stojany: curStojany, total: ob, done: 0, note: note 
-            });
-
+            orders.push({ id: Date.now(), line: curLine, car: curCar, stojany: curStojany, total: ob, done: 0, note: note });
             document.getElementById('noteInput').value = '';
             lastOrderCount = orders.length;
             save();
         }
 
-        function cancelOrder(id) {
-            orders = orders.filter(x => x.id !== id);
-            lastOrderCount = orders.length;
-            save();
-        }
-
-        function toggleOrderExpand(id) {
-            if (expandedOrderId === id) {
-                expandedOrderId = null;
-            } else {
-                expandedOrderId = id;
-                activeExpandSubTab[id] = 'srovnat';
-            }
-            render();
-        }
-
-        function setExpandSubTab(id, tab) {
-            activeExpandSubTab[id] = tab;
-            render();
-        }
+        function cancelOrder(id) { orders = orders.filter(x => x.id !== id); lastOrderCount = orders.length; save(); }
+        function toggleOrderExpand(id) { expandedOrderId = (expandedOrderId === id ? null : id); activeExpandSubTab[id] = 'srovnat'; render(); }
+        function setExpandSubTab(id, tab) { activeExpandSubTab[id] = tab; render(); }
 
         function setBoxProgress(id, count) {
             let o = orders.find(x => x.id === id);
             if (!o) return;
             o.done = count;
             o.note = (o.note ? o.note + " | " : "") + "Obsluha A srovnala počet obalů";
-            if (o.done >= o.total) {
-                orders = orders.filter(x => x.id !== id);
-                expandedOrderId = null;
-            }
+            if (o.done >= o.total) { orders = orders.filter(x => x.id !== id); expandedOrderId = null; }
             lastOrderCount = orders.length;
             save();
         }
@@ -1080,81 +1103,56 @@
         function changeBoxVariant(id, boxIndex, newCar) {
             let o = orders.find(x => x.id === id);
             if (!o) return;
-
-            let oldCar = o.car;
             o.car = newCar;
-            o.note = (o.note ? o.note + " | " : "") + `V boxu #${boxIndex} je jiný obal (změněno na ${newCar})`;
-
-            vzvMismatchAlerts.push({
-                id: Date.now(),
-                line: o.line,
-                text: `V boxu #${boxIndex} na lince ${o.line} je jiný obal! Obsluha A nastavila variantu: ${newCar}.`
-            });
-
+            o.note = (o.note ? o.note + " | " : "") + `V boxu #${boxIndex} je jiný obal (${newCar})`;
+            vzvVatAlerts.push({ id: Date.now(), line: o.line, text: `V boxu #${boxIndex} na lince ${o.line} je jiný obal (${newCar}).` });
             expandedOrderId = null;
-            save();
-        }
-
-        function dismissVzvMismatch(alertId) {
-            vzvMismatchAlerts = vzvMismatchAlerts.filter(a => a.id !== alertId);
             save();
         }
 
         function sendCustomStockAlert() {
             let variant = document.getElementById('vzvVariantSelect').value;
             let count = document.getElementById('vzvCountInput').value;
-            if (!count) {
-                alert("Prosím zadejte počet obalů.");
-                return;
-            }
+            if (!count) { alert("Prosím zadejte počet obalů."); return; }
             stockAlerts.push({ id: Date.now(), variant: variant, count: count });
             document.getElementById('vzvCountInput').value = '';
             save();
         }
 
-        function dismissAlert(alertId) {
-            stockAlerts = stockAlerts.filter(a => a.id !== alertId);
-            save();
-        }
+        function dismissAlert(alertId) { stockAlerts = stockAlerts.filter(a => a.id !== alertId); save(); }
 
         function zavezt(id) {
             let o = orders.find(x => x.id === id);
             if (o) {
                 o.done++;
-                if (o.done >= o.total) {
-                    orders = orders.filter(x => x.id !== id);
-                    lastOrderCount = orders.length;
-                }
+                if (o.done >= o.total) { orders = orders.filter(x => x.id !== id); lastOrderCount = orders.length; }
                 save();
             }
         }
 
         function render() {
             if (sessionStorage.getItem('device_authenticated') !== 'true') return;
-
             renderRepeatBoxesUI();
 
             let vzvSensorAlertArea = document.getElementById('vzvSensorAlertArea');
             if (vzvSensorAlertArea) {
                 let activeSensors = [];
-                for (let i = 1; i <= 4; i++) {
-                    if (repeatBoxes[i]) activeSensors.push(i);
-                }
+                for (let i = 1; i <= 4; i++) { if (repeatBoxes[i]) activeSensors.push(i); }
 
-                let mismatchHtml = '';
-                vzvMismatchAlerts.forEach(m => {
-                    mismatchHtml += `
+                let vatHtml = '';
+                vzvVatAlerts.forEach(v => {
+                    vatHtml += `
                         <div class="vzv-sensor-alert" style="margin-bottom:8px;">
-                            <div class="vzv-sensor-title">⚠️ V boxu je jiný obal!</div>
-                            <div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">${m.text}</div>
-                            <button class="btn-resolve-sensor" onclick="dismissVzvMismatch(${m.id})">✓ OK / ROZUMÍM</button>
+                            <div class="vzv-sensor-title">⚠️ Upozornění od obsluhy A</div>
+                            <div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">${v.text}</div>
+                            <button class="btn-resolve-sensor" onclick="dismissVzvVatAlert(${v.id})">✓ OK / ROZUMÍM</button>
                         </div>
                     `;
                 });
 
-                if (activeSensors.length > 0 || vzvMismatchAlerts.length > 0) {
-                    let sensorText = activeSensors.length > 0 ? `<div class="vzv-sensor-alert"><div class="vzv-sensor-title">⚠️ Opakuj zavezení, bedna není na čidlech !</div><div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">Týká se boxů: ${activeSensors.join(', ')}</div><button class="btn-resolve-sensor" onclick="clearAllRepeatBoxes()">✓ OK / VYŘEŠENO</button></div>` : '';
-                    vzvSensorAlertArea.innerHTML = mismatchHtml + sensorText;
+                if (activeSensors.length > 0 || vzvVatAlerts.length > 0) {
+                    let sensorText = activeSensors.length > 0 ? `<div class="vzv-sensor-alert"><div class="vzv-sensor-title">⚠️ Opakuj zavezení, bedna není na čidlech !</div><div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">Boxy: ${activeSensors.join(', ')}</div><button class="btn-resolve-sensor" onclick="clearAllRepeatBoxes()">✓ OK / VYŘEŠENO</button></div>` : '';
+                    vzvSensorAlertArea.innerHTML = vatHtml + sensorText;
                 } else {
                     vzvSensorAlertArea.innerHTML = '';
                 }
@@ -1166,7 +1164,7 @@
                 stockAlerts.forEach(a => {
                     alertArea.innerHTML += `
                         <div class="stock-alert-box">
-                            <span>⚠️ <b>VZV hlásí:</b> Pro variantu <b>${a.variant}</b> zbývá posledních <b>${a.count} obalů</b>!</span>
+                            <span>⚠️ <b>VZV hlásí:</b> Pro variantu <b>${a.variant}</b> zbývá <b>${a.count} obalů</b>!</span>
                             <button class="btn-dismiss" onclick="dismissAlert(${a.id})">✕ Rozumím</button>
                         </div>
                     `;
@@ -1176,26 +1174,13 @@
             let listA = document.getElementById('listA');
             if (listA) {
                 let htmlContent = '';
-
                 [1, 2].forEach(l => {
                     let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
                     if (singleModeLines[l]) {
-                        let cCar = singleModeCar[l] || 'Tiguan';
-                        htmlContent += `
-                            <div style="background:#1e293b; padding:10px; border-radius:6px; margin-bottom:6px; border:1px solid #f59e0b; display:flex; justify-content:space-between; align-items:center;">
-                                <span>🔒 <b>Režim 1 varianta:</b> ${cCar} <span class="${badgeCls}">Linka ${l}</span></span>
-                                <span style="font-size:0.75rem; color:#f59e0b; font-weight:bold;">Aktivní</span>
-                            </div>
-                        `;
+                        htmlContent += `<div style="background:#1e293b; padding:10px; border-radius:6px; margin-bottom:6px; border:1px solid #f59e0b; display:flex; justify-content:space-between; align-items:center;"><span>🔒 <b>Režim 1 varianta:</b> ${singleModeCar[l]||'Tiguan'} <span class="${badgeCls}">Linka ${l}</span></span><span style="font-size:0.75rem; color:#f59e0b; font-weight:bold;">Aktivní</span></div>`;
                     }
                     if (twoVariantModeLines[l]) {
-                        let cPair = twoVariantPair[l] || 'Tiguan / Kodiaq';
-                        htmlContent += `
-                            <div style="background:#1e293b; padding:10px; border-radius:6px; margin-bottom:6px; border:1px solid #f59e0b; display:flex; justify-content:space-between; align-items:center;">
-                                <span>🔒 <b>Režim 2 varianty:</b> ${cPair} <span class="${badgeCls}">Linka ${l}</span></span>
-                                <span style="font-size:0.75rem; color:#f59e0b; font-weight:bold;">Aktivní</span>
-                            </div>
-                        `;
+                        htmlContent += `<div style="background:#1e293b; padding:10px; border-radius:6px; margin-bottom:6px; border:1px solid #f59e0b; display:flex; justify-content:space-between; align-items:center;"><span>🔒 <b>Režim 2 varianty:</b> ${twoVariantPair[l]||''} <span class="${badgeCls}">Linka ${l}</span></span><span style="font-size:0.75rem; color:#f59e0b; font-weight:bold;">Aktivní</span></div>`;
                     }
                 });
 
@@ -1213,28 +1198,26 @@
 
                     let expandMenuHtml = '';
                     if (isExpanded) {
-                        let srovnatActive = subTab === 'srovnat' ? 'active' : '';
+                        let srovActive = subTab === 'srovnat' ? 'active' : '';
                         let jinyActive = subTab === 'jiny' ? 'active' : '';
-
                         let subContentHtml = '';
+
                         if (subTab === 'srovnat') {
                             subContentHtml += `<div class="boxes-row" style="margin-top:6px;">`;
                             for (let i = 1; i <= o.total; i++) {
                                 let st = i <= o.done ? 'done' : 'pending';
                                 subContentHtml += `<div class="box-unit ${st}" onclick="setBoxProgress(${o.id}, ${i})">#${i}</div>`;
                             }
-                            subContentHtml += `</div>`;
-                            subContentHtml += `<div style="font-size:0.65rem; color:#94a3b8; text-align:center; margin-top:2px;">Obsluha A srovnala počet obalů (zaklikněte čtvereček)</div>`;
+                            subContentHtml += `</div><div style="font-size:0.65rem; color:#94a3b8; text-align:center;">Zaklikněte čtvereček pro srovnání počtu</div>`;
                         } else {
                             let cars = ['Tiguan', 'Kodiaq', 'Tayron', 'Audi', 'Seat'];
-                            subContentHtml += `<div class="lbl" style="margin:4px 0;">Zaklikněte box a zvolte variantu:</div>`;
-                            subContentHtml += `<div class="mismatch-box-grid">`;
+                            subContentHtml += `<div class="lbl" style="margin:4px 0;">Zvolte box a novou variantu:</div><div class="box-grid-4">`;
                             for (let i = 1; i <= o.total; i++) {
                                 subContentHtml += `
                                     <div class="mismatch-box-card">
-                                        <div class="mismatch-box-title">Box #${i}</div>
+                                        <div style="font-size:0.7rem; font-weight:bold; color:#f59e0b;">Box #${i}</div>
                                         <div class="mismatch-car-grid">
-                                            ${cars.map(c => `<div class="btn-car-choice" onclick="changeBoxVariant(${o.id}, ${i}, '${c}')">${c}</div>`).join('')}
+                                            ${cars.map(c => `<button class="btn-car-choice" onclick="changeBoxVariant(${o.id}, ${i}, '${c}')">${c}</button>`).join('')}
                                         </div>
                                     </div>
                                 `;
@@ -1246,8 +1229,8 @@
                             <div class="order-expand-menu">
                                 <div class="expand-menu-title">⚠️ SPRÁVA STAVU OBALU</div>
                                 <div class="expand-menu-btns">
-                                    <button class="btn-expand-action ${srovnatActive}" onclick="setExpandSubTab(${o.id}, 'srovnat')">1. Srovnat počet obalů</button>
-                                    <button class="btn-expand-action ${jinyActive}" onclick="setExpandSubTab(${o.id}, 'jiny')">2. V boxu je jiný obal</button>
+                                    <button class="btn-expand-action ${srovActive}" onclick="setExpandSubTab(${o.id}, 'srovnat')">1. Srovnat počet</button>
+                                    <button class="btn-expand-action ${jinyActive}" onclick="setExpandSubTab(${o.id}, 'jiny')">2. V boxu jiný obal</button>
                                 </div>
                                 ${subContentHtml}
                             </div>
@@ -1257,14 +1240,13 @@
                     htmlContent += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="flex-grow:1;"><b>${o.car}</b> <span class="${wrtBadgeClass}">Zbývá ${remainingWRT}/${o.stojany} WRT</span> - Linka ${o.line}</span>
-                            <span onclick="toggleOrderExpand(${o.id})" class="editable-progress" title="Kliknutím upravit obaly">📦 ${o.done}/${o.total} obalů</span>
+                            <span onclick="toggleOrderExpand(${o.id})" class="editable-progress">📦 ${o.done}/${o.total} obalů</span>
                             <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
                         </div>
                         ${noteHtml}
                         ${expandMenuHtml}
                     </div>`;
                 });
-
                 listA.innerHTML = htmlContent;
             }
 
@@ -1275,44 +1257,29 @@
                 let body = document.getElementById(`l${l}Body`);
                 let isSingle = singleModeLines[l];
                 let isTwo = twoVariantModeLines[l];
-                let currentSingleCar = singleModeCar[l] || 'Tiguan';
-                let currentPair = twoVariantPair[l] || 'Tiguan / Kodiaq';
 
                 if (title && next && body) {
                     if (lOrders.length === 0 && !isSingle && !isTwo) {
                         title.innerText = 'Žádná objednávka';
-                        next.className = 'next-txt none';
-                        next.innerText = 'Následuje ➔ Žádné';
+                        next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
                         body.innerHTML = '<div class="empty">Linka je volná</div>';
                     } else {
                         if (isSingle || isTwo) {
-                            title.innerText = isSingle ? `🔒 Režim 1 varianta: ${currentSingleCar}` : `🔒 Režim 2 varianty: ${currentPair}`;
-                            next.className = 'next-txt none';
-                            next.innerText = 'Následuje ➔ Žádné';
+                            title.innerText = isSingle ? `🔒 Režim 1 varianta: ${singleModeCar[l]}` : `🔒 Režim 2 varianty: ${twoVariantPair[l]}`;
+                            next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
                         } else {
                             let cur = lOrders[0];
                             let nxt1 = lOrders[1];
-                            let nxt2 = lOrders[2];
-                            
                             title.innerText = `${cur.car} (${cur.stojany} WRT)`;
-                            
                             if (nxt1) {
                                 next.className = 'next-txt';
-                                let queueText = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
-                                if (nxt2) queueText += ` ➔ <b>${nxt2.car}</b> (${nxt2.total} ob.)`;
-                                next.innerHTML = queueText;
+                                next.innerHTML = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
                             } else {
-                                next.className = 'next-txt none';
-                                next.innerText = 'Následuje ➔ Žádné';
+                                next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
                             }
                         }
 
-                        let modeAlertHtml = '';
-                        if (isSingle) {
-                            modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE: ${currentSingleCar.toUpperCase()}.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
-                        } else if (isTwo) {
-                            modeAlertHtml = `<div class="vzv-single-mode-box">⚠️ ${currentPair} výroba 2 produktů se stejným obalem.<br>POKUD BY BYLA ZMĚNA, VČAS SE ZMĚNÍ OBJEDNÁVKA!</div>`;
-                        }
+                        let modeAlertHtml = isSingle ? `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE: ${singleModeCar[l].toUpperCase()}</div>` : (isTwo ? `<div class="vzv-single-mode-box">⚠️ ${twoVariantPair[l]}</div>` : '');
 
                         if (isSingle || isTwo) {
                             body.innerHTML = modeAlertHtml + '<div class="empty" style="color:#fbbf24; font-weight:bold;">Režim je aktivní na lince</div>';
@@ -1322,40 +1289,17 @@
                             let cur = lOrders[0];
                             let boxes = '';
                             for (let i = 1; i <= cur.total; i++) {
-                                let st = i <= cur.done ? 'done' : 'pending';
-                                boxes += `<div class="box-unit ${st}">#${i}</div>`;
+                                boxes += `<div class="box-unit ${i <= cur.done ? 'done' : 'pending'}">#${i}</div>`;
                             }
-
                             let btnText = l === 1 ? '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 3 - 4' : '✓ ZAVEZT OBAL DO OTEVŘENÉHO BOXU 1 - 2';
-                            let lineClass = cur.line === 1 ? 'line-1' : 'line-2';
-                            let noteHtml = cur.note ? `<div class="note-tag ${lineClass}">📝 Poznámka: ${cur.note}</div>` : '';
-
-                            body.innerHTML = `
-                                ${modeAlertHtml}
-                                ${noteHtml}
-                                <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; color:#94a3b8;">
-                                    <span>Zbývá zavezt: <b>${cur.total - cur.done} ob.</b></span>
-                                </div>
-                                <div class="boxes-row">${boxes}</div>
-                                <button class="btn-zavez" onclick="zavezt(${cur.id})">${btnText}</button>
-                            `;
+                            body.innerHTML = `${modeAlertHtml}${cur.note ? `<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>` : ''}<div class="boxes-row">${boxes}</div><button class="btn-zavez" onclick="zavezt(${cur.id})">${btnText}</button>`;
                         }
                     }
                 }
             });
-
-            let doneBanner = document.getElementById('doneBanner');
-            if (doneBanner) {
-                doneBanner.style.display = (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2] && !twoVariantModeLines[1] && !twoVariantModeLines[2]) ? 'block' : 'none';
-            }
         }
 
-        function clearAllRepeatBoxes() {
-            repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
-            save();
-            render();
-        }
+        function clearAllRepeatBoxes() { repeatBoxes = { 1: false, 2: false, 3: false, 4: false }; save(); render(); }
     </script>
-
 </body>
 </html>
