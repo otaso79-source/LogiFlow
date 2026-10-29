@@ -118,7 +118,7 @@
         .mismatch-box-card { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 6px; text-align: center; }
         .mismatch-car-grid { display: grid; grid-template-columns: 1fr; gap: 3px; margin-top: 4px; }
         .btn-car-choice { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 4px 2px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
-        .btn-car-choice:hover { border-color: #f59e0b; color: #fff; background: rgba(245, 158, 11, 0.2); }
+        .btn-car-choice.active-green { background: #10b981 !important; color: #fff !important; border-color: #059669 !important; animation: pulseAlarm 1.5s infinite; }
 
         .vzv-sensor-alert { background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center; animation: pulseAlarm 1.5s infinite; }
         .vzv-sensor-title { font-size: 0.85rem; font-weight: bold; color: #ef4444; margin-bottom: 6px; text-transform: uppercase; }
@@ -393,42 +393,42 @@
                             <div class="box-grid-4">
                                 <div class="mismatch-box-card">
                                     <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 4</div>
-                                    <div class="mismatch-car-grid">
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(4, 'Tiguan')">Tiguan</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(4, 'Kodiaq')">Kodiaq</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(4, 'Tayron')">Tayron</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(4, 'Audi')">Audi</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(4, 'Seat')">Seat</button>
+                                    <div class="mismatch-car-grid" id="mismatchGrid4">
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(4, 'Tiguan')">Tiguan</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(4, 'Kodiaq')">Kodiaq</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(4, 'Tayron')">Tayron</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(4, 'Audi')">Audi</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(4, 'Seat')">Seat</button>
                                     </div>
                                 </div>
                                 <div class="mismatch-box-card">
                                     <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 3</div>
-                                    <div class="mismatch-car-grid">
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(3, 'Tiguan')">Tiguan</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(3, 'Kodiaq')">Kodiaq</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(3, 'Tayron')">Tayron</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(3, 'Audi')">Audi</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(3, 'Seat')">Seat</button>
+                                    <div class="mismatch-car-grid" id="mismatchGrid3">
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(3, 'Tiguan')">Tiguan</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(3, 'Kodiaq')">Kodiaq</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(3, 'Tayron')">Tayron</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(3, 'Audi')">Audi</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(3, 'Seat')">Seat</button>
                                     </div>
                                 </div>
                                 <div class="mismatch-box-card">
                                     <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 2</div>
-                                    <div class="mismatch-car-grid">
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(2, 'Tiguan')">Tiguan</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(2, 'Kodiaq')">Kodiaq</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(2, 'Tayron')">Tayron</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(2, 'Audi')">Audi</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(2, 'Seat')">Seat</button>
+                                    <div class="mismatch-car-grid" id="mismatchGrid2">
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(2, 'Tiguan')">Tiguan</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(2, 'Kodiaq')">Kodiaq</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(2, 'Tayron')">Tayron</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(2, 'Audi')">Audi</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(2, 'Seat')">Seat</button>
                                     </div>
                                 </div>
                                 <div class="mismatch-box-card">
                                     <div style="font-size:0.7rem; font-weight:bold; color:#94a3b8; margin-bottom:4px;">Box 1</div>
-                                    <div class="mismatch-car-grid">
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(1, 'Tiguan')">Tiguan</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(1, 'Kodiaq')">Kodiaq</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(1, 'Tayron')">Tayron</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(1, 'Audi')">Audi</button>
-                                        <button class="btn-car-choice" onclick="sendMismatchReport(1, 'Seat')">Seat</button>
+                                    <div class="mismatch-car-grid" id="mismatchGrid1">
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(1, 'Tiguan')">Tiguan</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(1, 'Kodiaq')">Kodiaq</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(1, 'Tayron')">Tayron</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(1, 'Audi')">Audi</button>
+                                        <button class="btn-car-choice" onclick="toggleMismatchReport(1, 'Seat')">Seat</button>
                                     </div>
                                 </div>
                             </div>
@@ -438,10 +438,10 @@
                         <div id="reportSubDefect" style="display:none;">
                             <div class="repeat-title" style="margin-top:4px; color:#ef4444;">Obal je vadný, křivý. Vyměň ho (vyberte box):</div>
                             <div class="box-grid-4">
-                                <div class="box-col"><div class="box-col-lbl">Box 4</div><button class="box-col-btn" onclick="sendDefectReport(4)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
-                                <div class="box-col"><div class="box-col-lbl">Box 3</div><button class="box-col-btn" onclick="sendDefectReport(3)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
-                                <div class="box-col"><div class="box-col-lbl">Box 2</div><button class="box-col-btn" onclick="sendDefectReport(2)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
-                                <div class="box-col"><div class="box-col-lbl">Box 1</div><button class="box-col-btn" onclick="sendDefectReport(1)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 4</div><button class="box-col-btn" id="defectBox4" onclick="toggleDefectReport(4)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 3</div><button class="box-col-btn" id="defectBox3" onclick="toggleDefectReport(3)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 2</div><button class="box-col-btn" id="defectBox2" onclick="toggleDefectReport(2)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 1</div><button class="box-col-btn" id="defectBox1" onclick="toggleDefectReport(1)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
                             </div>
                         </div>
 
@@ -597,6 +597,9 @@
         let twoVariantModeLines = { 1: false, 2: false };
         let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
         let repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
+        let mismatchBoxes = {}; // { 'l1_b3_Tiguan': true, ... }
+        let defectBoxes = { 1: {1:false, 2:false, 3:false, 4:false}, 2: {1:false, 2:false, 3:false, 4:false} };
+        
         let activeReportSubTab = 'sensors';
         let vzvVatAlerts = [];
         
@@ -732,6 +735,18 @@
             render();
         });
 
+        db.ref('mismatchBoxes').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) mismatchBoxes = data;
+            render();
+        });
+
+        db.ref('defectBoxes').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) defectBoxes = data;
+            render();
+        });
+
         db.ref('systemUpdate').on('value', (snapshot) => {
             let val = snapshot.val();
             let newActive = val ? val.active : false;
@@ -751,6 +766,8 @@
             db.ref('twoVariantModeLines').set(twoVariantModeLines);
             db.ref('twoVariantPair').set(twoVariantPair);
             db.ref('repeatBoxes').set(repeatBoxes);
+            db.ref('mismatchBoxes').set(mismatchBoxes);
+            db.ref('defectBoxes').set(defectBoxes);
         }
 
         function toggleRepeatBox(boxNum) {
@@ -759,44 +776,71 @@
             renderRepeatBoxesUI();
         }
 
-        function sendMismatchReport(boxNum, variant) {
-            vzvVatAlerts.push({
-                id: Date.now(),
-                line: curLine,
-                text: `Na lince ${curLine}, Box #${boxNum}: Jiný obal. Zvoleno: ${variant}.`
-            });
+        function toggleMismatchReport(boxNum, variant) {
+            let key = `l${curLine}_b${boxNum}_${variant}`;
+            let isActive = !!mismatchBoxes[key];
+            if (isActive) {
+                delete mismatchBoxes[key];
+                vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'mismatch' && a.variant === variant));
+            } else {
+                mismatchBoxes[key] = true;
+                vzvVatAlerts.push({
+                    id: Date.now() + Math.random(),
+                    line: curLine,
+                    box: boxNum,
+                    type: 'mismatch',
+                    variant: variant,
+                    text: `Na lince ${curLine}, Box #${boxNum}: Jiný obal (${variant}).`
+                });
+            }
             save();
-            alert(`Hlášení: Jiný obal pro Box #${boxNum} (${variant}) bylo odesláno na VZV.`);
         }
 
-        function sendDefectReport(boxNum) {
-            vzvVatAlerts.push({
-                id: Date.now(),
-                line: curLine,
-                text: `Na lince ${curLine}, Box #${boxNum}: Obal je vadný, křivý. Vyměň ho!`
-            });
+        function toggleDefectReport(boxNum) {
+            if (!defectBoxes[curLine]) defectBoxes[curLine] = {};
+            let isActive = !!defectBoxes[curLine][boxNum];
+            defectBoxes[curLine][boxNum] = !isActive;
+
+            if (defectBoxes[curLine][boxNum]) {
+                vzvVatAlerts.push({
+                    id: Date.now() + Math.random(),
+                    line: curLine,
+                    box: boxNum,
+                    type: 'defect',
+                    text: `Na lince ${curLine}, Box #${boxNum}: Obal je vadný, křivý. Vyměň ho!`
+                });
+            } else {
+                vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'defect'));
+            }
             save();
-            alert(`Hlášení: Vadný obal pro Box #${boxNum} bylo odesláno na VZV.`);
         }
 
         function sendEmptyReport() {
             let variant = document.getElementById('emptyVariantSelect').value;
             let count = document.getElementById('emptyCountInput').value;
             if (!count) {
-                alert("Zadejte prosím počet obalů.");
                 return;
             }
             vzvVatAlerts.push({
-                id: Date.now(),
+                id: Date.now() + Math.random(),
                 line: curLine,
+                type: 'empty',
                 text: `Na lince ${curLine}: Přivez prázdný obal na pracoviště (${variant}, ${count} ks).`
             });
             document.getElementById('emptyCountInput').value = '';
             save();
-            alert(`Požadavek na přivezení prázdného obalu (${variant}, ${count} ks) byl odeslán na VZV.`);
         }
 
         function dismissVzvVatAlert(alertId) {
+            let alertObj = vzvVatAlerts.find(a => a.id === alertId);
+            if (alertObj) {
+                if (alertObj.type === 'mismatch') {
+                    let key = `l${alertObj.line}_b${alertObj.box}_${alertObj.variant}`;
+                    delete mismatchBoxes[key];
+                } else if (alertObj.type === 'defect') {
+                    if (defectBoxes[alertObj.line]) defectBoxes[alertObj.line][alertObj.box] = false;
+                }
+            }
             vzvVatAlerts = vzvVatAlerts.filter(a => a.id !== alertId);
             save();
         }
@@ -817,10 +861,50 @@
                 }
             }
 
+            // Vykreslení stavů tlačítek pro 2. Jiný obal
+            for (let b = 1; b <= 4; b++) {
+                let grid = document.getElementById(`mismatchGrid${b}`);
+                if (grid) {
+                    let buttons = grid.querySelectorAll('.btn-car-choice');
+                    buttons.forEach(btn => {
+                        let carName = btn.innerText;
+                        let key = `l${curLine}_b${b}_${carName}`;
+                        if (mismatchBoxes[key]) {
+                            btn.className = "btn-car-choice active-green";
+                        } else {
+                            btn.className = "btn-car-choice";
+                        }
+                    });
+                }
+            }
+
+            // Vykreslení stavů tlačítek pro 3. Vadný obal
+            for (let b = 1; b <= 4; b++) {
+                let defBtn = document.getElementById(`defectBox${b}`);
+                if (defBtn) {
+                    let isDef = defectBoxes[curLine] && defectBoxes[curLine][b];
+                    if (isDef) {
+                        defBtn.innerText = "ZAP";
+                        defBtn.className = "box-col-btn active";
+                    } else {
+                        defBtn.innerText = "Nahlásit";
+                        defBtn.className = "box-col-btn";
+                        defBtn.style.background = "#ef4444";
+                        defBtn.style.color = "#fff";
+                        defBtn.style.borderColor = "#ef4444";
+                    }
+                }
+            }
+
             let sensorHeader = document.getElementById('sensorAccordionHeader');
             let sensorTitle = document.getElementById('sensorAccordionTitle');
             if (sensorHeader && sensorTitle) {
-                if (activeSensors.length > 0 || vzvVatAlerts.length > 0) {
+                let hasActiveMismatch = Object.keys(mismatchBoxes).length > 0;
+                let hasActiveDefect = false;
+                if (defectBoxes[1]) { Object.values(defectBoxes[1]).forEach(v => { if(v) hasActiveDefect = true; }); }
+                if (defectBoxes[2]) { Object.values(defectBoxes[2]).forEach(v => { if(v) hasActiveDefect = true; }); }
+
+                if (activeSensors.length > 0 || vzvVatAlerts.length > 0 || hasActiveMismatch || hasActiveDefect) {
                     sensorHeader.classList.add('alarm-active');
                     sensorTitle.innerHTML = `⚠️ Info pro VZV (Aktivní hlášení...)`;
                 } else {
@@ -1091,6 +1175,7 @@
                 document.getElementById('optCustomWRT').classList.add(activeClass);
                 document.getElementById('customStojanBox').className = customBoxClass;
             }
+            renderRepeatBoxesUI();
         }
 
         function setLine(l) {
@@ -1141,7 +1226,7 @@
             if (!o) return;
             o.car = newCar;
             o.note = (o.note ? o.note + " | " : "") + `V boxu #${boxIndex} je jiný obal (${newCar})`;
-            vzvVatAlerts.push({ id: Date.now(), line: o.line, text: `V boxu #${boxIndex} na lince ${o.line} je jiný obal (${newCar}).` });
+            vzvVatAlerts.push({ id: Date.now() + Math.random(), line: o.line, box: boxIndex, type: 'mismatch', variant: newCar, text: `V boxu #${boxIndex} na lince ${o.line} je jiný obal (${newCar}).` });
             expandedOrderId = null;
             save();
         }
@@ -1149,7 +1234,7 @@
         function sendCustomStockAlert() {
             let variant = document.getElementById('vzvVariantSelect').value;
             let count = document.getElementById('vzvCountInput').value;
-            if (!count) { alert("Prosím zadejte počet obalů."); return; }
+            if (!count) { return; }
             stockAlerts.push({ id: Date.now(), variant: variant, count: count });
             document.getElementById('vzvCountInput').value = '';
             save();
@@ -1335,7 +1420,14 @@
             });
         }
 
-        function clearAllRepeatBoxes() { repeatBoxes = { 1: false, 2: false, 3: false, 4: false }; save(); render(); }
+        function clearAllRepeatBoxes() {
+            repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
+            mismatchBoxes = {};
+            defectBoxes = { 1: {1:false, 2:false, 3:false, 4:false}, 2: {1:false, 2:false, 3:false, 4:false} };
+            vzvVatAlerts = [];
+            save();
+            render();
+        }
     </script>
 </body>
 </html>
