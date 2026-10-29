@@ -77,7 +77,7 @@
             display: none; padding: 10px; border-top: 1px solid #334155; background: #0f172a;
         }
 
-        /* ČERVENÉ BLIKÁNÍ PRO AKTIIVNÍ ČIDLO */
+        /* ČERVENÉ BLIKÁNÍ PRO AKTIVNÍ ČIDLO */
         .accordion-header.alarm-active {
             background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #ef4444;
             animation: pulseHeaderAlarm 1.5s infinite;
@@ -638,10 +638,6 @@
             let newActive = val ? val.active : false;
             let newCompleted = val ? val.completed : false;
 
-            if (newActive !== systemUpdateActive || newCompleted !== systemUpdateCompletedState) {
-                localStorage.removeItem('ack_update_completed');
-            }
-
             systemUpdateActive = newActive;
             systemUpdateCompletedState = newCompleted;
             renderUpdateOverlay();
@@ -683,7 +679,7 @@
             let sensorTitle = document.getElementById('sensorAccordionTitle');
             if (sensorHeader && sensorTitle) {
                 if (activeSensors.length > 0) {
-                    sensorHeader.classList.add('alarm-active');
+                    sensorHeader.classList.add('alarm-alarm-active', 'alarm-active');
                     sensorTitle.innerHTML = `⚠️ Opakuj zavezení, bedna není na čidlech : (Box ${activeSensors.join(', ')})`;
                 } else {
                     sensorHeader.classList.remove('alarm-active');
@@ -726,7 +722,7 @@
         }
 
         function acknowledgeUpdate() {
-            localStorage.setItem('ack_update_completed', 'true');
+            localStorage.setItem('ack_update_completed_state', systemUpdateCompletedState.toString());
             document.getElementById('updateBannerOverlay').style.display = 'none';
         }
 
@@ -736,14 +732,15 @@
             let title = document.getElementById('bannerTitle');
             let text = document.getElementById('bannerText');
 
-            let ackCompleted = localStorage.getItem('ack_update_completed') === 'true';
+            let ackState = localStorage.getItem('ack_update_completed_state');
+            let isAlreadyAcked = (ackState === systemUpdateCompletedState.toString());
 
             if (systemUpdateActive) {
                 bannerBox.className = "update-banner-box";
                 title.innerText = "⚠️ UPOZORNĚNÍ NA ÚDRŽBU";
                 text.innerHTML = "POZOR: Proběhne aktualizace programu připravte se na výpadek.<br><br>Neřiďte se PROGRAMEM !!!";
                 overlay.style.display = 'flex';
-            } else if (systemUpdateCompletedState && !ackCompleted) {
+            } else if (systemUpdateCompletedState && !isAlreadyAcked) {
                 bannerBox.className = "update-banner-box completed-box";
                 title.innerText = "✅ HOTOVO";
                 text.innerText = "Program aktualizován, proveďte reset a vymažte objednávky.";
