@@ -314,7 +314,7 @@
             <!-- ROZBALOVACÍ LIŠTA 1: REŽIMY VARIANT -->
             <div class="accordion-wrapper">
                 <div class="accordion-header" id="modesAccordionHeader" onclick="toggleAccordion('modesAccordionContent', 'modesAccordionHeader')">
-                    <span>Výroba jedné nebo dvou variant se stejným obalem. Vyber možnosti</span>
+                    <span>Výroba jedné nebo dvou variant se stejným obalem :</span>
                     <span class="arrow">▼</span>
                 </div>
                 <div class="accordion-content" id="modesAccordionContent">
@@ -358,12 +358,12 @@
             <!-- ROZBALOVACÍ LIŠTA 2: OPAKUJ ZAVEZENÍ / ČIDLA -->
             <div class="accordion-wrapper">
                 <div class="accordion-header" id="sensorAccordionHeader" onclick="toggleAccordion('sensorAccordionContent', 'sensorAccordionHeader')">
-                    <span id="sensorAccordionTitle">Opakuj zavezení, bedna není na čidle</span>
+                    <span id="sensorAccordionTitle">Opakuj zavezení, bedna není na čidlech :</span>
                     <span class="arrow">▼</span>
                 </div>
                 <div class="accordion-content" id="sensorAccordionContent">
                     <div class="repeat-panel">
-                        <div class="repeat-title">Opakuj zavezení, bedna není na čidle</div>
+                        <div class="repeat-title">Opakuj zavezení, bedna není na čidlech :</div>
                         <div class="box-grid-4">
                             <div class="box-col">
                                 <div class="box-col-lbl">Box 4</div>
@@ -679,16 +679,15 @@
                 }
             }
 
-            // Pokud je nějaký box aktivní (ZAP), rozbalovací lišta bude červeně blikat
             let sensorHeader = document.getElementById('sensorAccordionHeader');
             let sensorTitle = document.getElementById('sensorAccordionTitle');
             if (sensorHeader && sensorTitle) {
                 if (activeSensors.length > 0) {
                     sensorHeader.classList.add('alarm-active');
-                    sensorTitle.innerHTML = `⚠️ Opakuj zavezení, bedna není na čidle (Box ${activeSensors.join(', ')})`;
+                    sensorTitle.innerHTML = `⚠️ Opakuj zavezení, bedna není na čidlech : (Box ${activeSensors.join(', ')})`;
                 } else {
                     sensorHeader.classList.remove('alarm-active');
-                    sensorTitle.innerText = "Opakuj zavezení, bedna není na čidle";
+                    sensorTitle.innerText = "Opakuj zavezení, bedna není na čidlech :";
                 }
             }
         }
@@ -1113,7 +1112,7 @@
                 if (activeSensors.length > 0) {
                     vzvSensorAlertArea.innerHTML = `
                         <div class="vzv-sensor-alert">
-                            <div class="vzv-sensor-title">⚠️ Opakuj zavezení, bedna není na čidle!</div>
+                            <div class="vzv-sensor-title">⚠️ Opakuj zavezení, bedna není na čidlech !</div>
                             <div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">Týká se boxů: ${activeSensors.join(', ')}</div>
                             <button class="btn-resolve-sensor" onclick="clearAllRepeatBoxes()">✓ OK / VYŘEŠENO</button>
                         </div>
