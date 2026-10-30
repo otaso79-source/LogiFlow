@@ -1342,7 +1342,9 @@
 
                 [1, 2].forEach(l => {
                     let lineOrders = orders.filter(x => x.line === l);
-                    if (lineOrders.length > 0) {
+                    let totalInLine = lineOrders.length;
+
+                    if (totalInLine > 0) {
                         let lineTitleClass = l === 1 ? 'l1' : 'l2';
                         let lineBadgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
                         htmlContent += `<div class="queue-section-box">
@@ -1370,13 +1372,21 @@
                                 `;
                             }
 
+                            // Dynamické generování šipek podle pozice
+                            let moveButtonsHtml = '';
+                            if (index > 0) {
+                                moveButtonsHtml += `<button class="btn-move" onclick="moveOrder(${o.id}, -1)" title="Posunout nahoru">▲</button>`;
+                            }
+                            if (index < totalInLine - 1) {
+                                moveButtonsHtml += `<button class="btn-move" onclick="moveOrder(${o.id}, 1)" title="Posunout dolů">▼</button>`;
+                            }
+
                             htmlContent += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px; border:1px solid #334155;">
                                 <div style="display:flex; justify-content:space-between; align-items:center; gap:4px;">
                                     <span class="queue-order-num">${queueNum}.</span>
                                     <span style="flex-grow:1; font-size:0.85rem;"><b>${o.car}</b> <span class="${lineBadgeCls}">Zbývá ${remainingWRT}/${o.stojany} WRT</span></span>
                                     
-                                    <button class="btn-move" onclick="moveOrder(${o.id}, -1)" title="Posunout nahoru">▲</button>
-                                    <button class="btn-move" onclick="moveOrder(${o.id}, 1)" title="Posunout dolů">▼</button>
+                                    ${moveButtonsHtml}
 
                                     <span onclick="toggleOrderExpand(${o.id})" class="editable-progress">📦 ${o.done}/${o.total} obalů</span>
                                     <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
