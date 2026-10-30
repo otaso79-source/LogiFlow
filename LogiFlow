@@ -682,7 +682,7 @@
                 <button class="btn-close" onclick="closeWorkersManager()">✕</button>
             </div>
             
-            <!-- Změna hesla výhradně v administraci správce -->
+            <!-- Změna hesla výhradně v administraci správce přes původní heslo -->
             <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #38bdf8; margin-bottom:12px;">
                 <div style="font-size:0.85rem; font-weight:bold; color:#38bdf8; margin-bottom:6px;">🔑 Změna mého hesla (Administrátor):</div>
                 <input type="password" id="oldPassInput" placeholder="Původní heslo" class="admin-pwd-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
@@ -725,7 +725,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const ADMIN_PASSWORD = '704517';
+        let ADMIN_PASSWORD = '704517'; // Výchozí heslo správce pro nouzový vstup
         
         let workers = [];
 
@@ -774,13 +774,18 @@
             let data = snapshot.val();
             if (data) {
                 workers = Array.isArray(data) ? data : Object.values(data);
-                if (!workers.some(w => w.role.includes('ADMIN'))) {
-                    workers.push({ id: 'adminAcc', name: 'Administrator', pass: ADMIN_PASSWORD, role: 'ADMIN' });
+                let adminObj = workers.find(w => w.role.includes('ADMIN'));
+                if (!adminObj) {
+                    workers.push({ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'ADMIN' });
                     db.ref('workers').set(workers);
+                } else {
+                    // Synchronizujeme globální administrátorské heslo podle uloženého administrátora
+                    ADMIN_PASSWORD = adminObj.pass;
                 }
             } else {
-                workers = [{ id: 'adminAcc', name: 'Administrator', pass: ADMIN_PASSWORD, role: 'ADMIN' }];
+                workers = [{ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'ADMIN' }];
                 db.ref('workers').set(workers);
+                ADMIN_PASSWORD = '704517';
             }
             renderWorkersDropdown();
         });
@@ -833,7 +838,7 @@
                         <div style="font-weight:bold; font-size:0.85rem; color:#f59e0b;">${w.name} <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">[${getRoleName(w.role)}]</span></div>
                         <div style="font-size:0.75rem; color:#94a3b8;">Heslo: <b>${w.pass}</b></div>
                     </div>
-                    {!w.role.includes('ADMIN') ? `<button class="btn-delete" onclick="deleteWorker(${idx})" title="Smazat">✖</button>` : `<span style="font-size:0.65rem; color:#f59e0b; font-weight:bold;">Chráněno</span>`}
+                    ${!w.role.includes('ADMIN') ? `<button class="btn-delete" onclick="deleteWorker(${idx})" title="Smazat">✖</button>` : `<span style="font-size:0.65rem; color:#f59e0b; font-weight:bold;">Chráněno</span>`}
                 </div>
             `).join('');
 
@@ -923,7 +928,7 @@
             let currentWorkerName = sessionStorage.getItem('active_worker');
 
             if (!oldP || !newP) {
-                alert('Vyplňte obě kolonek pro změnu hesla!');
+                alert('Vyplňte obě kolonky pro změnu hesla!');
                 return;
             }
 
@@ -935,9 +940,10 @@
 
             w.pass = newP;
             db.ref('workers').set(workers);
+            ADMIN_PASSWORD = newP; // Aktualizujeme globální heslo správce
             document.getElementById('oldPassInput').value = '';
             document.getElementById('newPassInput').value = '';
-            alert('Heslo bylo úspěšně změněno!');
+            alert('Heslo administrátora bylo úspěšně změněno!');
             closeWorkersManager();
         }
 
