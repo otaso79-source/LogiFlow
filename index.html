@@ -303,7 +303,7 @@
         .vzv-num-input { width: 140px; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.75rem; text-align: center; font-weight: bold; outline: none; }
         .btn-send-alert { width: 100%; padding: 9px; background: #ef4444; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
 
-        .empty { text-align: center; color: #64748b; padding: 12px; font-size: 0.85rem; }
+        .empty { text-align: center; color: #94a3b8; padding: 12px; font-size: 0.75rem; font-weight: bold; line-height: 1.4; }
         .done-msg { background: #065f46; color: #34d399; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
         
         .note-tag { padding: 4px 8px; font-size: 0.75rem; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
@@ -1336,4 +1336,193 @@
                     }
                 });
 
-                if (orders
+                if (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2] && !twoVariantModeLines[1] && !twoVariantModeLines[2]) {
+                    htmlContent += '<div class="empty">Žádné aktivní objednávky</div>';
+                }
+
+                [1, 2].forEach(l => {
+                    let lineOrders = orders.filter(x => x.line === l);
+                    let totalInLine = lineOrders.length;
+
+                    if (totalInLine > 0) {
+                        let lineTitleClass = l === 1 ? 'l1' : 'l2';
+                        let lineBadgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
+                        htmlContent += `<div class="queue-section-box">
+                            <div class="queue-section-title ${lineTitleClass}">📍 Linka ${l} - Fronta zpracování</div>`;
+
+                        lineOrders.forEach((o, index) => {
+                            let lineClass = o.line === 1 ? 'line-1' : 'line-2';
+                            let noteHtml = o.note ? `<div class="note-tag ${lineClass}">📝 ${o.note}</div>` : '';
+                            let remainingWRT = Math.max(0, o.stojany - o.done);
+                            let isExpanded = (expandedOrderId === o.id);
+                            let queueNum = index + 1;
+
+                            let expandMenuHtml = '';
+                            if (isExpanded) {
+                                let boxesHtml = '';
+                                for (let i = 1; i <= o.total; i++) {
+                                    boxesHtml += `<div class="box-unit ${i <= o.done ? 'done' : 'pending'}" onclick="toggleOrderBoxDone(${o.id}, ${i})">#${i}</div>`;
+                                }
+
+                                expandMenuHtml = `
+                                    <div class="order-expand-menu">
+                                        <div class="expand-menu-title">⚠️ SROVNÁT POČET</div>
+                                        <div class="boxes-row" style="margin:4px 0 0 0;">${boxesHtml}</div>
+                                    </div>
+                                `;
+                            }
+
+                            let moveButtonsHtml = '';
+                            if (index > 0) {
+                                moveButtonsHtml += `<button class="btn-move" onclick="moveOrder(${o.id}, -1)" title="Posunout nahoru">▲</button>`;
+                            }
+                            if (index < totalInLine - 1) {
+                                moveButtonsHtml += `<button class="btn-move" onclick="moveOrder(${o.id}, 1)" title="Posunout dolů">▼</button>`;
+                            }
+
+                            htmlContent += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px; border:1px solid #334155;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; gap:4px;">
+                                    <span class="queue-order-num">${queueNum}.</span>
+                                    <span style="flex-grow:1; font-size:0.85rem;"><b>${o.car}</b> <span class="${lineBadgeCls}">Zbývá ${remainingWRT}/${o.stojany} WRT</span></span>
+                                    
+                                    ${moveButtonsHtml}
+
+                                    <span onclick="toggleOrderExpand(${o.id})" class="editable-progress">📦 ${o.done}/${o.total} obalů</span>
+                                    <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
+                                </div>
+                                ${noteHtml}
+                                ${expandMenuHtml}
+                            </div>`;
+                        });
+                        htmlContent += `</div>`;
+                    }
+                });
+
+                listA.innerHTML = htmlContent;
+            }
+
+            [1, 2].forEach(l => {
+                let lOrders = orders.filter(x => x.line === l);
+                let title = document.getElementById(`l${l}Title`);
+                let next = document.getElementById(`l${l}Next`);
+                let body = document.getElementById(`l${l}Body`);
+                let headerBox = document.getElementById(`l${l}FirstBoxHeader`);
+                let isSingle = singleModeLines[l];
+                let isTwo = twoVariantModeLines[l];
+
+                if (title && next && body) {
+                    if (headerBox) {
+                        let boxA = (l === 1) ? 3 : 1;
+                        let boxB = (l === 1) ? 4 : 2;
+                        let activeOrder = lOrders[0];
+                        let currentFirst = (activeOrder && activeOrder.firstBox) ? activeOrder.firstBox : boxA;
+                        let activeOrderId = activeOrder ? activeOrder.id : 'null';
+                        let isOpen = folderOpenState[l];
+
+                        headerBox.innerHTML = `
+                            <div class="first-box-folder">
+                                <div class="first-box-folder-header ${isOpen ? 'open' : ''}" onclick="toggleFolder(${l})">
+                                    <span>Nastavení zavezení</span>
+                                    <span class="folder-arrow">▼</span>
+                                </div>
+                                <div class="first-box-folder-content ${isOpen ? 'open' : ''}">
+                                    <span class="toggle-title-lbl">Obal zavezen jako první:</span>
+                                    <div class="first-box-toggle-container">
+                                        <button class="btn-toggle-box ${currentFirst === boxA ? 'active' : ''}" onclick="setOrderFirstBox(${activeOrderId}, ${boxA})">BOX ${boxA}</button>
+                                        <button class="btn-toggle-box ${currentFirst === boxB ? 'active' : ''}" onclick="setOrderFirstBox(${activeOrderId}, ${boxB})">BOX ${boxB}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (lOrders.length === 0 && !isSingle && !isTwo) {
+                        title.innerText = 'Žádná objednávka';
+                        next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
+                        body.innerHTML = '<div class="empty">Linka čeká na materiál.<br>NECHTE BOX PRÁZDNÝ DO NOVÉ OBJEDNÁVKY.</div>';
+                    } else {
+                        if (isSingle || isTwo) {
+                            title.innerText = isSingle ? `🔒 ${singleModeCar[l]}` : `🔒 ${twoVariantPair[l]}`;
+                            next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
+                        } else {
+                            let cur = lOrders[0];
+                            let nxt1 = lOrders[1];
+                            
+                            let firstB = cur.firstBox || ((l === 1) ? 3 : 1);
+                            let targetBox = '';
+                            if (l === 1) {
+                                targetBox = (firstB === 3) ? ((cur.done % 2 === 0) ? 'Box 3' : 'Box 4') : ((cur.done % 2 === 0) ? 'Box 4' : 'Box 3');
+                            } else {
+                                targetBox = (firstB === 1) ? ((cur.done % 2 === 0) ? 'Box 1' : 'Box 2') : ((cur.done % 2 === 0) ? 'Box 2' : 'Box 1');
+                            }
+
+                            title.innerText = `${cur.car} (${targetBox})`;
+
+                            if (nxt1) {
+                                next.className = 'next-txt';
+                                next.innerHTML = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
+                            } else {
+                                next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
+                            }
+                        }
+
+                        let boxRangeText = (l === 1) ? '(Box 3 - 4)' : '(Box 1 - 2)';
+                        let modeAlertHtml = isSingle ? `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE: ${singleModeCar[l].toUpperCase()} ${boxRangeText}</div>` : (isTwo ? `<div class="vzv-single-mode-box">⚠️ ${twoVariantPair[l]} ${boxRangeText}</div>` : '');
+
+                        if (isSingle || isTwo) {
+                            body.innerHTML = modeAlertHtml + '<div class="empty" style="color:#fbbf24; font-weight:bold;">Režim je aktivní na lince</div>';
+                        } else if (lOrders.length === 0) {
+                            body.innerHTML = modeAlertHtml + '<div class="empty">Linka čeká na materiál.<br>NECHTE BOX PRÁZDNÝ DO NOVÉ OBJEDNÁVKY.</div>';
+                        } else {
+                            let cur = lOrders[0];
+                            let boxes = '';
+                            for (let i = 1; i <= cur.total; i++) {
+                                boxes += `<div class="box-unit ${i <= cur.done ? 'done' : 'pending'}">#${i}</div>`;
+                            }
+                            
+                            let targetBox = '';
+                            let firstB = cur.firstBox || ((l === 1) ? 3 : 1);
+
+                            if (l === 1) {
+                                if (firstB === 3) {
+                                    targetBox = (cur.done % 2 === 0) ? '3' : '4';
+                                } else {
+                                    targetBox = (cur.done % 2 === 0) ? '4' : '3';
+                                }
+                            } else {
+                                if (firstB === 1) {
+                                    targetBox = (cur.done % 2 === 0) ? '1' : '2';
+                                } else {
+                                    targetBox = (cur.done % 2 === 0) ? '2' : '1';
+                                }
+                            }
+
+                            let isLastBox = (cur.done + 1 >= cur.total);
+                            let btnText = isLastBox 
+                                ? `⚠️ ZAVEZ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE VÝMĚNA !` 
+                                : `✓ ZAVEZ OBAL DO BOXU ${targetBox} ! POTÉ POTVRĎ !`;
+                            let btnClass = 'btn-zavez' + (isLastBox ? ' last-box-btn' : '');
+
+                            body.innerHTML = `
+                                ${modeAlertHtml}
+                                ${cur.note ? `<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>` : ''}
+                                <div class="boxes-row">${boxes}</div>
+                                <button class="${btnClass}" onclick="zavezt(${cur.id})">${btnText}</button>
+                            `;
+                        }
+                    }
+                }
+            });
+            updateDynamicTheme();
+        }
+
+        function clearAllRepeatBoxes() {
+            repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
+            defectBoxes = { 1: {1:false, 2:false, 3:false, 4:false}, 2: {1:false, 2:false, 3:false, 4:false} };
+            vzvVatAlerts = [];
+            save();
+            render();
+        }
+    </script>
+</body>
+</html>
