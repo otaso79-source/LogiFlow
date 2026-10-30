@@ -65,15 +65,33 @@
 
         .accordion-wrapper {
             background: #1e293b; border: 1px solid #334155; border-radius: 8px; margin-bottom: 10px; overflow: hidden;
+            transition: all 0.3s ease;
         }
         .accordion-header {
             padding: 12px; background: #1e293b; font-size: 0.85rem; font-weight: bold; color: #f8fafc;
             display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;
+            transition: all 0.3s ease;
         }
         .accordion-header .arrow { font-size: 0.8rem; color: #94a3b8; transition: transform 0.2s; }
         .accordion-header.open .arrow { transform: rotate(180deg); }
         .accordion-content {
             display: none; padding: 10px; border-top: 1px solid #334155; background: #0f172a;
+        }
+
+        /* Aktivní zvýraznění akordeonu barevně podle linky */
+        .accordion-wrapper.active-mode-line-1 {
+            border-color: #3b82f6;
+        }
+        .accordion-wrapper.active-mode-line-1 .accordion-header {
+            background: #1e3a8a;
+            color: #ffffff;
+        }
+        .accordion-wrapper.active-mode-line-2 {
+            border-color: #a855f7;
+        }
+        .accordion-wrapper.active-mode-line-2 .accordion-header {
+            background: #581c87;
+            color: #ffffff;
         }
 
         .accordion-header.alarm-active {
@@ -147,7 +165,6 @@
         .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-zavez.last-box-btn { background: #f59e0b; animation: pulseAlarm 1.5s infinite; }
 
-        /* Styly pro rozbalovací složku „Nastavení zavezení obalu“ */
         .first-box-folder {
             background: #0f172a;
             border: 1px solid #334155;
@@ -385,7 +402,7 @@
                 <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.65rem; font-weight:normal;">BOX 2 - 1</span></div>
             </div>
 
-            <div class="accordion-wrapper">
+            <div class="accordion-wrapper" id="modesAccordionWrapper">
                 <div class="accordion-header" id="modesAccordionHeader" onclick="toggleAccordion('modesAccordionContent', 'modesAccordionHeader')">
                     <span>Výroba jedné nebo dvou variant se stejným obalem :</span>
                     <span class="arrow">▼</span>
@@ -628,7 +645,6 @@
         let selectedLoginMode = 'A';
         let expandedOrderId = null;
 
-        // Ukládání stavu otevření/zavření složek pro každou linku v rámci sezení
         let folderOpenState = { 1: false, 2: false };
 
         let deviceId = sessionStorage.getItem('device_id');
@@ -1111,6 +1127,15 @@
             document.getElementById('btnTwoYes').className = 'btn-yn ' + (isTwoActive ? 'active-yes' : '');
             document.getElementById('btnTwoNo').className = 'btn-yn ' + (!isTwoActive ? 'active-no' : '');
 
+            // Zbarvení akordeonu při aktivaci 1 nebo 2 variant
+            let accordionWrapper = document.getElementById('modesAccordionWrapper');
+            if (accordionWrapper) {
+                accordionWrapper.classList.remove('active-mode-line-1', 'active-mode-line-2');
+                if (isSingleActive || isTwoActive) {
+                    accordionWrapper.classList.add(curLine === 1 ? 'active-mode-line-1' : 'active-mode-line-2');
+                }
+            }
+
             let singleSelectBox = document.getElementById('singleModeSelectBox');
             let twoSelectBox = document.getElementById('twoModeSelectBox');
             let standardSection = document.getElementById('standardOrderSection');
@@ -1346,7 +1371,6 @@
                 let isTwo = twoVariantModeLines[l];
 
                 if (title && next && body) {
-                    // ROZBALOVACÍ SLOŽKA "Nastavení zavezení obalu"
                     if (headerBox) {
                         let boxA = (l === 1) ? 3 : 1;
                         let boxB = (l === 1) ? 4 : 2;
@@ -1402,7 +1426,6 @@
                             }
                         }
 
-                        // Doplněno zobrazení (Box 1 - 2) nebo (Box 3 - 4) k žlutému výstražnému boxu
                         let boxRangeText = (l === 1) ? '(Box 3 - 4)' : '(Box 1 - 2)';
                         let modeAlertHtml = isSingle ? `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE: ${singleModeCar[l].toUpperCase()} ${boxRangeText}</div>` : (isTwo ? `<div class="vzv-single-mode-box">⚠️ ${twoVariantPair[l]} ${boxRangeText}</div>` : '');
 
@@ -1450,6 +1473,7 @@
                     }
                 }
             });
+            updateDynamicTheme();
         }
 
         function clearAllRepeatBoxes() {
