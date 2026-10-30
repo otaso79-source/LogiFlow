@@ -26,11 +26,11 @@
         .login-section-btn { padding: 12px 4px; font-size: 0.9rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
         .login-section-btn.active-section { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
 
-        /* Styl pro rozbalenou "složku" Výroba */
+        /* Kontejner pro rozbalené složky Výroby */
         .login-sub-container {
             display: none;
             margin-bottom: 14px;
-            background: rgba(15, 23, 42, 0.5);
+            background: rgba(15, 23, 42, 0.6);
             border: 1px dashed #334155;
             border-radius: 8px;
             padding: 10px;
@@ -392,15 +392,15 @@
             <div class="login-title">⚡ LogiFlow</div>
             <div class="login-sub" id="loginSubText">Zvolte sekci a pracovníka</div>
             
-            <!-- Hlavní složky: Výroba nebo VZV -->
+            <!-- Hlavní sekce (Složky: Výroba nebo VZV) -->
             <div class="login-section-select">
                 <button type="button" id="loginSecVyroba" class="login-section-btn active-section" onclick="setLoginSection('Vyroba')">Výroba</button>
                 <button type="button" id="loginSecVzv" class="login-section-btn" onclick="setLoginSection('VZV')">VZV</button>
             </div>
 
-            <!-- Pod-složky pro Výrobu (otevřou se pouze při volbě Výroba) -->
+            <!-- Podsložky Výroby – rozbalí se po kliknutí na Výrobu -->
             <div id="vyrobaSubContainer" class="login-sub-container active">
-                <div class="login-sub-title">Otevřít linku:</div>
+                <div class="login-sub-title">Vyberte linku:</div>
                 <div class="login-mode-select">
                     <button type="button" id="loginBtnL1" class="login-mode-btn active-l1" onclick="setLoginMode('L1')">Linka 1</button>
                     <button type="button" id="loginBtnL2" class="login-mode-btn" onclick="setLoginMode('L2')">Linka 2</button>
