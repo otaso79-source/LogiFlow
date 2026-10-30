@@ -26,7 +26,7 @@
         .login-section-btn { padding: 12px 4px; font-size: 0.9rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
         .login-section-btn.active-section { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
 
-        /* Kontejner pro rozbalené složky Výroby */
+        /* Kontejner pro rozbalenou složku Výroba obsahující nadpis i tlačítka linek pohromadě */
         .login-sub-container {
             display: none;
             margin-bottom: 14px;
@@ -36,7 +36,7 @@
             padding: 10px;
         }
         .login-sub-container.active { display: block; }
-        .login-sub-title { font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; font-weight: bold; text-align: left; }
+        .login-sub-title { font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px; font-weight: bold; text-align: left; }
 
         .login-mode-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .login-mode-btn { padding: 10px 8px; font-size: 0.8rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
@@ -392,13 +392,13 @@
             <div class="login-title">⚡ LogiFlow</div>
             <div class="login-sub" id="loginSubText">Zvolte sekci a pracovníka</div>
             
-            <!-- Hlavní sekce (Složky: Výroba nebo VZV) -->
+            <!-- Hlavní sekce: Výroba nebo VZV -->
             <div class="login-section-select">
                 <button type="button" id="loginSecVyroba" class="login-section-btn active-section" onclick="setLoginSection('Vyroba')">Výroba</button>
                 <button type="button" id="loginSecVzv" class="login-section-btn" onclick="setLoginSection('VZV')">VZV</button>
             </div>
 
-            <!-- Podsložky Výroby – rozbalí se po kliknutí na Výrobu -->
+            <!-- Rozbalovací složka Výroba (obsahuje nadpis „Vyberte linku:“ i 3 tlačítka linek pohromadě uvnitř rámečku) -->
             <div id="vyrobaSubContainer" class="login-sub-container active">
                 <div class="login-sub-title">Vyberte linku:</div>
                 <div class="login-mode-select">
