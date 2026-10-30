@@ -608,7 +608,7 @@
             </div>
 
             <div class="vzv-alert-panel">
-                <div class="vzv-alert-title">⚠️ Hlášení stavu obalů obsluze A</div>
+                <div class="vzv-alert-title">⚠️ Hlášení stavu obalů obsluze</div>
                 <div class="vzv-alert-row">
                     <select id="vzvVariantSelect" class="vzv-select">
                         <option value="Tiguan / Kodiaq">Tiguan / Kodiaq</option>
@@ -617,7 +617,7 @@
                     </select>
                     <input type="number" id="vzvCountInput" class="vzv-num-input" placeholder="zde napiš počet obalu" value="" min="1" max="99">
                 </div>
-                <button class="btn-send-alert" onclick="sendCustomStockAlert()">📢 ODESLAT HLÁŠENÍ OBSLUZE A</button>
+                <button class="btn-send-alert" onclick="sendCustomStockAlert()">📢 ODESLAT HLÁŠENÍ OBSLUZE</button>
             </div>
 
             <div id="doneBanner" class="done-msg" style="display:none;">
@@ -659,7 +659,7 @@
                 <div style="font-size:0.85rem; font-weight:bold; color:#ef4444; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
                     <span>🔒</span> Režim údržby / Aktualizace
                 </div>
-                <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Aktivuje výstrahu na všech zařízeních A i B. Vyžaduje heslo správce.</div>
+                <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Aktivuje výstrahu na všech zařízeních. Vyžaduje heslo správce.</div>
                 <div class="banner-btns" style="width:100%; display:grid; grid-template-columns:1fr 1fr;">
                     <button class="btn-yn" id="setUpdateYes" onclick="openAdminPasswordModal(true)">ZAPNOUT</button>
                     <button class="btn-yn active-no" id="setUpdateNo" onclick="openAdminPasswordModal(false)">VYPNOUT</button>
@@ -815,7 +815,7 @@
             let raw = snapshot.val() || [];
             let updatedVatAlerts = Array.isArray(raw) ? raw : Object.values(raw);
             if (updatedVatAlerts.length > lastVzvAlertCount) {
-                triggerNotification("⚠️ Upozornění pro VZV!", "Nové hlášení od obsluhy");
+                triggerNotification("⚠️ Upozornění!", "Nové hlášení v systému");
             }
             vzvVatAlerts = updatedVatAlerts;
             lastVzvAlertCount = vzvVatAlerts.length;
@@ -856,6 +856,7 @@
             render();
         });
 
+        // OPRAVENO: Posluchač pro čidla teď spolehlivě spustí zvuk na zařízení VZV při změně stavu čidla
         db.ref('repeatBoxes').on('value', (snapshot) => {
             let data = snapshot.val();
             if (data) {
@@ -906,6 +907,9 @@
 
         function toggleRepeatBox(boxNum) {
             repeatBoxes[boxNum] = !repeatBoxes[boxNum];
+            if (repeatBoxes[boxNum]) {
+                triggerNotification("⚠️ Čidla", `Box ${boxNum} není na čidlech!`);
+            }
             save();
             renderRepeatBoxesUI();
         }
@@ -926,6 +930,7 @@
                     type: 'diff',
                     text: `Na lince ${curLine}, boxu #${boxNum}: Obal neodpovídá zvolené variantě.<br>ZAVEZ SPRÁVNÝ OBAL: ${carName}`
                 });
+                triggerNotification("⚠️ Jiný obal", `Hlášení pro linku ${curLine}, box #${boxNum}`);
             }
             save();
             renderRepeatBoxesUI();
@@ -954,6 +959,7 @@
                     type: 'defect',
                     text: `Na lince ${curLine}, Box #${boxNum}: Obal je vadný, křivý. Vyměň ho!`
                 });
+                triggerNotification("⚠️ Vadný obal", `Nahlášen vadný obal na lince ${curLine}`);
             } else {
                 vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'defect'));
             }
@@ -973,6 +979,7 @@
                 type: 'empty',
                 text: `Na lince ${curLine}: Přivez prázdný obal na pracoviště (${variantAcc}, ${count} ks).`
             });
+            triggerNotification("⚠️ Prázdný obal", `Požadavek na prázdný obal (linka ${curLine})`);
             document.getElementById('emptyCountInput').value = '';
             save();
         }
@@ -1480,6 +1487,7 @@
             let count = document.getElementById('vzvCountInput').value;
             if (!count) { return; }
             stockAlerts.push({ id: Date.now(), variant: variant, count: count });
+            triggerNotification("⚠️ Hlášení", `VZV poslal hlášení pro ${variant}`);
             document.getElementById('vzvCountInput').value = '';
             save();
         }
