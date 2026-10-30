@@ -1080,7 +1080,7 @@
             if (systemUpdateActive) {
                 bannerBox.className = "update-banner-box";
                 title.innerText = "⚠️ UPOZORNĚNÍ NA ÚDRŽBU";
-                text.innerHTML = "POZOR: Proběhne aktualizace programu připravte se na výpadek.<br><br>Neřiďte se PROGRAMEM !!!";
+                text.innerHTML = "POZOR: Proběhne aktualizace programu připravte se na výpadek.<br><br>Neřiďte się PROGRAMEM !!!";
                 overlay.style.display = 'flex';
             } else if (systemUpdateCompletedState && !isAlreadyAcked) {
                 bannerBox.className = "update-banner-box completed-box";
@@ -1191,7 +1191,6 @@
                 let gain = ctx.createGain();
                 
                 if (selectedSoundType === 1) {
-                    // 1. Klasické pípnutí
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(587.33, ctx.currentTime);
                     osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
@@ -1201,7 +1200,6 @@
                     osc.start();
                     osc.stop(ctx.currentTime + 0.4);
                 } else if (selectedSoundType === 2) {
-                    // 2. Alarm / Houkačka
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(400, ctx.currentTime);
                     osc.frequency.setValueAtTime(800, ctx.currentTime + 0.1);
@@ -1212,10 +1210,9 @@
                     osc.start();
                     osc.stop(ctx.currentTime + 0.35);
                 } else {
-                    // 3. Jemný cinkot
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(1046.50, ctx.currentTime); // C6
-                    osc.frequency.setValueAtTime(1318.51, ctx.currentTime + 0.1); // E6
+                    osc.frequency.setValueAtTime(1046.50, ctx.currentTime);
+                    osc.frequency.setValueAtTime(1318.51, ctx.currentTime + 0.1);
                     gain.gain.setValueAtTime(0.2, ctx.currentTime);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
@@ -1230,6 +1227,7 @@
             if (enable) {
                 twoVariantModeLines[curLine] = false;
                 if (!singleModeCar[curLine]) singleModeCar[curLine] = 'Tiguan';
+                triggerNotification("Režim aktivován", "Zapnut režim 1 varianta");
             } else {
                 singleModeLines[curLine] = false;
             }
@@ -1243,6 +1241,7 @@
             if (enable) {
                 singleModeLines[curLine] = false;
                 if (!twoVariantPair[curLine]) twoVariantPair[curLine] = 'Tiguan / Kodiaq';
+                triggerNotification("Režim aktivován", "Zapnut režim 2 varianty");
             } else {
                 twoVariantModeLines[curLine] = false;
             }
@@ -1251,8 +1250,18 @@
             render();
         }
 
-        function setSingleCar(car, el) { singleModeCar[curLine] = car; save(); updateDynamicTheme(); }
-        function setTwoPair(pair, el) { twoVariantPair[curLine] = pair; save(); updateDynamicTheme(); }
+        function setSingleCar(car, el) { 
+            singleModeCar[curLine] = car; 
+            save(); 
+            updateDynamicTheme(); 
+            triggerNotification("Změna režimu", "Změněna varianta");
+        }
+        function setTwoPair(pair, el) { 
+            twoVariantPair[curLine] = pair; 
+            save(); 
+            updateDynamicTheme(); 
+            triggerNotification("Změna režimu", "Změněna dvojice variant");
+        }
 
         function updateDynamicTheme() {
             let activeClass = curLine === 1 ? 'selected-1' : 'selected-2';
@@ -1652,7 +1661,7 @@
 
                             let isLastBox = (cur.done + 1 >= cur.total);
                             let btnText = isLastBox 
-                                ? `⚠️ ZAVEZ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE VÝMĚNA !` 
+                                ? `⚠️ ZAVEZ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE JINÁ VARIANTA !` 
                                 : `✓ ZAVEZ OBAL DO BOXU ${targetBox} ! POTÉ POTVRĎ !`;
                             let btnClass = 'btn-zavez' + (isLastBox ? ' last-box-btn' : '');
 
