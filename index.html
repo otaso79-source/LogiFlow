@@ -78,21 +78,10 @@
             display: none; padding: 10px; border-top: 1px solid #334155; background: #0f172a;
         }
 
-        /* Aktivní zvýraznění akordeonu barevně podle linky */
-        .accordion-wrapper.active-mode-line-1 {
-            border-color: #3b82f6;
-        }
-        .accordion-wrapper.active-mode-line-1 .accordion-header {
-            background: #1e3a8a;
-            color: #ffffff;
-        }
-        .accordion-wrapper.active-mode-line-2 {
-            border-color: #a855f7;
-        }
-        .accordion-wrapper.active-mode-line-2 .accordion-header {
-            background: #581c87;
-            color: #ffffff;
-        }
+        .accordion-wrapper.active-mode-line-1 { border-color: #3b82f6; }
+        .accordion-wrapper.active-mode-line-1 .accordion-header { background: #1e3a8a; color: #ffffff; }
+        .accordion-wrapper.active-mode-line-2 { border-color: #a855f7; }
+        .accordion-wrapper.active-mode-line-2 .accordion-header { background: #581c87; color: #ffffff; }
 
         .accordion-header.alarm-active {
             background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #ef4444;
@@ -157,7 +146,7 @@
         .next-txt.none { color: #64748b; font-weight: normal; }
         
         .boxes-row { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
-        .box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; }
+        .box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; cursor: pointer; }
         
         .box-unit.done { background: #065f46; color: #34d399; border-color: #059669; }
         .box-unit.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
@@ -338,11 +327,6 @@
 
         .order-expand-menu { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px; margin-top: 8px; }
         .expand-menu-title { font-size: 0.75rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; text-align: center; }
-        
-        .counter-control { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
-        .btn-counter { background: #1e293b; border: 1px solid #334155; color: #fff; width: 36px; height: 36px; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-counter:active { background: #334155; }
-        .counter-val { font-size: 0.95rem; font-weight: bold; color: #f59e0b; min-width: 60px; text-align: center; }
     </style>
 </head>
 <body>
@@ -1127,7 +1111,6 @@
             document.getElementById('btnTwoYes').className = 'btn-yn ' + (isTwoActive ? 'active-yes' : '');
             document.getElementById('btnTwoNo').className = 'btn-yn ' + (!isTwoActive ? 'active-no' : '');
 
-            // Zbarvení akordeonu při aktivaci 1 nebo 2 variant
             let accordionWrapper = document.getElementById('modesAccordionWrapper');
             if (accordionWrapper) {
                 accordionWrapper.classList.remove('active-mode-line-1', 'active-mode-line-2');
@@ -1228,16 +1211,20 @@
         function cancelOrder(id) { orders = orders.filter(x => x.id !== id); lastOrderCount = orders.length; save(); }
         function toggleOrderExpand(id) { expandedOrderId = (expandedOrderId === id ? null : id); render(); }
 
-        function adjustOrderProgress(id, delta) {
+        function toggleOrderBoxDone(id, boxIndex) {
             let o = orders.find(x => x.id === id);
             if (!o) return;
-            let newDone = o.done + delta;
-            if (newDone < 0) newDone = 0;
-            if (newDone > o.total) newDone = o.total;
             
-            o.done = newDone;
+            // Pokud je kliknuto na box, který ještě nebyl hotový, nastavíme done na daný index
+            // Pokud klikneme na již hotový box, vrátíme počet zpět
+            if (boxIndex <= o.done) {
+                o.done = boxIndex - 1;
+            } else {
+                o.done = boxIndex;
+            }
+
             o.note = (o.note ? o.note + " | " : "") + "Obsluha A srovnala počet obalů";
-            
+
             if (o.done >= o.total) {
                 orders = orders.filter(x => x.id !== id);
                 expandedOrderId = null;
@@ -1336,14 +1323,15 @@
 
                     let expandMenuHtml = '';
                     if (isExpanded) {
+                        let boxesHtml = '';
+                        for (let i = 1; i <= o.total; i++) {
+                            boxesHtml += `<div class="box-unit ${i <= o.done ? 'done' : 'pending'}" onclick="toggleOrderBoxDone(${o.id}, ${i})">#${i}</div>`;
+                        }
+
                         expandMenuHtml = `
                             <div class="order-expand-menu">
                                 <div class="expand-menu-title">⚠️ SROVNÁT POČET</div>
-                                <div class="counter-control">
-                                    <button class="btn-counter" onclick="adjustOrderProgress(${o.id}, -1)">−</button>
-                                    <div class="counter-val">${o.done} / ${o.total} obalů</div>
-                                    <button class="btn-counter" onclick="adjustOrderProgress(${o.id}, 1)">＋</button>
-                                </div>
+                                <div class="boxes-row" style="margin:4px 0 0 0;">${boxesHtml}</div>
                             </div>
                         `;
                     }
