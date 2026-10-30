@@ -774,12 +774,14 @@
             let data = snapshot.val();
             if (data) {
                 workers = Array.isArray(data) ? data : Object.values(data);
-                let adminObj = workers.find(w => w.role.includes('ADMIN'));
+                let adminObj = workers.find(w => w.name === 'Administrator');
+                if (!adminObj) {
+                    adminObj = workers.find(w => w.role && w.role.includes('ADMIN'));
+                }
                 if (!adminObj) {
                     workers.push({ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'ADMIN' });
                     db.ref('workers').set(workers);
                 } else {
-                    // Synchronizujeme globální administrátorské heslo podle uloženého administrátora
                     ADMIN_PASSWORD = adminObj.pass;
                 }
             } else {
@@ -801,15 +803,17 @@
         }
 
         function getRoleName(role) {
-            if (role === 'L1') return 'Linka 1';
-            if (role === 'L2') return 'Linka 2';
-            if (role === 'L12') return 'Linka 1-2';
-            if (role === 'VZV') return 'VZV';
-            if (role === 'ADMIN') return 'Administrator';
-            if (role && role.includes(',')) {
-                return role.split(',').map(r => getRoleName(r.trim())).join(' + ');
-            }
-            return role;
+            let parts = role.split(',').map(r => r.trim());
+            let names = [];
+            parts.forEach(r => {
+                if (r === 'L1') names.push('Linka 1');
+                else if (r === 'L2') names.push('Linka 2');
+                else if (r === 'L12') names.push('Linka 1-2');
+                else if (r === 'VZV') names.push('VZV');
+                else if (r === 'ADMIN') names.push('Administrator');
+                else names.push(r);
+            });
+            return names.join(' + ');
         }
 
         function onWorkerSelectChange() {
@@ -838,7 +842,7 @@
                         <div style="font-weight:bold; font-size:0.85rem; color:#f59e0b;">${w.name} <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">[${getRoleName(w.role)}]</span></div>
                         <div style="font-size:0.75rem; color:#94a3b8;">Heslo: <b>${w.pass}</b></div>
                     </div>
-                    ${!w.role.includes('ADMIN') ? `<button class="btn-delete" onclick="deleteWorker(${idx})" title="Smazat">✖</button>` : `<span style="font-size:0.65rem; color:#f59e0b; font-weight:bold;">Chráněno</span>`}
+                    ${w.name !== 'Administrator' ? `<button class="btn-delete" onclick="deleteWorker(${idx})" title="Smazat">✖</button>` : `<span style="font-size:0.65rem; color:#f59e0b; font-weight:bold;">Chráněno</span>`}
                 </div>
             `).join('');
 
@@ -908,7 +912,7 @@
         }
 
         function deleteWorker(index) {
-            if (workers[index].role.includes('ADMIN')) {
+            if (workers[index].name === 'Administrator') {
                 alert('Hlavního administrátora nelze smazat!');
                 return;
             }
@@ -940,10 +944,12 @@
 
             w.pass = newP;
             db.ref('workers').set(workers);
-            ADMIN_PASSWORD = newP; // Aktualizujeme globální heslo správce
+            if (w.name === 'Administrator' || w.role.includes('ADMIN')) {
+                ADMIN_PASSWORD = newP;
+            }
             document.getElementById('oldPassInput').value = '';
             document.getElementById('newPassInput').value = '';
-            alert('Heslo administrátora bylo úspěšně změněno!');
+            alert('Heslo bylo úspěšně změněno!');
             closeWorkersManager();
         }
 
@@ -1326,7 +1332,9 @@
 
         function verifyAdminPassword() {
             let pass = document.getElementById('adminPassInput').value;
-            if (pass !== ADMIN_PASSWORD) {
+            let adminObj = workers.find(w => w.role && w.role.includes('ADMIN') && w.pass === pass);
+            
+            if (!adminObj && pass !== ADMIN_PASSWORD) {
                 document.getElementById('adminPassError').style.display = 'block';
                 return;
             }
