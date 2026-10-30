@@ -23,15 +23,26 @@
         .login-sub { font-size: 0.8rem; color: #94a3b8; margin-bottom: 16px; }
         
         .login-section-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
-        .login-section-btn { padding: 10px 4px; font-size: 0.85rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
+        .login-section-btn { padding: 12px 4px; font-size: 0.9rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
         .login-section-btn.active-section { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
 
-        .login-mode-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
+        /* Styl pro rozbalenou "složku" Výroba */
+        .login-sub-container {
+            display: none;
+            margin-bottom: 14px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed #334155;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .login-sub-container.active { display: block; }
+        .login-sub-title { font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; font-weight: bold; text-align: left; }
+
+        .login-mode-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .login-mode-btn { padding: 10px 8px; font-size: 0.8rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
         .login-mode-btn.active-l1 { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
         .login-mode-btn.active-l2 { background: #312e81; border-color: #6366f1; color: #fff; }
         .login-mode-btn.active-l12 { background: #065f46; border-color: #10b981; color: #fff; grid-column: span 2; }
-        .login-mode-btn.active-vzv { background: #581c87; border-color: #a855f7; color: #fff; grid-column: span 2; }
 
         .login-input {
             width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
@@ -381,16 +392,20 @@
             <div class="login-title">⚡ LogiFlow</div>
             <div class="login-sub" id="loginSubText">Zvolte sekci a pracovníka</div>
             
+            <!-- Hlavní složky: Výroba nebo VZV -->
             <div class="login-section-select">
                 <button type="button" id="loginSecVyroba" class="login-section-btn active-section" onclick="setLoginSection('Vyroba')">Výroba</button>
                 <button type="button" id="loginSecVzv" class="login-section-btn" onclick="setLoginSection('VZV')">VZV</button>
             </div>
 
-            <div class="login-mode-select" id="loginRoleContainer">
-                <button type="button" id="loginBtnL1" class="login-mode-btn active-l1" onclick="setLoginMode('L1')">Linka 1</button>
-                <button type="button" id="loginBtnL2" class="login-mode-btn" onclick="setLoginMode('L2')">Linka 2</button>
-                <button type="button" id="loginBtnL12" class="login-mode-btn active-l12" onclick="setLoginMode('L12')">Linka 1-2</button>
-                <button type="button" id="loginBtnVZV" class="login-mode-btn active-vzv" style="display:none;" onclick="setLoginMode('VZV')">VZV</button>
+            <!-- Pod-složky pro Výrobu (otevřou se pouze při volbě Výroba) -->
+            <div id="vyrobaSubContainer" class="login-sub-container active">
+                <div class="login-sub-title">Otevřít linku:</div>
+                <div class="login-mode-select">
+                    <button type="button" id="loginBtnL1" class="login-mode-btn active-l1" onclick="setLoginMode('L1')">Linka 1</button>
+                    <button type="button" id="loginBtnL2" class="login-mode-btn" onclick="setLoginMode('L2')">Linka 2</button>
+                    <button type="button" id="loginBtnL12" class="login-mode-btn active-l12" onclick="setLoginMode('L12')">Linka 1-2</button>
+                </div>
             </div>
 
             <input type="password" id="passInput" class="login-input" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
@@ -1160,26 +1175,18 @@
             selectedSection = section;
             const btnVyroba = document.getElementById('loginSecVyroba');
             const btnVzv = document.getElementById('loginSecVzv');
-            const btnL1 = document.getElementById('loginBtnL1');
-            const btnL2 = document.getElementById('loginBtnL2');
-            const btnL12 = document.getElementById('loginBtnL12');
-            const btnVZV = document.getElementById('loginBtnVZV');
-
-            btnVyroba.className = 'login-section-btn ' + (section === 'Vyroba' ? 'active-section' : '');
-            btnVzv.className = 'login-section-btn ' + (section === 'VZV' ? 'active-section' : '');
+            const subContainer = document.getElementById('vyrobaSubContainer');
 
             if (section === 'Vyroba') {
-                btnL1.style.display = 'block';
-                btnL2.style.display = 'block';
-                btnL12.style.display = 'block';
-                btnVZV.style.display = 'none';
+                btnVyroba.className = 'login-section-btn active-section';
+                btnVzv.className = 'login-section-btn';
+                subContainer.classList.add('active');
                 setLoginMode('L1');
             } else {
-                btnL1.style.display = 'none';
-                btnL2.style.display = 'none';
-                btnL12.style.display = 'none';
-                btnVZV.style.display = 'block';
-                setLoginMode('VZV');
+                btnVyroba.className = 'login-section-btn';
+                btnVzv.className = 'login-section-btn active-section';
+                subContainer.classList.remove('active');
+                selectedLoginMode = 'VZV';
             }
         }
 
@@ -1188,12 +1195,10 @@
             const btnL1 = document.getElementById('loginBtnL1');
             const btnL2 = document.getElementById('loginBtnL2');
             const btnL12 = document.getElementById('loginBtnL12');
-            const btnVZV = document.getElementById('loginBtnVZV');
 
-            btnL1.className = 'login-mode-btn ' + (mode === 'L1' ? 'active-l1' : '');
-            btnL2.className = 'login-mode-btn ' + (mode === 'L2' ? 'active-l2' : '');
-            btnL12.className = 'login-mode-btn ' + (mode === 'L12' ? 'active-l12' : '');
-            btnVZV.className = 'login-mode-btn ' + (mode === 'VZV' ? 'active-vzv' : '');
+            if(btnL1) btnL1.className = 'login-mode-btn ' + (mode === 'L1' ? 'active-l1' : '');
+            if(btnL2) btnL2.className = 'login-mode-btn ' + (mode === 'L2' ? 'active-l2' : '');
+            if(btnL12) btnL12.className = 'login-mode-btn ' + (mode === 'L12' ? 'active-l12' : '');
         }
 
         function checkPassword() {
