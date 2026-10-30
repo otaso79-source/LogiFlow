@@ -644,14 +644,6 @@
                 <button class="btn-admin-action btn-admin-ok" onclick="openAdminForUsers()" style="width:100%; margin-top:4px;">🔑 Otevřít administraci</button>
             </div>
 
-            <!-- Změna vlastního hesla přes původní heslo -->
-            <div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:6px; border:1px solid #334155;">
-                <span style="font-size:0.85rem; font-weight:bold; color:#38bdf8;">🔑 Změna mého hesla</span>
-                <input type="password" id="oldPassInput" placeholder="Původní heslo" class="admin-pwd-input" style="font-size:0.9rem; padding:8px; margin:2px 0 6px 0; text-align:left; letter-spacing:normal;">
-                <input type="password" id="newPassInput" placeholder="Nové heslo" class="admin-pwd-input" style="font-size:0.9rem; padding:8px; margin:2px 0 6px 0; text-align:left; letter-spacing:normal;">
-                <button class="btn-admin-action btn-admin-ok" onclick="changeMyPassword()" style="width:100%; padding:8px;">Změnit heslo</button>
-            </div>
-
             <div class="settings-row">
                 <span style="font-size:0.85rem; font-weight:bold;">🔔 Zvukové notifikace</span>
                 <div class="banner-btns">
@@ -682,7 +674,7 @@
         </div>
     </div>
 
-    <!-- Modální okno pro administraci (uživatelé + přehled přihlášených s možností odhlášení) -->
+    <!-- Modální okno pro administraci (uživatelé + přehled přihlášených + změna hesla správce) -->
     <div id="workersManagerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); z-index:10000; align-items:center; justify-content:center; padding:15px;">
         <div class="settings-box" style="max-width:420px;">
             <div class="settings-header">
@@ -690,13 +682,21 @@
                 <button class="btn-close" onclick="closeWorkersManager()">✕</button>
             </div>
             
+            <!-- Změna hesla výhradně v administraci správce -->
+            <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #38bdf8; margin-bottom:12px;">
+                <div style="font-size:0.85rem; font-weight:bold; color:#38bdf8; margin-bottom:6px;">🔑 Změna mého hesla (Administrátor):</div>
+                <input type="password" id="oldPassInput" placeholder="Původní heslo" class="admin-pwd-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
+                <input type="password" id="newPassInput" placeholder="Nové heslo" class="admin-pwd-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
+                <button class="btn-admin-action btn-admin-ok" onclick="changeMyPassword()" style="width:100%; padding:8px;">Změnit heslo</button>
+            </div>
+
             <div class="lbl" style="color:#f59e0b; margin-top:0;">🟢 Aktivní přihlášení uživatelé (kontrola proti domovu):</div>
-            <div id="activeSessionsContainer" style="max-height:140px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px; background:#0f172a; padding:8px; border-radius:8px; border:1px solid #334155;">
+            <div id="activeSessionsContainer" style="max-height:120px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px; background:#0f172a; padding:8px; border-radius:8px; border:1px solid #334155;">
                 <!-- Načte se dynamicky -->
             </div>
 
             <div class="lbl" style="color:#f59e0b;">📋 Seznam uživatelů a hesel:</div>
-            <div id="workersListContainer" style="max-height:160px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px;"></div>
+            <div id="workersListContainer" style="max-height:140px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px;"></div>
             
             <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px dashed #f59e0b; margin-bottom:10px;">
                 <div style="font-size:0.8rem; font-weight:bold; color:#f59e0b; margin-bottom:6px;">➕ Přidat nového uživatele (výběr rolí):</div>
@@ -774,8 +774,7 @@
             let data = snapshot.val();
             if (data) {
                 workers = Array.isArray(data) ? data : Object.values(data);
-                // Vždy zajistíme, že v seznamu existuje hlavní Administrator
-                if (!workers.some(w => w.role === 'ADMIN')) {
+                if (!workers.some(w => w.role.includes('ADMIN'))) {
                     workers.push({ id: 'adminAcc', name: 'Administrator', pass: ADMIN_PASSWORD, role: 'ADMIN' });
                     db.ref('workers').set(workers);
                 }
@@ -802,7 +801,6 @@
             if (role === 'L12') return 'Linka 1-2';
             if (role === 'VZV') return 'VZV';
             if (role === 'ADMIN') return 'Administrator';
-            // Pokud by role obsahovala víc hodnot oddělených čárkou
             if (role && role.includes(',')) {
                 return role.split(',').map(r => getRoleName(r.trim())).join(' + ');
             }
@@ -835,7 +833,7 @@
                         <div style="font-weight:bold; font-size:0.85rem; color:#f59e0b;">${w.name} <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">[${getRoleName(w.role)}]</span></div>
                         <div style="font-size:0.75rem; color:#94a3b8;">Heslo: <b>${w.pass}</b></div>
                     </div>
-                    ${w.role !== 'ADMIN' ? `<button class="btn-delete" onclick="deleteWorker(${idx})" title="Smazat">✖</button>` : `<span style="font-size:0.65rem; color:#f59e0b; font-weight:bold;">Chráněno</span>`}
+                    {!w.role.includes('ADMIN') ? `<button class="btn-delete" onclick="deleteWorker(${idx})" title="Smazat">✖</button>` : `<span style="font-size:0.65rem; color:#f59e0b; font-weight:bold;">Chráněno</span>`}
                 </div>
             `).join('');
 
@@ -905,7 +903,7 @@
         }
 
         function deleteWorker(index) {
-            if (workers[index].role === 'ADMIN') {
+            if (workers[index].role.includes('ADMIN')) {
                 alert('Hlavního administrátora nelze smazat!');
                 return;
             }
@@ -940,7 +938,7 @@
             document.getElementById('oldPassInput').value = '';
             document.getElementById('newPassInput').value = '';
             alert('Heslo bylo úspěšně změněno!');
-            closeSettingsModal();
+            closeWorkersManager();
         }
 
         function setSoundType(type) {
@@ -995,7 +993,6 @@
                 let role = sessionStorage.getItem('active_role') || 'L1';
                 let workerName = sessionStorage.getItem('active_worker') || 'Neznámý';
                 
-                // Pokud má roli obsahující ADMIN, je neviditelný
                 if (role.includes('ADMIN')) {
                     db.ref('presence/' + deviceId).remove();
                 } else {
@@ -1436,7 +1433,6 @@
             let lineSelectContainer = document.getElementById('lineSelectContainer');
             let lineSelectContainerLbl = document.getElementById('lineSelectContainerLbl');
 
-            // Pokud má uživatel víc rolí (např. L1,L2), upřesníme chování
             if (role.includes('ADMIN')) {
                 curLine = 1;
                 badge.innerText = workerName + ' (Správce)';
@@ -1672,7 +1668,6 @@
 
         function setLine(l) {
             let role = sessionStorage.getItem('active_role') || '';
-            // Pokud uživatel nemá přístup k oběma linkám, nedovolíme přepnutí na zakázanou
             if (!role.includes('ADMIN') && !role.includes('L12')) {
                 if (role.includes('L1') && l !== 1) l = 1;
                 if (role.includes('L2') && l !== 2) l = 2;
