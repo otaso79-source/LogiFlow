@@ -17,15 +17,17 @@
         }
         .login-box {
             background: #1e293b; border: 1px solid #334155; padding: 24px;
-            border-radius: 12px; width: 100%; max-width: 340px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border-radius: 12px; width: 100%; max-width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
         .login-title { font-size: 1.4rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; }
         .login-sub { font-size: 0.8rem; color: #94a3b8; margin-bottom: 16px; }
         
         .login-mode-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
-        .login-mode-btn { padding: 10px 4px; font-size: 0.85rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
-        .login-mode-btn.active-a { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
-        .login-mode-btn.active-b { background: #581c87; border-color: #a855f7; color: #fff; }
+        .login-mode-btn { padding: 10px 4px; font-size: 0.8rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
+        .login-mode-btn.active-l1 { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
+        .login-mode-btn.active-l2 { background: #312e81; border-color: #6366f1; color: #fff; }
+        .login-mode-btn.active-l12 { background: #065f46; border-color: #10b981; color: #fff; }
+        .login-mode-btn.active-vzv { background: #581c87; border-color: #a855f7; color: #fff; }
 
         .login-input {
             width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
@@ -45,7 +47,10 @@
         
         .header-right { display: flex; align-items: center; gap: 6px; }
         .role-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; font-weight: bold; background: #1e3a8a; color: #3b82f6; }
-        .role-badge.b { background: #581c87; color: #a855f7; }
+        .role-badge.l2 { background: #312e81; color: #818cf8; }
+        .role-badge.l12 { background: #065f46; color: #34d399; }
+        .role-badge.vzv { background: #581c87; color: #a855f7; }
+
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-settings { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
@@ -372,9 +377,11 @@
             <div class="login-title">⚡ LogiFlow</div>
             <div class="login-sub">Zvolte roli a zadejte heslo</div>
             
-            <div class="login-mode-select">
-                <button type="button" id="loginBtnA" class="login-mode-btn active-a" onclick="setLoginMode('A')">Obsluha A</button>
-                <button type="button" id="loginBtnB" class="login-mode-btn" onclick="setLoginMode('B')">VZV B</button>
+            <div class="login-mode-select" style="grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px;">
+                <button type="button" id="loginBtnL1" class="login-mode-btn active-l1" onclick="setLoginMode('L1')">Linka 1</button>
+                <button type="button" id="loginBtnL2" class="login-mode-btn" onclick="setLoginMode('L2')">Linka 2</button>
+                <button type="button" id="loginBtnL12" class="login-mode-btn" onclick="setLoginMode('L12')">Linka 1-2</button>
+                <button type="button" id="loginBtnVZV" class="login-mode-btn" onclick="setLoginMode('VZV')">VZV</button>
             </div>
 
             <input type="password" id="passInput" class="login-input" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
@@ -388,15 +395,15 @@
             <div class="logo">⚡ LogiFlow</div>
             <div class="header-right">
                 <button class="btn-settings" onclick="openSettingsModal()" title="Nastavení">⚙️ Nastavení</button>
-                <span id="roleBadge" class="role-badge">Obsluha A</span>
+                <span id="roleBadge" class="role-badge">Linka 1</span>
                 <button class="btn-logout" onclick="logout()" title="Odhlásit tento telefon">🔓 Odhlásit</button>
             </div>
         </div>
 
         <div id="viewA">
             <div id="alertAreaA"></div>
-            <div class="lbl">Vyberte Linku</div>
-            <div class="line-select">
+            <div class="lbl" id="lineSelectContainerLbl">Vyberte Linku</div>
+            <div class="line-select" id="lineSelectContainer">
                 <div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1<br><span style="font-size:0.65rem; font-weight:normal;">BOX 4 - 3</span></div>
                 <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.65rem; font-weight:normal;">BOX 2 - 1</span></div>
             </div>
@@ -627,8 +634,8 @@
             </div>
 
             <div class="settings-online-counter">
-                <div>Obsluha A online: <br><span id="countOnlineA" class="online-val-a">0</span></div>
-                <div style="border-left: 1px solid #334155; padding-left: 10px;">VZV B online: <br><span id="countOnlineB" class="online-val-b">0</span></div>
+                <div>Obsluha online: <br><span id="countOnlineA" class="online-val-a">0</span></div>
+                <div style="border-left: 1px solid #334155; padding-left: 10px;">VZV online: <br><span id="countOnlineB" class="online-val-b">0</span></div>
             </div>
 
             <div class="settings-row">
@@ -693,7 +700,7 @@
         let stockAlerts = [];
         let lastOrderCount = 0;
         let lastVzvAlertCount = 0;
-        let selectedLoginMode = 'A';
+        let selectedLoginMode = 'L1';
         let expandedOrderId = null;
 
         let folderOpenState = { 1: false, 2: false };
@@ -753,7 +760,7 @@
         function updatePresence() {
             let isAuth = sessionStorage.getItem('device_authenticated') === 'true';
             if (isAuth) {
-                let role = sessionStorage.getItem('active_tab') || 'A';
+                let role = sessionStorage.getItem('active_role') || 'L1';
                 db.ref('presence/' + deviceId).set({
                     role: role,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
@@ -777,8 +784,8 @@
 
             Object.values(data).forEach(item => {
                 if (item && item.timestamp && (now - item.timestamp < 15000)) {
-                    if (item.role === 'A') countA++;
-                    if (item.role === 'B') countB++;
+                    if (item.role !== 'VZV') countA++;
+                    if (item.role === 'VZV') countB++;
                 }
             });
 
@@ -808,7 +815,7 @@
             let raw = snapshot.val() || [];
             let updatedVatAlerts = Array.isArray(raw) ? raw : Object.values(raw);
             if (updatedVatAlerts.length > lastVzvAlertCount) {
-                triggerNotification("⚠️ Upozornění pro VZV!", "Nové hlášení od obsluhy A");
+                triggerNotification("⚠️ Upozornění pro VZV!", "Nové hlášení od obsluhy");
             }
             vzvVatAlerts = updatedVatAlerts;
             lastVzvAlertCount = vzvVatAlerts.length;
@@ -1135,22 +1142,22 @@
 
         function setLoginMode(mode) {
             selectedLoginMode = mode;
-            const btnA = document.getElementById('loginBtnA');
-            const btnB = document.getElementById('loginBtnB');
-            if (mode === 'A') {
-                btnA.className = 'login-mode-btn active-a';
-                btnB.className = 'login-mode-btn';
-            } else {
-                btnA.className = 'login-mode-btn';
-                btnB.className = 'login-mode-btn active-b';
-            }
+            const btnL1 = document.getElementById('loginBtnL1');
+            const btnL2 = document.getElementById('loginBtnL2');
+            const btnL12 = document.getElementById('loginBtnL12');
+            const btnVZV = document.getElementById('loginBtnVZV');
+
+            btnL1.className = 'login-mode-btn ' + (mode === 'L1' ? 'active-l1' : '');
+            btnL2.className = 'login-mode-btn ' + (mode === 'L2' ? 'active-l2' : '');
+            btnL12.className = 'login-mode-btn ' + (mode === 'L12' ? 'active-l12' : '');
+            btnVZV.className = 'login-mode-btn ' + (mode === 'VZV' ? 'active-vzv' : '');
         }
 
         function checkPassword() {
             const input = document.getElementById('passInput').value;
             if (input === SYSTEM_PASSWORD) {
                 sessionStorage.setItem('device_authenticated', 'true');
-                sessionStorage.setItem('active_tab', selectedLoginMode);
+                sessionStorage.setItem('active_role', selectedLoginMode);
                 document.getElementById('loginError').style.display = 'none';
                 updatePresence();
                 showApp();
@@ -1162,7 +1169,7 @@
         function logout() {
             db.ref('presence/' + deviceId).remove();
             sessionStorage.removeItem('device_authenticated');
-            sessionStorage.removeItem('active_tab');
+            sessionStorage.removeItem('active_role');
             document.getElementById('passInput').value = '';
             document.getElementById('loginError').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
@@ -1173,18 +1180,39 @@
         function showApp() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appScreen').style.display = 'block';
-            let savedTab = sessionStorage.getItem('active_tab') || selectedLoginMode || 'A';
-            document.getElementById('viewA').style.display = savedTab === 'A' ? 'block' : 'none';
-            document.getElementById('viewB').style.display = savedTab === 'B' ? 'block' : 'none';
-
+            let role = sessionStorage.getItem('active_role') || selectedLoginMode || 'L1';
+            
             let badge = document.getElementById('roleBadge');
-            if (savedTab === 'A') {
-                badge.innerText = 'Obsluha A';
+            let lineSelectContainer = document.getElementById('lineSelectContainer');
+            let lineSelectContainerLbl = document.getElementById('lineSelectContainerLbl');
+
+            if (role === 'L1') {
+                curLine = 1;
+                badge.innerText = 'Linka 1';
                 badge.className = 'role-badge';
-            } else {
-                badge.innerText = 'VZV B';
-                badge.className = 'role-badge b';
+                if (lineSelectContainer) lineSelectContainer.style.display = 'none';
+                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'none';
+            } else if (role === 'L2') {
+                curLine = 2;
+                badge.innerText = 'Linka 2';
+                badge.className = 'role-badge l2';
+                if (lineSelectContainer) lineSelectContainer.style.display = 'none';
+                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'none';
+            } else if (role === 'L12') {
+                curLine = 1;
+                badge.innerText = 'Linka 1-2';
+                badge.className = 'role-badge l12';
+                if (lineSelectContainer) lineSelectContainer.style.display = 'grid';
+                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'block';
+            } else if (role === 'VZV') {
+                badge.innerText = 'VZV';
+                badge.className = 'role-badge vzv';
             }
+
+            document.getElementById('viewA').style.display = role !== 'VZV' ? 'block' : 'none';
+            document.getElementById('viewB').style.display = role === 'VZV' ? 'block' : 'none';
+
+            setLine(curLine);
             render();
         }
 
@@ -1198,7 +1226,7 @@
             const setYes = document.getElementById('setNotifYes');
             const setNo = document.getElementById('setNotifNo');
             if (enable) {
-                             if(setYes) setYes.className = 'btn-yn active-yes';
+                if(setYes) setYes.className = 'btn-yn active-yes';
                 if(setNo) setNo.className = 'btn-yn';
             } else {
                 if(setYes) setYes.className = 'btn-yn';
@@ -1250,6 +1278,7 @@
             if (enable) {
                 twoVariantModeLines[curLine] = false;
                 if (!singleModeCar[curLine]) singleModeCar[curLine] = 'Tiguan';
+                triggerNotification("Režim aktivován", "Zapnut režim 1 varianta");
             } else {
                 singleModeLines[curLine] = false;
             }
@@ -1263,6 +1292,7 @@
             if (enable) {
                 singleModeLines[curLine] = false;
                 if (!twoVariantPair[curLine]) twoVariantPair[curLine] = 'Tiguan / Kodiaq';
+                triggerNotification("Režim aktivován", "Zapnut režim 2 varianty");
             } else {
                 twoVariantModeLines[curLine] = false;
             }
@@ -1275,11 +1305,13 @@
             singleModeCar[curLine] = car; 
             save(); 
             updateDynamicTheme(); 
+            triggerNotification("Změna režimu", "Změněna varianta");
         }
         function setTwoPair(pair, el) { 
             twoVariantPair[curLine] = pair; 
             save(); 
             updateDynamicTheme(); 
+            triggerNotification("Změna režimu", "Změněna dvojice variant");
         }
 
         function updateDynamicTheme() {
@@ -1359,9 +1391,13 @@
         }
 
         function setLine(l) {
-            curLine = l;
-            document.getElementById('lBtn1').className = 'line-btn ' + (l===1?'active-1':'');
-            document.getElementById('lBtn2').className = 'line-btn ' + (l===2?'active-2':'');
+            let role = sessionStorage.getItem('active_role');
+            if (role === 'L1') curLine = 1;
+            else if (role === 'L2') curLine = 2;
+            else curLine = l;
+
+            document.getElementById('lBtn1').className = 'line-btn ' + (curLine===1?'active-1':'');
+            document.getElementById('lBtn2').className = 'line-btn ' + (curLine===2?'active-2':'');
             updateDynamicTheme();
         }
 
@@ -1411,7 +1447,7 @@
                 o.done = boxIndex;
             }
 
-            o.note = (o.note ? o.note + " | " : "") + "Obsluha A srovnala počet obalů";
+            o.note = (o.note ? o.note + " | " : "") + "Obsluha srovnala počet obalů";
 
             if (o.done >= o.total) {
                 orders = orders.filter(x => x.id !== id);
@@ -1475,7 +1511,7 @@
                 vzvVatAlerts.forEach(v => {
                     vatHtml += `
                         <div class="vzv-sensor-alert" style="margin-bottom:8px;">
-                            <div class="vzv-sensor-title">⚠️ UPOZORNĚNÍ OD OBSLUHY A</div>
+                            <div class="vzv-sensor-title">⚠️ UPOZORNĚNÍ OD OBSLUHY</div>
                             <div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">${v.text}</div>
                             <button class="btn-resolve-sensor" onclick="dismissVzvVatAlert(${v.id})">✓ OK / POTVRĎ</button>
                         </div>
