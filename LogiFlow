@@ -644,6 +644,14 @@
                 <button class="btn-admin-action btn-admin-ok" onclick="openAdminForUsers()" style="width:100%; margin-top:4px;">🔑 Otevřít administraci</button>
             </div>
 
+            <!-- Změna vlastního hesla přes původní heslo -->
+            <div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:6px; border:1px solid #334155;">
+                <span style="font-size:0.85rem; font-weight:bold; color:#38bdf8;">🔑 Změna mého hesla</span>
+                <input type="password" id="oldPassInput" placeholder="Původní heslo" class="admin-pwd-input" style="font-size:0.9rem; padding:8px; margin:2px 0 6px 0; text-align:left; letter-spacing:normal;">
+                <input type="password" id="newPassInput" placeholder="Nové heslo" class="admin-pwd-input" style="font-size:0.9rem; padding:8px; margin:2px 0 6px 0; text-align:left; letter-spacing:normal;">
+                <button class="btn-admin-action btn-admin-ok" onclick="changeMyPassword()" style="width:100%; padding:8px;">Změnit heslo</button>
+            </div>
+
             <div class="settings-row">
                 <span style="font-size:0.85rem; font-weight:bold;">🔔 Zvukové notifikace</span>
                 <div class="banner-btns">
@@ -691,16 +699,19 @@
             <div id="workersListContainer" style="max-height:160px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px;"></div>
             
             <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px dashed #f59e0b; margin-bottom:10px;">
-                <div style="font-size:0.8rem; font-weight:bold; color:#f59e0b; margin-bottom:6px;">➕ Přidat nového uživatele:</div>
+                <div style="font-size:0.8rem; font-weight:bold; color:#f59e0b; margin-bottom:6px;">➕ Přidat nového uživatele (výběr rolí):</div>
                 <input type="text" id="newWorkerName" placeholder="Jméno (např. Ota / VZV 1)" class="login-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
                 <input type="text" id="newWorkerPass" placeholder="Heslo" class="login-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
-                <select id="newWorkerRole" class="login-select" style="font-size:0.85rem; padding:8px; margin-bottom:6px;">
-                    <option value="L1">Linka 1</option>
-                    <option value="L2">Linka 2</option>
-                    <option value="L12">Linka 1-2</option>
-                    <option value="VZV">VZV</option>
-                    <option value="ADMIN">Administrator (Neviditelný)</option>
-                </select>
+                
+                <div style="background:#1e293b; padding:8px; border-radius:6px; margin-bottom:8px; border:1px solid #334155; text-align:left;">
+                    <div style="font-size:0.75rem; color:#94a3b8; font-weight:bold; margin-bottom:4px;">Povolit role / oprávnění:</div>
+                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="L1"> Linka 1</label>
+                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="L2"> Linka 2</label>
+                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="L12"> Linka 1-2</label>
+                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="VZV"> VZV</label>
+                    <label style="display:block; font-size:0.8rem; margin-bottom:3px; color:#fbbf24;"><input type="checkbox" class="role-chk" value="ADMIN"> Administrator (Neviditelný)</label>
+                </div>
+
                 <button class="btn-admin-action btn-admin-ok" onclick="addNewWorker()" style="width:100%; padding:8px;">+ Přidat uživatele</button>
             </div>
             <button class="btn-admin-action btn-admin-cancel" onclick="closeWorkersManager()" style="width:100%;">Zavřít</button>
@@ -716,7 +727,6 @@
 
         const ADMIN_PASSWORD = '704517';
         
-        // Zpočátku prázdné pole, správce si uživatele vytvoří sám (nebo se načte z DB)
         let workers = [];
 
         let notificationsEnabled = true;
@@ -752,7 +762,6 @@
             sessionStorage.setItem('device_id', deviceId);
         }
 
-        // Kontrola vynuceného odhlášení na dálku pro toto zařízení
         db.ref('forceLogout/' + deviceId).on('value', (snapshot) => {
             if (snapshot.val() === true) {
                 db.ref('forceLogout/' + deviceId).remove();
@@ -761,14 +770,17 @@
             }
         });
 
-        // Načtení uživatelů z databáze Firebase
         db.ref('workers').on('value', (snapshot) => {
             let data = snapshot.val();
             if (data) {
                 workers = Array.isArray(data) ? data : Object.values(data);
+                // Vždy zajistíme, že v seznamu existuje hlavní Administrator
+                if (!workers.some(w => w.role === 'ADMIN')) {
+                    workers.push({ id: 'adminAcc', name: 'Administrator', pass: ADMIN_PASSWORD, role: 'ADMIN' });
+                    db.ref('workers').set(workers);
+                }
             } else {
-                // Výchozí prázdný stav, popř. vytvoříme nouzového admina, pokud by byl seznam zcela prázdný
-                workers = [{ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'ADMIN' }];
+                workers = [{ id: 'adminAcc', name: 'Administrator', pass: ADMIN_PASSWORD, role: 'ADMIN' }];
                 db.ref('workers').set(workers);
             }
             renderWorkersDropdown();
@@ -790,6 +802,10 @@
             if (role === 'L12') return 'Linka 1-2';
             if (role === 'VZV') return 'VZV';
             if (role === 'ADMIN') return 'Administrator';
+            // Pokud by role obsahovala víc hodnot oddělených čárkou
+            if (role && role.includes(',')) {
+                return role.split(',').map(r => getRoleName(r.trim())).join(' + ');
+            }
             return role;
         }
 
@@ -819,11 +835,10 @@
                         <div style="font-weight:bold; font-size:0.85rem; color:#f59e0b;">${w.name} <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">[${getRoleName(w.role)}]</span></div>
                         <div style="font-size:0.75rem; color:#94a3b8;">Heslo: <b>${w.pass}</b></div>
                     </div>
-                    <button class="btn-delete" onclick="deleteWorker(${idx})" title="Smazat">✖</button>
+                    ${w.role !== 'ADMIN' ? `<button class="btn-delete" onclick="deleteWorker(${idx})" title="Smazat">✖</button>` : `<span style="font-size:0.65rem; color:#f59e0b; font-weight:bold;">Chráněno</span>`}
                 </div>
             `).join('');
 
-            // Zobrazení aktivních relací pro kontrolu přihlášení
             db.ref('presence').once('value', (snapshot) => {
                 let data = snapshot.val() || {};
                 let activeContainer = document.getElementById('activeSessionsContainer');
@@ -861,23 +876,39 @@
         function addNewWorker() {
             let name = document.getElementById('newWorkerName').value.trim();
             let pass = document.getElementById('newWorkerPass').value.trim();
-            let role = document.getElementById('newWorkerRole').value;
+            
+            let checkedRoles = [];
+            document.querySelectorAll('.role-chk:checked').forEach(chk => {
+                checkedRoles.push(chk.value);
+            });
 
             if (!name || !pass) {
                 alert('Vyplňte jméno i heslo uživatele!');
                 return;
             }
+            if (checkedRoles.length === 0) {
+                alert('Zvolte alespoň jednu roli / oprávnění!');
+                return;
+            }
 
-            workers.push({ id: 'w_' + Date.now(), name: name, pass: pass, role: role });
+            let roleString = checkedRoles.join(',');
+
+            workers.push({ id: 'w_' + Date.now(), name: name, pass: pass, role: roleString });
             db.ref('workers').set(workers);
             
             document.getElementById('newWorkerName').value = '';
             document.getElementById('newWorkerPass').value = '';
+            document.querySelectorAll('.role-chk').forEach(chk => chk.checked = false);
+
             renderWorkersManagerList();
             renderWorkersDropdown();
         }
 
         function deleteWorker(index) {
+            if (workers[index].role === 'ADMIN') {
+                alert('Hlavního administrátora nelze smazat!');
+                return;
+            }
             if (workers.length <= 1) {
                 alert('Musí zůstat alespoň jeden uživatel!');
                 return;
@@ -886,6 +917,30 @@
             db.ref('workers').set(workers);
             renderWorkersManagerList();
             renderWorkersDropdown();
+        }
+
+        function changeMyPassword() {
+            let oldP = document.getElementById('oldPassInput').value;
+            let newP = document.getElementById('newPassInput').value;
+            let currentWorkerName = sessionStorage.getItem('active_worker');
+
+            if (!oldP || !newP) {
+                alert('Vyplňte obě kolonek pro změnu hesla!');
+                return;
+            }
+
+            let w = workers.find(x => x.name === currentWorkerName);
+            if (!w || w.pass !== oldP) {
+                alert('Původní heslo není správné!');
+                return;
+            }
+
+            w.pass = newP;
+            db.ref('workers').set(workers);
+            document.getElementById('oldPassInput').value = '';
+            document.getElementById('newPassInput').value = '';
+            alert('Heslo bylo úspěšně změněno!');
+            closeSettingsModal();
         }
 
         function setSoundType(type) {
@@ -940,8 +995,8 @@
                 let role = sessionStorage.getItem('active_role') || 'L1';
                 let workerName = sessionStorage.getItem('active_worker') || 'Neznámý';
                 
-                // Pokud je přihlášen Administrator (ADMIN), vymažeme jeho přítomnost, aby byl neviditelný
-                if (role === 'ADMIN') {
+                // Pokud má roli obsahující ADMIN, je neviditelný
+                if (role.includes('ADMIN')) {
                     db.ref('presence/' + deviceId).remove();
                 } else {
                     db.ref('presence/' + deviceId).set({
@@ -968,9 +1023,9 @@
             let now = Date.now();
 
             Object.values(data).forEach(item => {
-                if (item && item.timestamp && (now - item.timestamp < 15000) && item.role !== 'ADMIN') {
+                if (item && item.timestamp && (now - item.timestamp < 15000) && (!item.role || !item.role.includes('ADMIN'))) {
                     if (item.role !== 'VZV') countA++;
-                    if (item.role === 'VZV') countB++;
+                    if (item.role === 'VZV' || (item.role && item.role.includes('VZV'))) countB++;
                 }
             });
 
@@ -1381,37 +1436,39 @@
             let lineSelectContainer = document.getElementById('lineSelectContainer');
             let lineSelectContainerLbl = document.getElementById('lineSelectContainerLbl');
 
-            if (role === 'L1') {
-                curLine = 1;
-                badge.innerText = workerName + ' (Linka 1)';
-                badge.className = 'role-badge';
-                if (lineSelectContainer) lineSelectContainer.style.display = 'none';
-                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'none';
-            } else if (role === 'L2') {
-                curLine = 2;
-                badge.innerText = workerName + ' (Linka 2)';
-                badge.className = 'role-badge l2';
-                if (lineSelectContainer) lineSelectContainer.style.display = 'none';
-                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'none';
-            } else if (role === 'L12') {
-                curLine = 1;
-                badge.innerText = workerName + ' (Linka 1-2)';
-                badge.className = 'role-badge l12';
-                if (lineSelectContainer) lineSelectContainer.style.display = 'grid';
-                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'block';
-            } else if (role === 'VZV') {
-                badge.innerText = workerName + ' (VZV)';
-                badge.className = 'role-badge vzv';
-            } else if (role === 'ADMIN') {
+            // Pokud má uživatel víc rolí (např. L1,L2), upřesníme chování
+            if (role.includes('ADMIN')) {
                 curLine = 1;
                 badge.innerText = workerName + ' (Správce)';
                 badge.className = 'role-badge admin';
                 if (lineSelectContainer) lineSelectContainer.style.display = 'grid';
                 if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'block';
+            } else if (role === 'VZV' || role === 'vzv') {
+                badge.innerText = workerName + ' (VZV)';
+                badge.className = 'role-badge vzv';
+            } else if (role.includes('L12') || (role.includes('L1') && role.includes('L2'))) {
+                curLine = 1;
+                badge.innerText = workerName + ' (Všechny linky)';
+                badge.className = 'role-badge l12';
+                if (lineSelectContainer) lineSelectContainer.style.display = 'grid';
+                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'block';
+            } else if (role.includes('L2')) {
+                curLine = 2;
+                badge.innerText = workerName + ' (Linka 2)';
+                badge.className = 'role-badge l2';
+                if (lineSelectContainer) lineSelectContainer.style.display = 'none';
+                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'none';
+            } else {
+                curLine = 1;
+                badge.innerText = workerName + ' (Linka 1)';
+                badge.className = 'role-badge';
+                if (lineSelectContainer) lineSelectContainer.style.display = 'none';
+                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'none';
             }
 
-            document.getElementById('viewA').style.display = role !== 'VZV' ? 'block' : 'none';
-            document.getElementById('viewB').style.display = role === 'VZV' ? 'block' : 'none';
+            let isVzvOnly = (role === 'VZV' || (role.includes('VZV') && !role.includes('L1') && !role.includes('L2') && !role.includes('L12')));
+            document.getElementById('viewA').style.display = !isVzvOnly ? 'block' : 'none';
+            document.getElementById('viewB').style.display = isVzvOnly ? 'block' : 'none';
 
             setLine(curLine);
             render();
@@ -1614,10 +1671,13 @@
         }
 
         function setLine(l) {
-            let role = sessionStorage.getItem('active_role');
-            if (role === 'L1') curLine = 1;
-            else if (role === 'L2') curLine = 2;
-            else curLine = l;
+            let role = sessionStorage.getItem('active_role') || '';
+            // Pokud uživatel nemá přístup k oběma linkám, nedovolíme přepnutí na zakázanou
+            if (!role.includes('ADMIN') && !role.includes('L12')) {
+                if (role.includes('L1') && l !== 1) l = 1;
+                if (role.includes('L2') && l !== 2) l = 2;
+            }
+            curLine = l;
 
             let btn1 = document.getElementById('lBtn1');
             let btn2 = document.getElementById('lBtn2');
