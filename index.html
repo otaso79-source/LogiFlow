@@ -692,6 +692,7 @@
         let orders = [];
         let stockAlerts = [];
         let lastOrderCount = 0;
+        let lastVzvAlertCount = 0;
         let selectedLoginMode = 'A';
         let expandedOrderId = null;
 
@@ -805,13 +806,23 @@
 
         db.ref('vzvVatAlerts').on('value', (snapshot) => {
             let raw = snapshot.val() || [];
-            vzvVatAlerts = Array.isArray(raw) ? raw : Object.values(raw);
+            let updatedVatAlerts = Array.isArray(raw) ? raw : Object.values(raw);
+            if (updatedVatAlerts.length > lastVzvAlertCount) {
+                triggerNotification("⚠️ Upozornění pro VZV!", "Nové hlášení od obsluhy A");
+            }
+            vzvVatAlerts = updatedVatAlerts;
+            lastVzvAlertCount = vzvVatAlerts.length;
             render();
         });
 
         db.ref('singleModeLines').on('value', (snapshot) => {
             let data = snapshot.val();
-            if (data) singleModeLines = data;
+            if (data) {
+                if (singleModeLines[1] !== data[1] || singleModeLines[2] !== data[2]) {
+                    triggerNotification("🔒 Změna režimu", "Režim 1 varianta byl změněn");
+                }
+                singleModeLines = data;
+            }
             render();
         });
 
@@ -823,7 +834,12 @@
 
         db.ref('twoVariantModeLines').on('value', (snapshot) => {
             let data = snapshot.val();
-            if (data) twoVariantModeLines = data;
+            if (data) {
+                if (twoVariantModeLines[1] !== data[1] || twoVariantModeLines[2] !== data[2]) {
+                    triggerNotification("🔒 Změna režimu", "Režim 2 varianty byl změněn");
+                }
+                twoVariantModeLines = data;
+            }
             render();
         });
 
@@ -835,7 +851,14 @@
 
         db.ref('repeatBoxes').on('value', (snapshot) => {
             let data = snapshot.val();
-            if (data) repeatBoxes = data;
+            if (data) {
+                let activeBefore = Object.values(repeatBoxes).some(Boolean);
+                let activeNow = Object.values(data).some(Boolean);
+                if (!activeBefore && activeNow) {
+                    triggerNotification("⚠️ Upozornění", "Hlášení čidel aktivováno");
+                }
+                repeatBoxes = data;
+            }
             render();
         });
 
@@ -1080,7 +1103,7 @@
             if (systemUpdateActive) {
                 bannerBox.className = "update-banner-box";
                 title.innerText = "⚠️ UPOZORNĚNÍ NA ÚDRŽBU";
-                text.innerHTML = "POZOR: Proběhne aktualizace programu připravte se na výpadek.<br><br>Neřiďte się PROGRAMEM !!!";
+                text.innerHTML = "POZOR: Proběhne aktualizace programu připravte se na výpadek.<br><br>Neřiďte se PROGRAMEM !!!";
                 overlay.style.display = 'flex';
             } else if (systemUpdateCompletedState && !isAlreadyAcked) {
                 bannerBox.className = "update-banner-box completed-box";
@@ -1175,7 +1198,7 @@
             const setYes = document.getElementById('setNotifYes');
             const setNo = document.getElementById('setNotifNo');
             if (enable) {
-                if(setYes) setYes.className = 'btn-yn active-yes';
+                             if(setYes) setYes.className = 'btn-yn active-yes';
                 if(setNo) setNo.className = 'btn-yn';
             } else {
                 if(setYes) setYes.className = 'btn-yn';
@@ -1227,7 +1250,6 @@
             if (enable) {
                 twoVariantModeLines[curLine] = false;
                 if (!singleModeCar[curLine]) singleModeCar[curLine] = 'Tiguan';
-                triggerNotification("Režim aktivován", "Zapnut režim 1 varianta");
             } else {
                 singleModeLines[curLine] = false;
             }
@@ -1241,7 +1263,6 @@
             if (enable) {
                 singleModeLines[curLine] = false;
                 if (!twoVariantPair[curLine]) twoVariantPair[curLine] = 'Tiguan / Kodiaq';
-                triggerNotification("Režim aktivován", "Zapnut režim 2 varianty");
             } else {
                 twoVariantModeLines[curLine] = false;
             }
@@ -1254,13 +1275,11 @@
             singleModeCar[curLine] = car; 
             save(); 
             updateDynamicTheme(); 
-            triggerNotification("Změna režimu", "Změněna varianta");
         }
         function setTwoPair(pair, el) { 
             twoVariantPair[curLine] = pair; 
             save(); 
             updateDynamicTheme(); 
-            triggerNotification("Změna režimu", "Změněna dvojice variant");
         }
 
         function updateDynamicTheme() {
