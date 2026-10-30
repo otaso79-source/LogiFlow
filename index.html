@@ -1142,6 +1142,7 @@
         }
 
         function setOrderFirstBox(orderId, chosenBox) {
+            if (orderId === 'null') return;
             let o = orders.find(x => x.id === orderId);
             if (o) {
                 o.firstBox = parseInt(chosenBox);
@@ -1296,16 +1297,31 @@
                 let isTwo = twoVariantModeLines[l];
 
                 if (title && next && body) {
+                    // NATRDO ZOBRAZIT PŘEPÍNAČ V HORNÍM ROHU PRO KAŽDOU LINKU
+                    if (headerBox) {
+                        let boxA = (l === 1) ? 3 : 1;
+                        let boxB = (l === 1) ? 4 : 2;
+                        let activeOrder = lOrders[0];
+                        let currentFirst = (activeOrder && activeOrder.firstBox) ? activeOrder.firstBox : boxA;
+                        let activeOrderId = activeOrder ? activeOrder.id : 'null';
+
+                        headerBox.innerHTML = `
+                            <div class="first-box-toggle-container">
+                                <span class="toggle-title-lbl">Obal zavezen jako první:</span>
+                                <button class="btn-toggle-box ${currentFirst === boxA ? 'active' : ''}" onclick="setOrderFirstBox(${activeOrderId}, ${boxA})">BOX ${boxA}</button>
+                                <button class="btn-toggle-box ${currentFirst === boxB ? 'active' : ''}" onclick="setOrderFirstBox(${activeOrderId}, ${boxB})">BOX ${boxB}</button>
+                            </div>
+                        `;
+                    }
+
                     if (lOrders.length === 0 && !isSingle && !isTwo) {
                         title.innerText = 'Žádná objednávka';
                         next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
                         body.innerHTML = '<div class="empty">Linka je volná</div>';
-                        if (headerBox) headerBox.innerHTML = '';
                     } else {
                         if (isSingle || isTwo) {
                             title.innerText = isSingle ? `🔒 Režim 1 varianta: ${singleModeCar[l]}` : `🔒 Režim 2 varianty: ${twoVariantPair[l]}`;
                             next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
-                            if (headerBox) headerBox.innerHTML = '';
                         } else {
                             let cur = lOrders[0];
                             let nxt1 = lOrders[1];
@@ -1315,20 +1331,6 @@
                                 next.innerHTML = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
                             } else {
                                 next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
-                            }
-
-                            if (headerBox) {
-                                let boxA = (l === 1) ? 3 : 1;
-                                let boxB = (l === 1) ? 4 : 2;
-                                let curFirst = cur.firstBox || boxA;
-
-                                headerBox.innerHTML = `
-                                    <div class="first-box-toggle-container">
-                                        <span class="toggle-title-lbl">Obal zavezen jako první:</span>
-                                        <button class="btn-toggle-box ${curFirst === boxA ? 'active' : ''}" onclick="setOrderFirstBox(${cur.id}, ${boxA})">BOX ${boxA}</button>
-                                        <button class="btn-toggle-box ${curFirst === boxB ? 'active' : ''}" onclick="setOrderFirstBox(${cur.id}, ${boxB})">BOX ${boxB}</button>
-                                    </div>
-                                `;
                             }
                         }
 
