@@ -1,61 +1,56 @@
-```html
 <!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Logistik - Systém Závozů LogiFlow</title>
-    <!-- Firebase JS SDK -->
+    <title>Logistik - Systém Závozů</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background: #0f172a; color: #f8fafc; padding: 10px; font-size: 14px; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background: #0f172a; color: #f8fafc; padding: 10px; font-size: 14px; }
         
-        /* Přihlašovací obrazovka */
         #loginScreen {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 85vh; text-align: center; padding: 20px;
+            min-height: 80vh; text-align: center; padding: 20px;
         }
         .login-box {
             background: #1e293b; border: 1px solid #334155; padding: 24px;
             border-radius: 12px; width: 100%; max-width: 340px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        .login-title { font-size: 1.5rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; }
-        .login-sub { font-size: 0.85rem; color: #94a3b8; margin-bottom: 16px; }
+        .login-title { font-size: 1.4rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; }
+        .login-sub { font-size: 0.8rem; color: #94a3b8; margin-bottom: 16px; }
         
-        .login-mode-select { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-        .login-mode-btn { padding: 12px 4px; font-size: 0.85rem; font-weight: bold; border-radius: 8px; cursor: pointer; border: 2px solid #334155; background: #0f172a; color: #94a3b8; text-align: center; transition: all 0.2s; }
+        .login-mode-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
+        .login-mode-btn { padding: 10px 4px; font-size: 0.85rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
         .login-mode-btn.active-a { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
         .login-mode-btn.active-b { background: #581c87; border-color: #a855f7; color: #fff; }
 
         .login-input {
             width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
             border-radius: 8px; color: #fff; font-size: 1.2rem; text-align: center;
-            letter-spacing: 4px; margin-bottom: 14px; outline: none;
+            letter-spacing: 4px; margin-bottom: 12px; outline: none;
         }
         .login-input:focus { border-color: #f59e0b; }
         .btn-login {
             width: 100%; padding: 12px; background: #f59e0b; color: #0f172a;
-            border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s;
+            border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;
         }
-        .btn-login:hover { background: #d97706; }
-        .login-error { color: #ef4444; font-size: 0.8rem; margin-top: 10px; display: none; font-weight: bold; }
+        .login-error { color: #ef4444; font-size: 0.8rem; margin-top: 10px; display: none; }
 
-        /* Hlavní obrazovka aplikace */
-        #appScreen { display: none; max-width: 600px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #334155; }
-        .logo { font-size: 1.2rem; font-weight: bold; color: #f59e0b; }
+        #appScreen { display: none; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .logo { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
         
         .header-right { display: flex; align-items: center; gap: 6px; }
-        .role-badge { font-size: 0.75rem; padding: 6px 10px; border-radius: 6px; font-weight: bold; background: #1e3a8a; color: #3b82f6; }
+        .role-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; font-weight: bold; background: #1e3a8a; color: #3b82f6; }
         .role-badge.b { background: #581c87; color: #a855f7; }
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-settings { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
         .line-select { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-        .line-btn { padding: 10px 6px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.8rem; line-height: 1.3; }
+        .line-btn { padding: 10px 6px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.75rem; line-height: 1.3; }
         
         .line-btn.active-1 { border-color: #3b82f6; color: #fff; background: #1e3a8a; }
         .line-btn.active-2 { border-color: #a855f7; color: #fff; background: #581c87; }
@@ -135,7 +130,6 @@
         .val { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
         .btn-submit { width: 100%; padding: 12px; background: #f59e0b; color: #0f172a; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
 
-        /* VZV KARTY A TLAČÍTKA */
         .vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid #a855f7; }
         .vzv-card.l1-card { border-top-color: #3b82f6; }
         .vzv-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
@@ -150,16 +144,8 @@
         .box-unit.done { background: #065f46; color: #34d399; border-color: #059669; }
         .box-unit.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
 
-        .btn-zavez { width: 100%; padding: 12px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9rem; text-align: center; }
-        .btn-zavez.last-box-btn { background: #f59e0b; color: #0f172a; animation: pulseAlarm 1.5s infinite; font-size: 0.85rem; }
-
-        /* Tlačítka pro volbu 1. obalu */
-        .first-zavez-container { background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 8px; padding: 8px; margin-top: 6px; }
-        .first-zavez-title { font-size: 0.8rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; text-align: center; text-transform: uppercase; }
-        .zavez-two-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-zavez-choice { padding: 12px 6px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; text-align: center; line-height: 1.3; }
-        .btn-zavez-choice.last-box-btn { background: #f59e0b; color: #0f172a; animation: pulseAlarm 1.5s infinite; }
-        .btn-zavez-choice:active { opacity: 0.8; transform: translateY(1px); }
+        .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-zavez.last-box-btn { background: #f59e0b; animation: pulseAlarm 1.5s infinite; }
 
         #settingsModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -183,7 +169,7 @@
 
         .settings-online-counter {
             background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px;
-            display: flex; justify-content: space-around; text-align: center; font-size: 0.8rem;
+            display: flex; justify-around: space-around; text-align: center; font-size: 0.8rem;
         }
         .online-val-a { color: #3b82f6; font-weight: bold; font-size: 1rem; }
         .online-val-b { color: #a855f7; font-weight: bold; font-size: 1rem; }
@@ -219,9 +205,17 @@
         .update-banner-text { font-size: 0.95rem; color: #f8fafc; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
         .btn-update-ack { width: 100%; padding: 14px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; display: none; }
 
-        .update-banner-box.completed-box { border: 3px solid #10b981; box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4); }
-        .update-banner-box.completed-box .update-banner-title { color: #10b981; }
-        .update-banner-box.completed-box .btn-update-ack { background: #10b981; display: block; }
+        .update-banner-box.completed-box {
+            border: 3px solid #10b981;
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+        .update-banner-box.completed-box .update-banner-title {
+            color: #10b981;
+        }
+        .update-banner-box.completed-box .btn-update-ack {
+            background: #10b981;
+            display: block;
+        }
 
         .vzv-alert-panel { background: #1e293b; border: 1px solid #ef4444; border-radius: 8px; padding: 10px; margin-top: 16px; }
         .vzv-alert-title { font-size: 0.8rem; font-weight: bold; color: #ef4444; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
@@ -231,6 +225,7 @@
         .btn-send-alert { width: 100%; padding: 9px; background: #ef4444; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
 
         .empty { text-align: center; color: #64748b; padding: 12px; font-size: 0.85rem; }
+        .done-msg { background: #065f46; color: #34d399; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
         
         .note-tag { padding: 4px 8px; font-size: 0.75rem; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
         .note-tag.line-1 { background: rgba(59, 130, 246, 0.15); border-left: 3px solid #3b82f6; color: #93c5fd; }
@@ -262,7 +257,6 @@
 </head>
 <body>
 
-    <!-- Overlay aktualizace -->
     <div id="updateBannerOverlay">
         <div class="update-banner-box" id="updateBannerBox">
             <div class="update-banner-title" id="bannerTitle" onclick="openAdminPasswordModal(true)" title="Kliknutím zadat heslo správce">⚠️ UPOZORNĚNÍ NA ÚDRŽBU</div>
@@ -271,7 +265,6 @@
         </div>
     </div>
 
-    <!-- Zadání hesla správce -->
     <div id="adminPasswordModal">
         <div class="admin-pwd-box">
             <div style="font-size: 1rem; font-weight: bold; color: #f59e0b;">🔒 Zadejte heslo správce</div>
@@ -285,7 +278,6 @@
         </div>
     </div>
 
-    <!-- Přihlašovací formulář -->
     <div id="loginScreen">
         <div class="login-box">
             <div class="login-title">⚡ LogiFlow</div>
@@ -302,7 +294,6 @@
         </div>
     </div>
 
-    <!-- Hlavní aplikace -->
     <div id="appScreen">
         <div class="header">
             <div class="logo">⚡ LogiFlow</div>
@@ -313,7 +304,6 @@
             </div>
         </div>
 
-        <!-- Pohled Obsluhy A -->
         <div id="viewA">
             <div id="alertAreaA"></div>
             <div class="lbl">Vyberte Linku</div>
@@ -453,9 +443,8 @@
             <div id="listA"></div>
         </div>
 
-        <!-- Pohled VZV B -->
         <div id="viewB" style="display:none;">
-            <div class="lbl">Přehled linek pro závoz VZV</div>
+            <div class="lbl">Přehled linek</div>
              
             <div id="vzvSensorAlertArea"></div>
 
@@ -489,14 +478,17 @@
                         <option value="Audi / Seat">Audi / Seat</option>
                         <option value="Tayron">Tayron</option>
                     </select>
-                    <input type="number" id="vzvCountInput" class="vzv-num-input" placeholder="zde napiš počet obalů" value="" min="1" max="99">
+                    <input type="number" id="vzvCountInput" class="vzv-num-input" placeholder="zde napiš počet obalu" value="" min="1" max="99">
                 </div>
                 <button class="btn-send-alert" onclick="sendCustomStockAlert()">📢 ODESLAT HLÁŠENÍ OBSLUZE A</button>
+            </div>
+
+            <div id="doneBanner" class="done-msg" style="display:none;">
+                ✓ Vše zpracováno! Čekám na novou objednávku.
             </div>
         </div>
     </div>
 
-    <!-- Nastavení Modal -->
     <div id="settingsModal">
         <div class="settings-box">
             <div class="settings-header">
@@ -530,7 +522,6 @@
         </div>
     </div>
 
-    <!-- JavaScript Logika -->
     <script>
         const firebaseConfig = {
             databaseURL: "https://logiflow-app-default-rtdb.europe-west1.firebasedatabase.app"
@@ -747,7 +738,9 @@
         function sendEmptyReport() {
             let variant = document.getElementById('emptyVariantSelect').value;
             let count = document.getElementById('emptyCountInput').value;
-            if (!count) return;
+            if (!count) {
+                return;
+            }
             let variantAcc = getAccusativeCar(variant);
             vzvVatAlerts.push({
                 id: Date.now() + Math.random(),
@@ -761,8 +754,10 @@
 
         function dismissVzvVatAlert(alertId) {
             let alertObj = vzvVatAlerts.find(a => a.id === alertId);
-            if (alertObj && alertObj.type === 'defect') {
-                if (defectBoxes[alertObj.line]) defectBoxes[alertObj.line][alertObj.box] = false;
+            if (alertObj) {
+                if (alertObj.type === 'defect') {
+                    if (defectBoxes[alertObj.line]) defectBoxes[alertObj.line][alertObj.box] = false;
+                }
             }
             vzvVatAlerts = vzvVatAlerts.filter(a => a.id !== alertId);
             save();
@@ -1105,17 +1100,7 @@
             let ks = curStojany * 12;
             let ob = Math.ceil(ks / 9);
             let note = document.getElementById('noteInput').value.trim();
-            // Pridána vlastnost initialBox pro uchování volby prvního závozu VZV B
-            orders.push({ 
-                id: Date.now(), 
-                line: curLine, 
-                car: curCar, 
-                stojany: curStojany, 
-                total: ob, 
-                done: 0, 
-                initialBox: null, 
-                note: note 
-            });
+            orders.push({ id: Date.now(), line: curLine, car: curCar, stojany: curStojany, total: ob, done: 0, note: note });
             document.getElementById('noteInput').value = '';
             lastOrderCount = orders.length;
             save();
@@ -1132,9 +1117,6 @@
             if (newDone > o.total) newDone = o.total;
             
             o.done = newDone;
-            if (o.done === 0) {
-                o.initialBox = null; // Reset volby prvního boxu při vrácení na začátek
-            }
             o.note = (o.note ? o.note + " | " : "") + "Obsluha A srovnala počet obalů";
             
             if (o.done >= o.total) {
@@ -1148,7 +1130,7 @@
         function sendCustomStockAlert() {
             let variant = document.getElementById('vzvVariantSelect').value;
             let count = document.getElementById('vzvCountInput').value;
-            if (!count) return;
+            if (!count) { return; }
             stockAlerts.push({ id: Date.now(), variant: variant, count: count });
             document.getElementById('vzvCountInput').value = '';
             save();
@@ -1156,15 +1138,16 @@
 
         function dismissAlert(alertId) { stockAlerts = stockAlerts.filter(a => a.id !== alertId); save(); }
 
-        // Hlavní funkce závozu s podporou výběru prvního boxu
+        // HLAVNÍ FUNKCE ZAVÉZT S ULOŽENÍM PRVNÍHO BOXU
         function zavezt(id, chosenBox = null) {
             let o = orders.find(x => x.id === id);
             if (o) {
-                // Pokud jde o 1. obal a byl předán vybraný box
                 if (o.done === 0 && chosenBox !== null) {
-                    o.initialBox = chosenBox;
+                    o.firstBox = parseInt(chosenBox);
                 }
+                
                 o.done++;
+
                 if (o.done >= o.total) { 
                     orders = orders.filter(x => x.id !== id); 
                     lastOrderCount = orders.length; 
@@ -1265,7 +1248,6 @@
                 listA.innerHTML = htmlContent;
             }
 
-            // Vvykreslení VZV pohledu B pro Linku 1 a Linku 2
             [1, 2].forEach(l => {
                 let lOrders = orders.filter(x => x.line === l);
                 let title = document.getElementById(`l${l}Title`);
@@ -1308,51 +1290,45 @@
                                 boxes += `<div class="box-unit ${i <= cur.done ? 'done' : 'pending'}">#${i}</div>`;
                             }
                             
-                            let isLastBox = (cur.done + 1 >= cur.total);
-
-                            // === KLÍČOVÁ ZMĚNA LOGIKY ZÁVOZŮ ===
+                            // 1. POKUD JE TO PRVNÍ OBAL -> DVĚ TLAČÍTKA PRO PRVNÍ ZÁVOZ
                             if (cur.done === 0) {
-                                // 1. Obal: Zobrazíme dvě tlačítka pro volbu prvního boxu
-                                let boxA = (l === 2) ? 1 : 3;
-                                let boxB = (l === 2) ? 2 : 4;
-                                
-                                let btnA_Text = `ZAVEZ DO BOXU ${boxA}`;
-                                let btnB_Text = `ZAVEZ DO BOXU ${boxB}`;
-
-                                if (isLastBox) {
-                                    btnA_Text = `⚠️ POSLEDNÍ OBAL DO BOXU ${boxA}!`;
-                                    btnB_Text = `⚠️ POSLEDNÍ OBAL DO BOXU ${boxB}!`;
-                                }
+                                let btnA = (l === 1) ? '3' : '1';
+                                let btnB = (l === 1) ? '4' : '2';
 
                                 body.innerHTML = `
                                     ${modeAlertHtml}
                                     ${cur.note ? `<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>` : ''}
                                     <div class="boxes-row">${boxes}</div>
-                                    <div class="first-zavez-container">
-                                        <div class="first-zavez-title">Zvolte kam dáte 1. obal:</div>
-                                        <div class="zavez-two-grid">
-                                            <button class="btn-zavez-choice ${isLastBox ? 'last-box-btn' : ''}" onclick="zavezt(${cur.id}, ${boxA})">${btnA_Text}</button>
-                                            <button class="btn-zavez-choice ${isLastBox ? 'last-box-btn' : ''}" onclick="zavezt(${cur.id}, ${boxB})">${btnB_Text}</button>
-                                        </div>
+                                    <div style="font-size:0.8rem; font-weight:bold; color:#f59e0b; margin-bottom:6px; text-align:center;">
+                                        Zvolte, kam dávate 1. obal:
+                                    </div>
+                                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+                                        <button class="btn-zavez" onclick="zavezt(${cur.id}, ${btnA})">ZAVEZ DO BOXU ${btnA}</button>
+                                        <button class="btn-zavez" onclick="zavezt(${cur.id}, ${btnB})">ZAVEZ DO BOXU ${btnB}</button>
                                     </div>
                                 `;
                             } else {
-                                // Od 2. obalu výše: Automatický návazný cyklus podle zvoleného 1. boxu
-                                let firstBox = cur.initialBox || ((l === 2) ? 1 : 3);
-                                let otherBox = (l === 2) ? (firstBox === 1 ? 2 : 1) : (firstBox === 3 ? 4 : 3);
-                                
-                                // Pokud byl 1. obal v prvním boxu, tak 2. obal (cur.done=1) jde do druhého boxu, 3. obal (cur.done=2) do prvního...
-                                let targetBox = (cur.done % 2 === 0) ? firstBox : otherBox;
-
-                                let btnText = '';
-                                let btnClass = 'btn-zavez';
-
-                                if (isLastBox) {
-                                    btnText = `⚠️ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE VÝMĚNA !`;
-                                    btnClass += ' last-box-btn';
+                                // 2. AUTOMATICKÝ CYKLUS OD 2. OBALU DÁLE
+                                let targetBox = '';
+                                if (l === 1) {
+                                    if (cur.firstBox === 3) {
+                                        targetBox = (cur.done % 2 === 0) ? '3' : '4';
+                                    } else {
+                                        targetBox = (cur.done % 2 === 0) ? '4' : '3';
+                                    }
                                 } else {
-                                    btnText = `✓ ZAVEZ DO BOXU ${targetBox} ! POTÉ POTVRĎ !`;
+                                    if (cur.firstBox === 1) {
+                                        targetBox = (cur.done % 2 === 0) ? '1' : '2';
+                                    } else {
+                                        targetBox = (cur.done % 2 === 0) ? '2' : '1';
+                                    }
                                 }
+
+                                let isLastBox = (cur.done + 1 >= cur.total);
+                                let btnText = isLastBox 
+                                    ? `⚠️ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE VÝMĚNA !` 
+                                    : `✓ OBAL ZAVES DO BOXU ${targetBox} ! POTÉ POTVRĎ !`;
+                                let btnClass = 'btn-zavez' + (isLastBox ? ' last-box-btn' : '');
 
                                 body.innerHTML = `
                                     ${modeAlertHtml}
@@ -1377,4 +1353,3 @@
     </script>
 </body>
 </html>
-```
