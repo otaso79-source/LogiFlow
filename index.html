@@ -1402,7 +1402,9 @@
                             }
                         }
 
-                        let modeAlertHtml = isSingle ? `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE: ${singleModeCar[l].toUpperCase()}</div>` : (isTwo ? `<div class="vzv-single-mode-box">⚠️ ${twoVariantPair[l]}</div>` : '');
+                        // Doplněno zobrazení (Box 1 - 2) nebo (Box 3 - 4) k žlutému výstražnému boxu
+                        let boxRangeText = (l === 1) ? '(Box 3 - 4)' : '(Box 1 - 2)';
+                        let modeAlertHtml = isSingle ? `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE: ${singleModeCar[l].toUpperCase()} ${boxRangeText}</div>` : (isTwo ? `<div class="vzv-single-mode-box">⚠️ ${twoVariantPair[l]} ${boxRangeText}</div>` : '');
 
                         if (isSingle || isTwo) {
                             body.innerHTML = modeAlertHtml + '<div class="empty" style="color:#fbbf24; font-weight:bold;">Režim je aktivní na lince</div>';
