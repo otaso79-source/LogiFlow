@@ -1555,9 +1555,13 @@
             let listA = document.getElementById('listA');
             if (listA) {
                 let htmlContent = '';
+                let currentRole = sessionStorage.getItem('active_role') || 'L1';
                 
-                // Obě linky (Linka 1 i Linka 2) se nyní zobrazují společně na obou zařízeních
-                let linesToRender = [1, 2];
+                // Opraveno: Filtr pro zobrazení podle přihlášené role (L1 uvidí jen linku 1, L2 jen linku 2, L12 a VZV obě)
+                let linesToRender = [];
+                if (currentRole === 'L1') linesToRender = [1];
+                else if (currentRole === 'L2') linesToRender = [2];
+                else linesToRender = [1, 2];
 
                 linesToRender.forEach(l => {
                     let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
