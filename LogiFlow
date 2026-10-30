@@ -22,23 +22,23 @@
         .login-title { font-size: 1.4rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; }
         .login-sub { font-size: 0.8rem; color: #94a3b8; margin-bottom: 16px; }
         
+        .login-section-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
+        .login-section-btn { padding: 10px 4px; font-size: 0.85rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
+        .login-section-btn.active-section { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
+
         .login-mode-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
-        .login-mode-btn { padding: 10px 4px; font-size: 0.85rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
-        .login-mode-btn.active-section { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
+        .login-mode-btn { padding: 10px 4px; font-size: 0.8rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
+        .login-mode-btn.active-l1 { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
+        .login-mode-btn.active-l2 { background: #312e81; border-color: #6366f1; color: #fff; }
+        .login-mode-btn.active-l12 { background: #065f46; border-color: #10b981; color: #fff; }
+        .login-mode-btn.active-vzv { background: #581c87; border-color: #a855f7; color: #fff; }
 
         .login-input {
             width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
-            border-radius: 8px; color: #fff; font-size: 1.1rem; text-align: center;
-            margin-bottom: 12px; outline: none;
+            border-radius: 8px; color: #fff; font-size: 1.2rem; text-align: center;
+            letter-spacing: 4px; margin-bottom: 12px; outline: none;
         }
         .login-input:focus { border-color: #f59e0b; }
-        
-        select.login-input {
-            text-align-last: center;
-            letter-spacing: normal;
-            font-size: 1rem;
-        }
-
         .btn-login {
             width: 100%; padding: 12px; background: #f59e0b; color: #0f172a;
             border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;
@@ -381,16 +381,17 @@
             <div class="login-title">⚡ LogiFlow</div>
             <div class="login-sub" id="loginSubText">Zvolte sekci a pracovníka</div>
             
-            <div class="login-mode-select">
-                <button type="button" id="loginSecVyroba" class="login-mode-btn active-section" onclick="setLoginSection('Vyroba')">Výroba</button>
-                <button type="button" id="loginSecVzv" class="login-mode-btn" onclick="setLoginSection('VZV')">VZV</button>
+            <div class="login-section-select">
+                <button type="button" id="loginSecVyroba" class="login-section-btn active-section" onclick="setLoginSection('Vyroba')">Výroba</button>
+                <button type="button" id="loginSecVzv" class="login-section-btn" onclick="setLoginSection('VZV')">VZV</button>
             </div>
 
-            <select id="loginRoleSelect" class="login-input">
-                <option value="L1">Linka 1</option>
-                <option value="L2">Linka 2</option>
-                <option value="L12">Linka 1-2</option>
-            </select>
+            <div class="login-mode-select" id="loginRoleContainer">
+                <button type="button" id="loginBtnL1" class="login-mode-btn active-l1" onclick="setLoginMode('L1')">Linka 1</button>
+                <button type="button" id="loginBtnL2" class="login-mode-btn" onclick="setLoginMode('L2')">Linka 2</button>
+                <button type="button" id="loginBtnL12" class="login-mode-btn" onclick="setLoginMode('L12')">Linka 1-2</button>
+                <button type="button" id="loginBtnVZV" class="login-mode-btn" style="display:none;" onclick="setLoginMode('VZV')">VZV</button>
+            </div>
 
             <input type="password" id="passInput" class="login-input" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
             <button class="btn-login" type="button" onclick="checkPassword()">VSTOUPIT DO SYSTÉMU</button>
@@ -709,6 +710,7 @@
         let lastOrderCount = 0;
         let lastVzvAlertCount = 0;
         let selectedSection = 'Vyroba';
+        let selectedLoginMode = 'L1';
         let expandedOrderId = null;
 
         let folderOpenState = { 1: false, 2: false };
@@ -1158,31 +1160,47 @@
             selectedSection = section;
             const btnVyroba = document.getElementById('loginSecVyroba');
             const btnVzv = document.getElementById('loginSecVzv');
-            const roleSelect = document.getElementById('loginRoleSelect');
+            const btnL1 = document.getElementById('loginBtnL1');
+            const btnL2 = document.getElementById('loginBtnL2');
+            const btnL12 = document.getElementById('loginBtnL12');
+            const btnVZV = document.getElementById('loginBtnVZV');
 
-            btnVyroba.className = 'login-mode-btn ' + (section === 'Vyroba' ? 'active-section' : '');
-            btnVzv.className = 'login-mode-btn ' + (section === 'VZV' ? 'active-section' : '');
+            btnVyroba.className = 'login-section-btn ' + (section === 'Vyroba' ? 'active-section' : '');
+            btnVzv.className = 'login-section-btn ' + (section === 'VZV' ? 'active-section' : '');
 
-            roleSelect.innerHTML = '';
             if (section === 'Vyroba') {
-                roleSelect.innerHTML = `
-                    <option value="L1">Linka 1</option>
-                    <option value="L2">Linka 2</option>
-                    <option value="L12">Linka 1-2</option>
-                `;
+                btnL1.style.display = 'block';
+                btnL2.style.display = 'block';
+                btnL12.style.display = 'block';
+                btnVZV.style.display = 'none';
+                setLoginMode('L1');
             } else {
-                roleSelect.innerHTML = `
-                    <option value="VZV">VZV</option>
-                `;
+                btnL1.style.display = 'none';
+                btnL2.style.display = 'none';
+                btnL12.style.display = 'none';
+                btnVZV.style.display = 'block';
+                setLoginMode('VZV');
             }
+        }
+
+        function setLoginMode(mode) {
+            selectedLoginMode = mode;
+            const btnL1 = document.getElementById('loginBtnL1');
+            const btnL2 = document.getElementById('loginBtnL2');
+            const btnL12 = document.getElementById('loginBtnL12');
+            const btnVZV = document.getElementById('loginBtnVZV');
+
+            btnL1.className = 'login-mode-btn ' + (mode === 'L1' ? 'active-l1' : '');
+            btnL2.className = 'login-mode-btn ' + (mode === 'L2' ? 'active-l2' : '');
+            btnL12.className = 'login-mode-btn ' + (mode === 'L12' ? 'active-l12' : '');
+            btnVZV.className = 'login-mode-btn ' + (mode === 'VZV' ? 'active-vzv' : '');
         }
 
         function checkPassword() {
             const input = document.getElementById('passInput').value;
-            const roleSelectVal = document.getElementById('loginRoleSelect').value;
             if (input === SYSTEM_PASSWORD) {
                 sessionStorage.setItem('device_authenticated', 'true');
-                sessionStorage.setItem('active_role', roleSelectVal);
+                sessionStorage.setItem('active_role', selectedLoginMode);
                 document.getElementById('loginError').style.display = 'none';
                 updatePresence();
                 showApp();
@@ -1205,7 +1223,7 @@
         function showApp() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appScreen').style.display = 'block';
-            let role = sessionStorage.getItem('active_role') || 'L1';
+            let role = sessionStorage.getItem('active_role') || selectedLoginMode || 'L1';
             
             let badge = document.getElementById('roleBadge');
             let lineSelectContainer = document.getElementById('lineSelectContainer');
