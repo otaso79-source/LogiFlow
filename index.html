@@ -27,11 +27,11 @@
         .login-section-btn.active-section { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
 
         .login-mode-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
-        .login-mode-btn { padding: 10px 4px; font-size: 0.8rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
+        .login-mode-btn { padding: 10px 8px; font-size: 0.8rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
         .login-mode-btn.active-l1 { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
         .login-mode-btn.active-l2 { background: #312e81; border-color: #6366f1; color: #fff; }
-        .login-mode-btn.active-l12 { background: #065f46; border-color: #10b981; color: #fff; }
-        .login-mode-btn.active-vzv { background: #581c87; border-color: #a855f7; color: #fff; }
+        .login-mode-btn.active-l12 { background: #065f46; border-color: #10b981; color: #fff; grid-column: span 2; }
+        .login-mode-btn.active-vzv { background: #581c87; border-color: #a855f7; color: #fff; grid-column: span 2; }
 
         .login-input {
             width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
@@ -389,8 +389,8 @@
             <div class="login-mode-select" id="loginRoleContainer">
                 <button type="button" id="loginBtnL1" class="login-mode-btn active-l1" onclick="setLoginMode('L1')">Linka 1</button>
                 <button type="button" id="loginBtnL2" class="login-mode-btn" onclick="setLoginMode('L2')">Linka 2</button>
-                <button type="button" id="loginBtnL12" class="login-mode-btn" onclick="setLoginMode('L12')">Linka 1-2</button>
-                <button type="button" id="loginBtnVZV" class="login-mode-btn" style="display:none;" onclick="setLoginMode('VZV')">VZV</button>
+                <button type="button" id="loginBtnL12" class="login-mode-btn active-l12" onclick="setLoginMode('L12')">Linka 1-2</button>
+                <button type="button" id="loginBtnVZV" class="login-mode-btn active-vzv" style="display:none;" onclick="setLoginMode('VZV')">VZV</button>
             </div>
 
             <input type="password" id="passInput" class="login-input" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
