@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -146,6 +147,10 @@
 
         .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-zavez.last-box-btn { background: #f59e0b; animation: pulseAlarm 1.5s infinite; }
+        
+        .zavez-two-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+        .btn-zavez-choice { padding: 12px 6px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; text-align: center; }
+        .btn-zavez-choice:active { opacity: 0.8; }
 
         #settingsModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -169,7 +174,7 @@
 
         .settings-online-counter {
             background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px;
-            display: flex; justify-content: space-around; text-align: center; font-size: 0.8rem;
+            display: flex; justify-around: space-around; text-align: center; font-size: 0.8rem;
         }
         .online-val-a { color: #3b82f6; font-weight: bold; font-size: 1rem; }
         .online-val-b { color: #a855f7; font-weight: bold; font-size: 1rem; }
@@ -1100,7 +1105,7 @@
             let ks = curStojany * 12;
             let ob = Math.ceil(ks / 9);
             let note = document.getElementById('noteInput').value.trim();
-            orders.push({ id: Date.now(), line: curLine, car: curCar, stojany: curStojany, total: ob, done: 0, note: note });
+            orders.push({ id: Date.now(), line: curLine, car: curCar, stojany: curStojany, total: ob, done: 0, initialBox: null, note: note });
             document.getElementById('noteInput').value = '';
             lastOrderCount = orders.length;
             save();
@@ -1117,6 +1122,9 @@
             if (newDone > o.total) newDone = o.total;
             
             o.done = newDone;
+            if (o.done === 0) {
+                o.initialBox = null;
+            }
             o.note = (o.note ? o.note + " | " : "") + "Obsluha A srovnala počet obalů";
             
             if (o.done >= o.total) {
@@ -1138,9 +1146,12 @@
 
         function dismissAlert(alertId) { stockAlerts = stockAlerts.filter(a => a.id !== alertId); save(); }
 
-        function zavezt(id) {
+        function zavezt(id, chosenBox) {
             let o = orders.find(x => x.id === id);
             if (o) {
+                if (o.done === 0 && chosenBox) {
+                    o.initialBox = chosenBox;
+                }
                 o.done++;
                 if (o.done >= o.total) { orders = orders.filter(x => x.id !== id); lastOrderCount = orders.length; }
                 save();
@@ -1281,27 +1292,39 @@
                                 boxes += `<div class="box-unit ${i <= cur.done ? 'done' : 'pending'}">#${i}</div>`;
                             }
                             
-                            // Automatický výpočet boxu dle aktuálního progresu obalů
-                            let targetBox = '';
-                            if (l === 2) {
-                                targetBox = (cur.done % 2 === 0) ? '1' : '2';
-                            } else {
-                                targetBox = (cur.done % 2 === 0) ? '3' : '4';
-                            }
-
-                            // Zjištění, zda jde o poslední obal této objednávky (např. 4. z 4 obalů)
                             let isLastBox = (cur.done + 1 >= cur.total);
-                            let btnText = '';
-                            let btnClass = 'btn-zavez';
 
-                            if (isLastBox) {
-                                btnText = `⚠️ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE VÝMĚNA !`;
-                                btnClass += ' last-box-btn';
+                            if (cur.done === 0) {
+                                // 1. Obal: Zobrazit dvě tlačítka pro volbu prvního boxu
+                                let boxA = (l === 2) ? 1 : 3;
+                                let boxB = (l === 2) ? 2 : 4;
+                                
+                                body.innerHTML = `${modeAlertHtml}${cur.note ? `<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>` : ''}
+                                    <div class="boxes-row">${boxes}</div>
+                                    <div style="font-size:0.8rem; font-weight:bold; color:#f59e0b; margin-bottom:4px; text-align:center;">ZVOLTE 1. ZÁVOZ:</div>
+                                    <div class="zavez-two-btns">
+                                        <button class="btn-zavez-choice ${isLastBox ? 'last-box-btn' : ''}" onclick="zavezt(${cur.id}, ${boxA})">ZAVEZ DO BOXU ${boxA}</button>
+                                        <button class="btn-zavez-choice ${isLastBox ? 'last-box-btn' : ''}" onclick="zavezt(${cur.id}, ${boxB})">ZAVEZ DO BOXU ${boxB}</button>
+                                    </div>`;
                             } else {
-                                btnText = `✓ OBAL ZAVES DO BOXU ${targetBox} ! POTÉ POTVRĎ !`;
-                            }
+                                // Automatický výpočet návazného boxu dle první volby
+                                let firstBox = cur.initialBox || ((l === 2) ? 1 : 3);
+                                let otherBox = (l === 2) ? (firstBox === 1 ? 2 : 1) : (firstBox === 3 ? 4 : 3);
+                                
+                                let targetBox = (cur.done % 2 === 0) ? firstBox : otherBox;
 
-                            body.innerHTML = `${modeAlertHtml}${cur.note ? `<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>` : ''}<div class="boxes-row">${boxes}</div><button class="${btnClass}" onclick="zavezt(${cur.id})">${btnText}</button>`;
+                                let btnText = '';
+                                let btnClass = 'btn-zavez';
+
+                                if (isLastBox) {
+                                    btnText = `⚠️ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE VÝMĚNA !`;
+                                    btnClass += ' last-box-btn';
+                                } else {
+                                    btnText = `✓ ZAVEZ DO BOXU ${targetBox} ! POTÉ POTVRĎ !`;
+                                }
+
+                                body.innerHTML = `${modeAlertHtml}${cur.note ? `<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>` : ''}<div class="boxes-row">${boxes}</div><button class="${btnClass}" onclick="zavezt(${cur.id})">${btnText}</button>`;
+                            }
                         }
                     }
                 }
@@ -1318,3 +1341,4 @@
     </script>
 </body>
 </html>
+```
