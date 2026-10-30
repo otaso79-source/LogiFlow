@@ -28,6 +28,11 @@
         }
         .login-select:focus { border-color: #f59e0b; }
 
+        .login-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+        .btn-login-tab { padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; border: 1px solid #334155; background: #0f172a; color: #94a3b8; cursor: pointer; }
+        .btn-login-tab.active-vyroba { border-color: #3b82f6; background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .btn-login-tab.active-vzv { border-color: #a855f7; background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+
         .login-input {
             width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
             border-radius: 8px; color: #fff; font-size: 1.2rem; text-align: center;
@@ -54,11 +59,12 @@
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-settings { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-        .line-select { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-        .line-btn { padding: 10px 6px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.75rem; line-height: 1.3; }
+        .line-select { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+        .line-btn { padding: 10px 4px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.7rem; line-height: 1.3; }
         
         .line-btn.active-1 { border-color: #3b82f6; color: #fff; background: #1e3a8a; }
         .line-btn.active-2 { border-color: #a855f7; color: #fff; background: #581c87; }
+        .line-btn.active-12 { border-color: #10b981; color: #fff; background: #065f46; }
 
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
@@ -373,15 +379,20 @@
         </div>
     </div>
 
-    <!-- Přihlašovací obrazovka s výběrem uživatele -->
+    <!-- Přihlašovací obrazovka s volbou Výroba | VZV -->
     <div id="loginScreen">
         <div class="login-box">
             <div class="login-title">⚡ LogiFlow</div>
-            <div class="login-sub">Zvolte pracovníka a zadejte heslo</div>
+            <div class="login-sub">Zvolte pracovníka a sekci</div>
             
             <select id="workerSelect" class="login-select" onchange="onWorkerSelectChange()">
                 <!-- Naplní se dynamicky ze seznamu pracovníků -->
             </select>
+
+            <div class="login-tabs">
+                <button class="btn-login-tab active-vyroba" id="loginTabVyroba" onclick="setLoginSection('VYROBA')">Výroba</button>
+                <button class="btn-login-tab" id="loginTabVzv" onclick="setLoginSection('VZV')">VZV</button>
+            </div>
 
             <input type="password" id="passInput" class="login-input" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
             <button class="btn-login" type="button" onclick="checkPassword()">VSTOUPIT DO SYSTÉMU</button>
@@ -403,8 +414,9 @@
             <div id="alertAreaA"></div>
             <div class="lbl" id="lineSelectContainerLbl">Vyberte Linku</div>
             <div class="line-select" id="lineSelectContainer">
-                <div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1<br><span style="font-size:0.65rem; font-weight:normal;">BOX 4 - 3</span></div>
-                <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.65rem; font-weight:normal;">BOX 2 - 1</span></div>
+                <div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1<br><span style="font-size:0.6rem; font-weight:normal;">BOX 4 - 3</span></div>
+                <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.6rem; font-weight:normal;">BOX 2 - 1</span></div>
+                <div class="line-btn" id="lBtn12" onclick="setLine('1-2')">LINKA 1-2<br><span style="font-size:0.6rem; font-weight:normal;">Všechny</span></div>
             </div>
 
             <div class="accordion-wrapper" id="modesAccordionWrapper">
@@ -682,7 +694,6 @@
                 <button class="btn-close" onclick="closeWorkersManager()">✕</button>
             </div>
             
-            <!-- Změna hesla výhradně v administraci správce přes původní heslo -->
             <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #38bdf8; margin-bottom:12px;">
                 <div style="font-size:0.85rem; font-weight:bold; color:#38bdf8; margin-bottom:6px;">🔑 Změna mého hesla (Administrátor):</div>
                 <input type="password" id="oldPassInput" placeholder="Původní heslo" class="admin-pwd-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
@@ -690,7 +701,7 @@
                 <button class="btn-admin-action btn-admin-ok" onclick="changeMyPassword()" style="width:100%; padding:8px;">Změnit heslo</button>
             </div>
 
-            <div class="lbl" style="color:#f59e0b; margin-top:0;">🟢 Aktivní přihlášení uživatelé (kontrola proti domovu):</div>
+            <div class="lbl" style="color:#f59e0b; margin-top:0;">🟢 Aktivní přihlášení uživatelé:</div>
             <div id="activeSessionsContainer" style="max-height:120px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px; background:#0f172a; padding:8px; border-radius:8px; border:1px solid #334155;">
                 <!-- Načte se dynamicky -->
             </div>
@@ -699,16 +710,14 @@
             <div id="workersListContainer" style="max-height:140px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px;"></div>
             
             <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px dashed #f59e0b; margin-bottom:10px;">
-                <div style="font-size:0.8rem; font-weight:bold; color:#f59e0b; margin-bottom:6px;">➕ Přidat nového uživatele (výběr rolí):</div>
-                <input type="text" id="newWorkerName" placeholder="Jméno (např. Ota / VZV 1)" class="login-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
+                <div style="font-size:0.8rem; font-weight:bold; color:#f59e0b; margin-bottom:6px;">➕ Přidat nového uživatele (oprávnění):</div>
+                <input type="text" id="newWorkerName" placeholder="Jméno (např. Ota)" class="login-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
                 <input type="text" id="newWorkerPass" placeholder="Heslo" class="login-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
                 
                 <div style="background:#1e293b; padding:8px; border-radius:6px; margin-bottom:8px; border:1px solid #334155; text-align:left;">
-                    <div style="font-size:0.75rem; color:#94a3b8; font-weight:bold; margin-bottom:4px;">Povolit role / oprávnění:</div>
-                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="L1"> Linka 1</label>
-                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="L2"> Linka 2</label>
-                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="L12"> Linka 1-2</label>
-                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="VZV"> VZV</label>
+                    <div style="font-size:0.75rem; color:#94a3b8; font-weight:bold; margin-bottom:4px;">Povolit sekce:</div>
+                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="VYROBA"> Výroba (Linka 1, 2, 1-2)</label>
+                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="VZV"> VZV (Závozy)</label>
                     <label style="display:block; font-size:0.8rem; margin-bottom:3px; color:#fbbf24;"><input type="checkbox" class="role-chk" value="ADMIN"> Administrator (Neviditelný)</label>
                 </div>
 
@@ -725,8 +734,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let ADMIN_PASSWORD = '704517'; // Výchozí heslo správce pro nouzový vstup
-        
+        let ADMIN_PASSWORD = '704517';
         let workers = [];
 
         let notificationsEnabled = true;
@@ -756,6 +764,8 @@
         let expandedOrderId = null;
         let folderOpenState = { 1: false, 2: false };
 
+        let selectedLoginSection = 'VYROBA'; // Výchozí přihlašovací záložka
+
         let deviceId = sessionStorage.getItem('device_id');
         if (!deviceId) {
             deviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
@@ -779,13 +789,13 @@
                     adminObj = workers.find(w => w.role && w.role.includes('ADMIN'));
                 }
                 if (!adminObj) {
-                    workers.push({ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'ADMIN' });
+                    workers.push({ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'VYROBA,VZV,ADMIN' });
                     db.ref('workers').set(workers);
                 } else {
                     ADMIN_PASSWORD = adminObj.pass;
                 }
             } else {
-                workers = [{ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'ADMIN' }];
+                workers = [{ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'VYROBA,VZV,ADMIN' }];
                 db.ref('workers').set(workers);
                 ADMIN_PASSWORD = '704517';
             }
@@ -803,17 +813,26 @@
         }
 
         function getRoleName(role) {
+            if (!role) return '';
             let parts = role.split(',').map(r => r.trim());
             let names = [];
             parts.forEach(r => {
-                if (r === 'L1') names.push('Linka 1');
-                else if (r === 'L2') names.push('Linka 2');
-                else if (r === 'L12') names.push('Linka 1-2');
+                if (r === 'VYROBA') names.push('Výroba');
                 else if (r === 'VZV') names.push('VZV');
                 else if (r === 'ADMIN') names.push('Administrator');
                 else names.push(r);
             });
             return names.join(' + ');
+        }
+
+        function setLoginSection(section) {
+            selectedLoginSection = section;
+            let btnVyroba = document.getElementById('loginTabVyroba');
+            let btnVzv = document.getElementById('loginTabVzv');
+            if (btnVyroba && btnVzv) {
+                btnVyroba.className = 'btn-login-tab ' + (section === 'VYROBA' ? 'active-vyroba' : '');
+                btnVzv.className = 'btn-login-tab ' + (section === 'VZV' ? 'active-vzv' : '');
+            }
         }
 
         function onWorkerSelectChange() {
@@ -863,7 +882,7 @@
                         let timeStr = new Date(info.timestamp).toLocaleTimeString();
                         html += `
                             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; border-bottom:1px solid #334155; padding-bottom:4px; margin-bottom:4px;">
-                                <div><b>${info.worker}</b> [${getRoleName(info.role)}] <br><span style="color:#94a3b8;">Od: ${timeStr}</span></div>
+                                <div><b>${info.worker}</b> [${info.section}] <br><span style="color:#94a3b8;">Od: ${timeStr}</span></div>
                                 <button class="btn-delete" style="background:rgba(239,68,68,0.3); color:#ef4444; width:auto; padding:2px 6px; font-size:0.7rem;" onclick="forceLogoutDevice('${devId}')">Odhlásit</button>
                             </div>
                         `;
@@ -894,7 +913,7 @@
                 return;
             }
             if (checkedRoles.length === 0) {
-                alert('Zvolte alespoň jednu roli / oprávnění!');
+                alert('Zvolte alespoň jednu sekci / roli!');
                 return;
             }
 
@@ -944,7 +963,7 @@
 
             w.pass = newP;
             db.ref('workers').set(workers);
-            if (w.name === 'Administrator' || w.role.includes('ADMIN')) {
+            if (w.name === 'Administrator' || (w.role && w.role.includes('ADMIN'))) {
                 ADMIN_PASSWORD = newP;
             }
             document.getElementById('oldPassInput').value = '';
@@ -1002,14 +1021,15 @@
         function updatePresence() {
             let isAuth = sessionStorage.getItem('device_authenticated') === 'true';
             if (isAuth) {
-                let role = sessionStorage.getItem('active_role') || 'L1';
+                let section = sessionStorage.getItem('active_section') || 'VYROBA';
                 let workerName = sessionStorage.getItem('active_worker') || 'Neznámý';
+                let role = sessionStorage.getItem('active_role') || '';
                 
                 if (role.includes('ADMIN')) {
                     db.ref('presence/' + deviceId).remove();
                 } else {
                     db.ref('presence/' + deviceId).set({
-                        role: role,
+                        section: section,
                         worker: workerName,
                         timestamp: firebase.database.ServerValue.TIMESTAMP
                     });
@@ -1032,9 +1052,9 @@
             let now = Date.now();
 
             Object.values(data).forEach(item => {
-                if (item && item.timestamp && (now - item.timestamp < 15000) && (!item.role || !item.role.includes('ADMIN'))) {
-                    if (item.role !== 'VZV') countA++;
-                    if (item.role === 'VZV' || (item.role && item.role.includes('VZV'))) countB++;
+                if (item && item.timestamp && (now - item.timestamp < 15000)) {
+                    if (item.section === 'VYROBA') countA++;
+                    if (item.section === 'VZV') countB++;
                 }
             });
 
@@ -1414,13 +1434,32 @@
 
             let worker = workers.find(w => w.name === workerName);
             if (worker && worker.pass === inputPass) {
+                let role = worker.role || '';
+                let isAdmin = role.includes('ADMIN');
+
+                if (!isAdmin) {
+                    if (selectedLoginSection === 'VYROBA' && !role.includes('VYROBA')) {
+                        document.getElementById('loginError').innerText = '⚠️ Nemáte oprávnění pro Výrobu!';
+                        document.getElementById('loginError').style.display = 'block';
+                        return;
+                    }
+                    if (selectedLoginSection === 'VZV' && !role.includes('VZV')) {
+                        document.getElementById('loginError').innerText = '⚠️ Nemáte oprávnění pro VZV!';
+                        document.getElementById('loginError').style.display = 'block';
+                        return;
+                    }
+                }
+
                 sessionStorage.setItem('device_authenticated', 'true');
-                sessionStorage.setItem('active_role', worker.role);
+                sessionStorage.setItem('active_role', role);
                 sessionStorage.setItem('active_worker', worker.name);
+                sessionStorage.setItem('active_section', isAdmin ? selectedLoginSection : (selectedLoginSection === 'VZV' ? 'VZV' : 'VYROBA'));
+                
                 document.getElementById('loginError').style.display = 'none';
                 updatePresence();
                 showApp();
             } else {
+                document.getElementById('loginError').innerText = '⚠️ Nesprávné heslo! Zkuste to znovu.';
                 document.getElementById('loginError').style.display = 'block';
             }
         }
@@ -1430,6 +1469,7 @@
             sessionStorage.removeItem('device_authenticated');
             sessionStorage.removeItem('active_role');
             sessionStorage.removeItem('active_worker');
+            sessionStorage.removeItem('active_section');
             document.getElementById('passInput').value = '';
             document.getElementById('loginError').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
@@ -1440,47 +1480,36 @@
         function showApp() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appScreen').style.display = 'block';
-            let role = sessionStorage.getItem('active_role') || 'L1';
+            let role = sessionStorage.getItem('active_role') || '';
             let workerName = sessionStorage.getItem('active_worker') || '';
+            let section = sessionStorage.getItem('active_section') || 'VYROBA';
             
             let badge = document.getElementById('roleBadge');
             let lineSelectContainer = document.getElementById('lineSelectContainer');
             let lineSelectContainerLbl = document.getElementById('lineSelectContainerLbl');
 
-            if (role.includes('ADMIN')) {
-                curLine = 1;
-                badge.innerText = workerName + ' (Správce)';
-                badge.className = 'role-badge admin';
-                if (lineSelectContainer) lineSelectContainer.style.display = 'grid';
-                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'block';
-            } else if (role === 'VZV' || role === 'vzv') {
+            if (section === 'VZV') {
                 badge.innerText = workerName + ' (VZV)';
                 badge.className = 'role-badge vzv';
-            } else if (role.includes('L12') || (role.includes('L1') && role.includes('L2'))) {
-                curLine = 1;
-                badge.innerText = workerName + ' (Všechny linky)';
-                badge.className = 'role-badge l12';
+            } else {
+                if (role.includes('ADMIN')) {
+                    badge.innerText = workerName + ' (Správce)';
+                    badge.className = 'role-badge admin';
+                } else {
+                    badge.innerText = workerName + ' (Výroba)';
+                    badge.className = 'role-badge l12';
+                }
                 if (lineSelectContainer) lineSelectContainer.style.display = 'grid';
                 if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'block';
-            } else if (role.includes('L2')) {
-                curLine = 2;
-                badge.innerText = workerName + ' (Linka 2)';
-                badge.className = 'role-badge l2';
-                if (lineSelectContainer) lineSelectContainer.style.display = 'none';
-                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'none';
-            } else {
-                curLine = 1;
-                badge.innerText = workerName + ' (Linka 1)';
-                badge.className = 'role-badge';
-                if (lineSelectContainer) lineSelectContainer.style.display = 'none';
-                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'none';
             }
 
-            let isVzvOnly = (role === 'VZV' || (role.includes('VZV') && !role.includes('L1') && !role.includes('L2') && !role.includes('L12')));
+            let isVzvOnly = (section === 'VZV');
             document.getElementById('viewA').style.display = !isVzvOnly ? 'block' : 'none';
             document.getElementById('viewB').style.display = isVzvOnly ? 'block' : 'none';
 
-            setLine(curLine);
+            if (!isVzvOnly) {
+                setLine(curLine);
+            }
             render();
         }
 
@@ -1489,6 +1518,7 @@
             showApp();
         } else {
             renderWorkersDropdown();
+            setLoginSection('VYROBA');
         }
 
         function toggleNotifications(enable) {
@@ -1549,6 +1579,7 @@
         }
 
         function toggleSingleMode(enable) {
+            if (curLine === '1-2') return;
             singleModeLines[curLine] = enable;
             if (enable) {
                 twoVariantModeLines[curLine] = false;
@@ -1563,6 +1594,7 @@
         }
 
         function toggleTwoVariantMode(enable) {
+            if (curLine === '1-2') return;
             twoVariantModeLines[curLine] = enable;
             if (enable) {
                 singleModeLines[curLine] = false;
@@ -1577,12 +1609,14 @@
         }
 
         function setSingleCar(car, el) { 
+            if (curLine === '1-2') return;
             singleModeCar[curLine] = car; 
             save(); 
             updateDynamicTheme(); 
             triggerNotification("Změna režimu", "Změněna varianta");
         }
         function setTwoPair(pair, el) { 
+            if (curLine === '1-2') return;
             twoVariantPair[curLine] = pair; 
             save(); 
             updateDynamicTheme(); 
@@ -1590,6 +1624,7 @@
         }
 
         function updateDynamicTheme() {
+            if (curLine === '1-2') return;
             let activeClass = curLine === 1 ? 'selected-1' : 'selected-2';
             let panelClass = curLine === 1 ? 'single-mode-panel line-1' : 'single-mode-panel line-2';
             let selectorBoxClass = curLine === 1 ? 'mode-selector-box line-1 active' : 'mode-selector-box line-2 active';
@@ -1681,18 +1716,30 @@
         }
 
         function setLine(l) {
-            let role = sessionStorage.getItem('active_role') || '';
-            if (!role.includes('ADMIN') && !role.includes('L12')) {
-                if (role.includes('L1') && l !== 1) l = 1;
-                if (role.includes('L2') && l !== 2) l = 2;
-            }
             curLine = l;
 
             let btn1 = document.getElementById('lBtn1');
             let btn2 = document.getElementById('lBtn2');
+            let btn12 = document.getElementById('lBtn12');
             if(btn1) btn1.className = 'line-btn ' + (curLine===1?'active-1':'');
             if(btn2) btn2.className = 'line-btn ' + (curLine===2?'active-2':'');
-            updateDynamicTheme();
+            if(btn12) btn12.className = 'line-btn ' + (curLine==='1-2'?'active-12':'');
+
+            let modesWrapper = document.getElementById('modesAccordionWrapper');
+            let sensorWrapper = document.getElementById('sensorAccordionHeader').parentElement;
+            let standardSec = document.getElementById('standardOrderSection');
+
+            if (l === '1-2') {
+                if (modesWrapper) modesWrapper.style.display = 'none';
+                if (sensorWrapper) sensorWrapper.style.display = 'none';
+                if (standardSec) standardSec.style.display = 'none';
+            } else {
+                if (modesWrapper) modesWrapper.style.display = 'block';
+                if (sensorWrapper) sensorWrapper.style.display = 'block';
+                if (standardSec) standardSec.style.display = 'block';
+                updateDynamicTheme();
+            }
+            render();
         }
 
         function setCar(c, el) { curCar = c; updateDynamicTheme(); }
@@ -1710,6 +1757,7 @@
         }
 
         function addOrder() {
+            if (curLine === '1-2') return;
             let ks = curStojany * 12;
             let ob = Math.ceil(ks / 9);
             let noteInput = document.getElementById('noteInput');
@@ -1841,7 +1889,7 @@
             let listA = document.getElementById('listA');
             if (listA) {
                 let htmlContent = '';
-                let linesToRender = [1, 2];
+                let linesToRender = curLine === '1-2' ? [1, 2] : [curLine];
 
                 linesToRender.forEach(l => {
                     let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
@@ -2033,7 +2081,9 @@
                     }
                 }
             });
-            updateDynamicTheme();
+            if (curLine !== '1-2') {
+                updateDynamicTheme();
+            }
         }
 
         function clearAllRepeatBoxes() {
