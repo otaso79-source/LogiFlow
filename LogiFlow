@@ -469,7 +469,7 @@
                         </div>
 
                         <div id="reportSubDiff" style="display:none;">
-                            <div class="repeat-title" style="margin-top:4px; color:#f59e0b;">Obal se neshoduje s variantou (vyberte box a variantu):</div>
+                            <div class="repeat-title" style="margin-top:4px; color:#f59e0b;">Obal se neshoduje s variantou (vyberte box a správnou variantu):</div>
                             <div class="diff-box-grid">
                                 <div class="diff-box-col" id="diffColBox4">
                                     <div class="diff-box-title">Box 4</div>
@@ -867,7 +867,7 @@
                     line: curLine,
                     box: boxNum,
                     type: 'diff',
-                    text: `Na lince ${curLine}, Box #${boxNum}: Obal se neshoduje! Je zde jiný obal (${carName}).`
+                    text: `Na lince ${curLine}, boxu #${boxNum}: Obal neodpovídá zvolené variantě.<br>ZAVEZ SPRÁVNÝ OBAL: ${carName}`
                 });
             }
             save();
@@ -1392,7 +1392,7 @@
                 vzvVatAlerts.forEach(v => {
                     vatHtml += `
                         <div class="vzv-sensor-alert" style="margin-bottom:8px;">
-                            <div class="vzv-sensor-title">⚠️ Upozornění od obsluhy A</div>
+                            <div class="vzv-sensor-title">⚠️ UPOZORNĚNÍ OD OBSLUHY A</div>
                             <div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">${v.text}</div>
                             <button class="btn-resolve-sensor" onclick="dismissVzvVatAlert(${v.id})">✓ OK / POTVRĎ</button>
                         </div>
