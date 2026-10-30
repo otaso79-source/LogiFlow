@@ -22,6 +22,11 @@
         .login-title { font-size: 1.4rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; }
         .login-sub { font-size: 0.8rem; color: #94a3b8; margin-bottom: 16px; }
         
+        .login-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+        .btn-login-tab { padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; border: 1px solid #334155; background: #0f172a; color: #94a3b8; cursor: pointer; }
+        .btn-login-tab.active-vyroba { border-color: #3b82f6; background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .btn-login-tab.active-vzv { border-color: #a855f7; background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+
         .login-select {
             width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
             border-radius: 8px; color: #fff; font-size: 1rem; font-weight: bold; margin-bottom: 12px; outline: none; text-align-last: center;
@@ -46,6 +51,7 @@
         
         .header-right { display: flex; align-items: center; gap: 6px; }
         .role-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; font-weight: bold; background: #1e3a8a; color: #3b82f6; }
+        .role-badge.vzv { background: #581c87; color: #a855f7; }
         .role-badge.admin { background: #78350f; color: #fbbf24; }
 
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
@@ -86,16 +92,6 @@
         .accordion-wrapper.active-mode-line-2 { border-color: #a855f7; }
         .accordion-wrapper.active-mode-line-2 .accordion-header { background: #581c87; color: #ffffff; }
 
-        .accordion-header.alarm-active {
-            background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #ef4444;
-            animation: pulseHeaderAlarm 1.5s infinite;
-        }
-        @keyframes pulseHeaderAlarm {
-            0% { background: rgba(239, 68, 68, 0.35); }
-            50% { background: rgba(239, 68, 68, 0.1); }
-            100% { background: rgba(239, 68, 68, 0.35); }
-        }
-
         .single-mode-panel { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .single-mode-panel.line-1 { border-color: #3b82f6; }
         .single-mode-panel.line-2 { border-color: #a855f7; }
@@ -105,29 +101,6 @@
         .mode-selector-box.active { display: block; }
         .mode-selector-box.line-1 { border-color: #3b82f6; }
         .mode-selector-box.line-2 { border-color: #a855f7; }
-
-        .report-panel { background: #1e293b; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; }
-        .report-sub-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-bottom: 8px; }
-        .btn-report-tab { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 6px 2px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; text-align: center; cursor: pointer; }
-        .btn-report-tab.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
-
-        .box-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
-        .box-col { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 6px 2px; }
-        .box-col-lbl { font-size: 0.7rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; }
-        .box-col-btn { width: 100%; padding: 6px 2px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #64748b; cursor: pointer; }
-        .box-col-btn.active { background: #ef4444; color: #fff; border-color: #ef4444; animation: pulseAlarm 1.5s infinite; }
-
-        @keyframes pulseAlarm {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-
-        .diff-box-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; text-align: center; margin-top: 4px; }
-        .diff-box-col { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 4px; }
-        .diff-box-title { font-size: 0.65rem; color: #f59e0b; font-weight: bold; margin-bottom: 4px; }
-        .diff-car-btn { width: 100%; padding: 5px 2px; font-size: 0.65rem; font-weight: bold; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; margin-bottom: 3px; }
-        .diff-car-btn.active { background: #10b981; color: #fff; border-color: #10b981; }
 
         .custom-stojan-input { margin-top: 6px; display: none; gap: 6px; align-items: center; }
         .custom-stojan-input.active { display: flex; }
@@ -142,6 +115,16 @@
         .val { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
         .btn-submit { width: 100%; padding: 12px; background: #f59e0b; color: #0f172a; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
 
+        /* VZV Zobrazení */
+        .vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid #a855f7; }
+        .vzv-card.l1-card { border-top-color: #3b82f6; }
+        .vzv-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: #3b82f6; }
+        .badge.l2 { background: #a855f7; }
+        .next-txt { font-size: 0.8rem; color: #f59e0b; font-weight: bold; margin-top: 2px; line-height: 1.3; }
+        .next-txt.none { color: #64748b; font-weight: normal; }
+        .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
         #settingsModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px;
@@ -154,77 +137,19 @@
         .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .settings-title { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
         .btn-close { background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
-
         .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: #0f172a; padding: 10px; border-radius: 8px; }
-
         .banner-btns { display: flex; gap: 4px; background: #0f172a; padding: 3px; border-radius: 6px; }
         .btn-yn { padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: none; cursor: pointer; color: #64748b; background: transparent; }
         .btn-yn.active-yes { background: #10b981; color: #fff; }
         .btn-yn.active-no { background: #ef4444; color: #fff; }
 
-        .settings-online-counter {
-            background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px;
-            display: flex; justify-content: space-around; text-align: center; font-size: 0.8rem;
-        }
-        .online-val-a { color: #3b82f6; font-weight: bold; font-size: 1rem; }
-        .online-val-b { color: #a855f7; font-weight: bold; font-size: 1rem; }
-
-        #adminPasswordModal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.85); z-index: 10000; align-items: center; justify-content: center; padding: 15px;
-        }
-        .admin-pwd-box {
-            background: #1e293b; border: 2px solid #f59e0b; border-radius: 12px;
-            width: 100%; max-width: 320px; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        }
-        .admin-pwd-input {
-            width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
-            border-radius: 8px; color: #fff; font-size: 1.2rem; text-align: center;
-            letter-spacing: 4px; margin: 15px 0; outline: none;
-        }
-        .admin-pwd-input:focus { border-color: #f59e0b; }
-        .admin-pwd-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-admin-action { padding: 10px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; font-size: 0.9rem; }
-        .btn-admin-cancel { background: #334155; color: #94a3b8; }
-        .btn-admin-ok { background: #f59e0b; color: #0f172a; }
-
-        #updateBannerOverlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.95); z-index: 9999; align-items: center; justify-content: center; padding: 20px; text-align: center;
-        }
-        .update-banner-box {
-            background: #1e293b; border: 3px solid #ef4444; border-radius: 16px;
-            width: 100%; max-width: 380px; padding: 24px; box-shadow: 0 15px 40px rgba(239, 68, 68, 0.4);
-        }
-        .update-banner-title { font-size: 1.2rem; font-weight: bold; color: #ef4444; margin-bottom: 12px; text-transform: uppercase; cursor: pointer; user-select: none; }
-        .update-banner-text { font-size: 0.95rem; color: #f8fafc; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
-        .btn-update-ack { width: 100%; padding: 14px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; display: none; }
-
-        .update-banner-box.completed-box {
-            border: 3px solid #10b981;
-            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
-        }
-        .update-banner-box.completed-box .update-banner-title {
-            color: #10b981;
-        }
-        .update-banner-box.completed-box .btn-update-ack {
-            background: #10b981;
-            display: block;
-        }
-
         .empty { text-align: center; color: #94a3b8; padding: 12px; font-size: 0.75rem; font-weight: bold; line-height: 1.4; }
-        
         .note-tag { padding: 4px 8px; font-size: 0.75rem; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
         .note-tag.line-1 { background: rgba(59, 130, 246, 0.15); border-left: 3px solid #3b82f6; color: #93c5fd; }
         .note-tag.line-2 { background: rgba(168, 85, 247, 0.15); border-left: 3px solid #a855f7; color: #d8b4fe; }
 
         .btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 4px; flex-shrink: 0; }
         .btn-move { background: rgba(51, 65, 85, 0.5); border: 1px solid #334155; color: #94a3b8; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-left: 4px; flex-shrink: 0; }
-        .btn-move:hover { background: #334155; color: #fff; }
-
-        .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.80rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-        .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        
         .wrt-badge-1 { background: rgba(59, 130, 246, 0.25); border: 1px solid #3b82f6; color: #93c5fd; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
         .wrt-badge-2 { background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #d8b4fe; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
         
@@ -250,35 +175,19 @@
 </head>
 <body>
 
-    <div id="updateBannerOverlay">
-        <div class="update-banner-box" id="updateBannerBox">
-            <div class="update-banner-title" id="bannerTitle" onclick="openAdminPasswordModal(true)" title="Kliknutím zadat heslo správce">⚠️ UPOZORNĚNÍ NA ÚDRŽBU</div>
-            <div class="update-banner-text" id="bannerText">Načítání...</div>
-            <button class="btn-update-ack" id="bannerAckBtn" onclick="acknowledgeUpdate()">OK</button>
-        </div>
-    </div>
-
-    <div id="adminPasswordModal">
-        <div class="admin-pwd-box">
-            <div style="font-size: 1rem; font-weight: bold; color: #f59e0b;">🔒 Zadejte heslo správce</div>
-            <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Pro přístup ke správě nebo režimu údržby</div>
-            <input type="password" id="adminPassInput" class="admin-pwd-input" placeholder="••••••" autofocus onkeydown="if(event.key==='Enter') verifyAdminPassword()">
-            <div id="adminPassError" style="color: #ef4444; font-size: 0.75rem; margin-bottom: 8px; display: none;">⚠️ Nesprávné heslo!</div>
-            <div class="admin-pwd-btns">
-                <button class="btn-admin-action btn-admin-cancel" onclick="closeAdminPasswordModal()">Zrušit</button>
-                <button class="btn-admin-action btn-admin-ok" onclick="verifyAdminPassword()">Potvrdit</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Původní čisté přihlášení -->
+    <!-- Přihlašovací obrazovka s přepínačem Výroba | VZV a filtrováním roletki -->
     <div id="loginScreen">
         <div class="login-box">
             <div class="login-title">⚡ LogiFlow</div>
-            <div class="login-sub">Vyberte pracovníka a zadejte heslo</div>
+            <div class="login-sub">Zvolte sekci a pracovníka</div>
             
+            <div class="login-tabs">
+                <button class="btn-login-tab active-vyroba" id="loginTabVyroba" onclick="setLoginSection('VYROBA')">Výroba</button>
+                <button class="btn-login-tab" id="loginTabVzv" onclick="setLoginSection('VZV')">VZV</button>
+            </div>
+
             <select id="workerSelect" class="login-select" onchange="onWorkerSelectChange()">
-                <!-- Naplní se dynamicky -->
+                <!-- Naplní se dynamicky podle sekce -->
             </select>
 
             <input type="password" id="passInput" class="login-input" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
@@ -287,6 +196,7 @@
         </div>
     </div>
 
+    <!-- Hlavní aplikace -->
     <div id="appScreen">
         <div class="header">
             <div class="logo">⚡ LogiFlow</div>
@@ -297,10 +207,8 @@
             </div>
         </div>
 
+        <!-- Sekce Výroba se 3 tlačítky -->
         <div id="viewA">
-            <div id="alertAreaA"></div>
-            
-            <!-- Hlavní volba linek ihned po přihlášení -->
             <div class="lbl" id="lineSelectContainerLbl">Vyberte Linku</div>
             <div class="line-select" id="lineSelectContainer">
                 <div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1<br><span style="font-size:0.6rem; font-weight:normal;">BOX 4 - 3</span></div>
@@ -387,27 +295,41 @@
             <div class="lbl" style="margin-top:16px;">Odesláno na VZV (Probíhají objednávky / Aktivní režimy)</div>
             <div id="listA"></div>
         </div>
+
+        <!-- Sekce VZV -->
+        <div id="viewB" style="display:none;">
+            <div class="lbl">Přehled linek pro závoz VZV</div>
+            <div class="vzv-card l2">
+                <div class="vzv-hdr">
+                    <div>
+                        <span class="badge l2">Box: 1 - 2</span>
+                        <h2 id="l2Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
+                        <div id="l2Next" class="next-txt none">Následuje ➔ Žádné</div>
+                    </div>
+                </div>
+                <div id="l2Body"></div>
+            </div>
+            
+            <div class="vzv-card l1-card">
+                <div class="vzv-hdr">
+                    <div>
+                        <span class="badge">Box: 3 - 4</span>
+                        <h2 id="l1Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
+                        <div id="l1Next" class="next-txt none">Následuje ➔ Žádné</div>
+                    </div>
+                </div>
+                <div id="l1Body"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- Modální okno Nastavení -->
+    <!-- Nastavení -->
     <div id="settingsModal">
         <div class="settings-box">
             <div class="settings-header">
                 <div class="settings-title">⚙️ Nastavení systému</div>
                 <button class="btn-close" onclick="closeSettingsModal()">✕</button>
             </div>
-
-            <div class="settings-online-counter">
-                <div>Obsluha online: <br><span id="countOnlineA" class="online-val-a">0</span></div>
-                <div style="border-left: 1px solid #334155; padding-left: 10px;">VZV online: <br><span id="countOnlineB" class="online-val-b">0</span></div>
-            </div>
-
-            <div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:8px; border:1px solid #f59e0b;">
-                <span style="font-size:0.85rem; font-weight:bold; color:#f59e0b;">🔒 Administrátor (Uživatelé a přehled)</span>
-                <div style="font-size:0.75rem; color:#94a3b8;">Správa uživatelů, hesel a kontrola přihlášených zařízení.</div>
-                <button class="btn-admin-action btn-admin-ok" onclick="openAdminForUsers()" style="width:100%; margin-top:4px;">🔑 Otevřít administraci</button>
-            </div>
-
             <div class="settings-row">
                 <span style="font-size:0.85rem; font-weight:bold;">🔔 Zvukové notifikace</span>
                 <div class="banner-btns">
@@ -415,57 +337,6 @@
                     <button class="btn-yn" id="setNotifNo" onclick="toggleNotifications(false)">NE</button>
                 </div>
             </div>
-
-            <div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:6px;">
-                <span style="font-size:0.85rem; font-weight:bold;">🎵 Výběr zvuku upozornění</span>
-                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; width:100%;">
-                    <button class="btn-yn" id="soundOpt1" onclick="setSoundType(1)" style="font-size:0.65rem; padding:6px 2px;">1. Pípnutí</button>
-                    <button class="btn-yn" id="soundOpt2" onclick="setSoundType(2)" style="font-size:0.65rem; padding:6px 2px;">2. Alarm</button>
-                    <button class="btn-yn" id="soundOpt3" onclick="setSoundType(3)" style="font-size:0.65rem; padding:6px 2px;">3. Cinkot</button>
-                </div>
-            </div>
-
-            <div style="background:#0f172a; padding:12px; border-radius:8px; margin-top:12px; border:1px solid #ef4444;">
-                <div style="font-size:0.85rem; font-weight:bold; color:#ef4444; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-                    <span>🔒</span> Režim údržby / Aktualizace
-                </div>
-                <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Aktivuje výstrahu na všech zařízeních. Vyžaduje heslo správce.</div>
-                <div class="banner-btns" style="width:100%; display:grid; grid-template-columns:1fr 1fr;">
-                    <button class="btn-yn" id="setUpdateYes" onclick="openAdminPasswordModal(true)">ZAPNOUT</button>
-                    <button class="btn-yn active-no" id="setUpdateNo" onclick="openAdminPasswordModal(false)">VYPNOUT</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modální okno pro administraci (správa uživatelů, posun v seznamu, hesla) -->
-    <div id="workersManagerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); z-index:10000; align-items:center; justify-content:center; padding:15px;">
-        <div class="settings-box" style="max-width:420px;">
-            <div class="settings-header">
-                <div class="settings-title">👥 Administrace uživatelů</div>
-                <button class="btn-close" onclick="closeWorkersManager()">✕</button>
-            </div>
-            
-            <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #38bdf8; margin-bottom:12px;">
-                <div style="font-size:0.85rem; font-weight:bold; color:#38bdf8; margin-bottom:6px;">🔑 Změna mého hesla (Administrátor):</div>
-                <input type="password" id="oldPassInput" placeholder="Původní heslo" class="admin-pwd-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
-                <input type="password" id="newPassInput" placeholder="Nové heslo" class="admin-pwd-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
-                <button class="btn-admin-action btn-admin-ok" onclick="changeMyPassword()" style="width:100%; padding:8px;">Změnit heslo</button>
-            </div>
-
-            <div class="lbl" style="color:#f59e0b; margin-top:0;">🟢 Aktivní přihlášení uživatelé:</div>
-            <div id="activeSessionsContainer" style="max-height:120px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px; background:#0f172a; padding:8px; border-radius:8px; border:1px solid #334155;"></div>
-
-            <div class="lbl" style="color:#f59e0b;">📋 Seznam uživatelů a hesel (možnost posunu):</div>
-            <div id="workersListContainer" style="max-height:180px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px;"></div>
-            
-            <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px dashed #f59e0b; margin-bottom:10px;">
-                <div style="font-size:0.8rem; font-weight:bold; color:#f59e0b; margin-bottom:6px;">➕ Přidat nového uživatele:</div>
-                <input type="text" id="newWorkerName" placeholder="Jméno (např. Ota)" class="login-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
-                <input type="text" id="newWorkerPass" placeholder="Heslo" class="login-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
-                <button class="btn-admin-action btn-admin-ok" onclick="addNewWorker()" style="width:100%; padding:8px;">+ Přidat uživatele</button>
-            </div>
-            <button class="btn-admin-action btn-admin-cancel" onclick="closeWorkersManager()" style="width:100%;">Zavřít</button>
         </div>
     </div>
 
@@ -476,26 +347,15 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let ADMIN_PASSWORD = '704517';
         let workers = [];
-
         let notificationsEnabled = true;
-        let selectedSoundType = parseInt(localStorage.getItem('selected_sound_type')) || 1;
-
+        let selectedLoginSection = 'VYROBA';
         let curLine = 1, curCar = 'Tiguan', curStojany = 3;
         let singleModeLines = { 1: false, 2: false };
         let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' };
         let twoVariantModeLines = { 1: false, 2: false };
         let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
-        
-        let systemUpdateActive = false;
-        let systemUpdateCompletedState = false;
-        let pendingUpdateState = false;
-        let pendingAdminAction = null;
-
         let orders = [];
-        let stockAlerts = [];
-        let lastOrderCount = 0;
         let expandedOrderId = null;
 
         let deviceId = sessionStorage.getItem('device_id');
@@ -504,42 +364,43 @@
             sessionStorage.setItem('device_id', deviceId);
         }
 
-        db.ref('forceLogout/' + deviceId).on('value', (snapshot) => {
-            if (snapshot.val() === true) {
-                db.ref('forceLogout/' + deviceId).remove();
-                logout();
-                alert('Byli jste správcem na dálku odhlášeni.');
-            }
-        });
-
         db.ref('workers').on('value', (snapshot) => {
             let data = snapshot.val();
             if (data) {
                 workers = Array.isArray(data) ? data : Object.values(data);
-                let adminObj = workers.find(w => w.name === 'Administrator');
-                if (!adminObj) {
-                    workers.push({ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'ADMIN' });
-                    db.ref('workers').set(workers);
-                } else {
-                    ADMIN_PASSWORD = adminObj.pass;
-                }
             } else {
-                workers = [{ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'ADMIN' }];
+                workers = [{ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'VYROBA,VZV,ADMIN' }];
                 db.ref('workers').set(workers);
-                ADMIN_PASSWORD = '704517';
             }
             renderWorkersDropdown();
-            if (document.getElementById('workersManagerModal').style.display === 'flex') {
-                renderWorkersManagerList();
-            }
         });
+
+        function setLoginSection(section) {
+            selectedLoginSection = section;
+            let btnVyroba = document.getElementById('loginTabVyroba');
+            let btnVzv = document.getElementById('loginTabVzv');
+            if (btnVyroba && btnVzv) {
+                btnVyroba.className = 'btn-login-tab ' + (section === 'VYROBA' ? 'active-vyroba' : '');
+                btnVzv.className = 'btn-login-tab ' + (section === 'VZV' ? 'active-vzv' : '');
+            }
+            renderWorkersDropdown();
+        }
 
         function renderWorkersDropdown() {
             let select = document.getElementById('workerSelect');
             if (!select) return;
             let currentVal = select.value;
-            select.innerHTML = workers.map(w => `<option value="${w.name}">${w.name}</option>`).join('');
-            if (currentVal && workers.some(w => w.name === currentVal)) {
+
+            let filteredWorkers = workers.filter(w => {
+                let role = w.role || '';
+                if (role.includes('ADMIN')) return true;
+                if (selectedLoginSection === 'VYROBA' && role.includes('VYROBA')) return true;
+                if (selectedLoginSection === 'VZV' && role.includes('VZV')) return true;
+                return false;
+            });
+
+            select.innerHTML = filteredWorkers.map(w => `<option value="${w.name}">${w.name}</option>`).join('');
+            if (currentVal && filteredWorkers.some(w => w.name === currentVal)) {
                 select.value = currentVal;
             }
         }
@@ -549,145 +410,78 @@
             document.getElementById('loginError').style.display = 'none';
         }
 
-        function openAdminForUsers() {
-            closeSettingsModal();
-            pendingAdminAction = 'openUsers';
-            document.getElementById('adminPassInput').value = '';
-            document.getElementById('adminPassError').style.display = 'none';
-            document.getElementById('adminPasswordModal').style.display = 'flex';
-            setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
+        db.ref('orders').on('value', (snapshot) => {
+            let rawOrders = snapshot.val() || [];
+            orders = Array.isArray(rawOrders) ? rawOrders : Object.values(rawOrders);
+            render();
+        });
+
+        db.ref('singleModeLines').on('value', (snapshot) => { if (snapshot.val()) singleModeLines = snapshot.val(); render(); });
+        db.ref('singleModeCar').on('value', (snapshot) => { if (snapshot.val()) singleModeCar = snapshot.val(); render(); });
+        db.ref('twoVariantModeLines').on('value', (snapshot) => { if (snapshot.val()) twoVariantModeLines = snapshot.val(); render(); });
+        db.ref('twoVariantPair').on('value', (snapshot) => { if (snapshot.val()) twoVariantPair = snapshot.val(); render(); });
+
+        function save() {
+            db.ref('orders').set(orders);
+            db.ref('singleModeLines').set(singleModeLines);
+            db.ref('singleModeCar').set(singleModeCar);
+            db.ref('twoVariantModeLines').set(twoVariantModeLines);
+            db.ref('twoVariantPair').set(twoVariantPair);
         }
 
-        function closeWorkersManager() {
-            document.getElementById('workersManagerModal').style.display = 'none';
-        }
+        function checkPassword() {
+            let workerName = document.getElementById('workerSelect').value;
+            let inputPass = document.getElementById('passInput').value;
+            let worker = workers.find(w => w.name === workerName);
 
-        function renderWorkersManagerList() {
-            let container = document.getElementById('workersListContainer');
-            container.innerHTML = workers.map((w, idx) => `
-                <div style="background:#0f172a; padding:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; border:1px solid #334155;">
-                    <div>
-                        <div style="font-weight:bold; font-size:0.85rem; color:#f59e0b;">${w.name}</div>
-                        <div style="font-size:0.75rem; color:#94a3b8;">Heslo: <b>${w.pass}</b></div>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:2px;">
-                        ${idx > 0 ? `<button class="btn-move" onclick="moveWorker(${idx}, -1)" title="Posunout nahoru">▲</button>` : ''}
-                        ${idx < workers.length - 1 ? `<button class="btn-move" onclick="moveWorker(${idx}, 1)" title="Posunout dolů">▼</button>` : ''}
-                        ${w.name !== 'Administrator' ? `<button class="btn-delete" onclick="deleteWorker(${idx})" title="Smazat">✖</button>` : `<span style="font-size:0.65rem; color:#f59e0b; font-weight:bold; margin-left:4px;">Chráněno</span>`}
-                    </div>
-                </div>
-            `).join('');
-
-            db.ref('presence').once('value', (snapshot) => {
-                let data = snapshot.val() || {};
-                let activeContainer = document.getElementById('activeSessionsContainer');
-                let html = '';
-                let now = Date.now();
-                let entries = Object.entries(data);
-
-                if (entries.length === 0) {
-                    activeContainer.innerHTML = '<div style="font-size:0.75rem; color:#94a3b8; text-align:center;">Žádní aktivní uživatelé online</div>';
-                    return;
-                }
-
-                entries.forEach(([devId, info]) => {
-                    if (info && info.timestamp && (now - info.timestamp < 20000)) {
-                        let timeStr = new Date(info.timestamp).toLocaleTimeString();
-                        html += `
-                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; border-bottom:1px solid #334155; padding-bottom:4px; margin-bottom:4px;">
-                                <div><b>${info.worker}</b> <br><span style="color:#94a3b8;">Od: ${timeStr}</span></div>
-                                <button class="btn-delete" style="background:rgba(239,68,68,0.3); color:#ef4444; width:auto; padding:2px 6px; font-size:0.7rem;" onclick="forceLogoutDevice('${devId}')">Odhlásit</button>
-                            </div>
-                        `;
-                    }
-                });
-                activeContainer.innerHTML = html || '<div style="font-size:0.75rem; color:#94a3b8; text-align:center;">Žádní aktivní uživatelé online</div>';
-            });
-        }
-
-        function moveWorker(index, direction) {
-            let targetIndex = index + direction;
-            if (targetIndex < 0 || targetIndex >= workers.length) return;
-            let temp = workers[index];
-            workers[index] = workers[targetIndex];
-            workers[targetIndex] = temp;
-            db.ref('workers').set(workers);
-        }
-
-        function forceLogoutDevice(targetDevId) {
-            if (confirm('Opravdu chcete tohoto uživatele na dálku odhlásit?')) {
-                db.ref('forceLogout/' + targetDevId).set(true);
-                setTimeout(renderWorkersManagerList, 500);
+            if (worker && worker.pass === inputPass) {
+                let role = worker.role || '';
+                sessionStorage.setItem('device_authenticated', 'true');
+                sessionStorage.setItem('active_worker', worker.name);
+                sessionStorage.setItem('active_role', role);
+                sessionStorage.setItem('active_section', selectedLoginSection);
+                
+                document.getElementById('loginError').style.display = 'none';
+                showApp();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
             }
         }
 
-        function addNewWorker() {
-            let name = document.getElementById('newWorkerName').value.trim();
-            let pass = document.getElementById('newWorkerPass').value.trim();
-            if (!name || !pass) {
-                alert('Vyplňte jméno i heslo uživatele!');
-                return;
-            }
-            workers.push({ id: 'w_' + Date.now(), name: name, pass: pass, role: 'USER' });
-            db.ref('workers').set(workers);
-            document.getElementById('newWorkerName').value = '';
-            document.getElementById('newWorkerPass').value = '';
-            renderWorkersManagerList();
-            renderWorkersDropdown();
+        function logout() {
+            sessionStorage.clear();
+            document.getElementById('passInput').value = '';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appScreen').style.display = 'none';
         }
 
-        function deleteWorker(index) {
-            if (workers[index].name === 'Administrator') {
-                alert('Hlavního administrátora nelze smazat!');
-                return;
+        function showApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'block';
+            let workerName = sessionStorage.getItem('active_worker') || '';
+            let section = sessionStorage.getItem('active_section') || 'VYROBA';
+            let badge = document.getElementById('roleBadge');
+
+            if (section === 'VZV') {
+                badge.innerText = workerName + ' (VZV)';
+                badge.className = 'role-badge vzv';
+                document.getElementById('viewA').style.display = 'none';
+                document.getElementById('viewB').style.display = 'block';
+            } else {
+                badge.innerText = workerName + ' (Výroba)';
+                badge.className = 'role-badge';
+                document.getElementById('viewA').style.display = 'block';
+                document.getElementById('viewB').style.display = 'none';
+                setLine(1);
             }
-            if (workers.length <= 1) {
-                alert('Musí zůstat alespoň jeden uživatel!');
-                return;
-            }
-            workers.splice(index, 1);
-            db.ref('workers').set(workers);
-            renderWorkersManagerList();
-            renderWorkersDropdown();
+            render();
         }
 
-        function changeMyPassword() {
-            let oldP = document.getElementById('oldPassInput').value;
-            let newP = document.getElementById('newPassInput').value;
-            let currentWorkerName = sessionStorage.getItem('active_worker');
-
-            if (!oldP || !newP) {
-                alert('Vyplňte obě kolonky pro změnu hesla!');
-                return;
-            }
-
-            let w = workers.find(x => x.name === currentWorkerName);
-            if (!w || w.pass !== oldP) {
-                alert('Původní heslo není správné!');
-                return;
-            }
-
-            w.pass = newP;
-            db.ref('workers').set(workers);
-            if (w.name === 'Administrator') ADMIN_PASSWORD = newP;
-            document.getElementById('oldPassInput').value = '';
-            document.getElementById('newPassInput').value = '';
-            alert('Heslo bylo úspěšně změněno!');
-            closeWorkersManager();
-        }
-
-        function setSoundType(type) {
-            selectedSoundType = type;
-            localStorage.setItem('selected_sound_type', type);
-            updateSoundUI();
-            triggerNotification("Test", "Test zvuku");
-        }
-
-        function updateSoundUI() {
-            for (let i = 1; i <= 3; i++) {
-                let btn = document.getElementById(`soundOpt${i}`);
-                if (btn) btn.className = 'btn-yn ' + (selectedSoundType === i ? 'active-yes' : '');
-            }
+        if (sessionStorage.getItem('device_authenticated') === 'true') {
+            showApp();
+        } else {
+            setLoginSection('VYROBA');
         }
 
         function toggleAccordion(contentId, headerId) {
@@ -700,223 +494,6 @@
                 content.style.display = 'block';
                 header.classList.add('open');
             }
-        }
-
-        function updatePresence() {
-            let isAuth = sessionStorage.getItem('device_authenticated') === 'true';
-            if (isAuth) {
-                let workerName = sessionStorage.getItem('active_worker') || 'Neznámý';
-                let role = sessionStorage.getItem('active_role') || '';
-                if (!role.includes('ADMIN')) {
-                    db.ref('presence/' + deviceId).set({
-                        worker: workerName,
-                        timestamp: firebase.database.ServerValue.TIMESTAMP
-                    });
-                }
-            } else {
-                db.ref('presence/' + deviceId).remove();
-            }
-        }
-
-        setInterval(updatePresence, 5000);
-        window.addEventListener('beforeunload', () => { db.ref('presence/' + deviceId).remove(); });
-
-        db.ref('presence').on('value', (snapshot) => {
-            let data = snapshot.val() || {};
-            let count = 0;
-            let now = Date.now();
-            Object.values(data).forEach(item => {
-                if (item && item.timestamp && (now - item.timestamp < 15000)) count++;
-            });
-            let elA = document.getElementById('countOnlineA');
-            if (elA) elA.innerText = count;
-        });
-
-        db.ref('orders').on('value', (snapshot) => {
-            let rawOrders = snapshot.val() || [];
-            orders = Array.isArray(rawOrders) ? rawOrders : Object.values(rawOrders);
-            render();
-        });
-
-        db.ref('singleModeLines').on('value', (snapshot) => {
-            let data = snapshot.val();
-            if (data) singleModeLines = data;
-            render();
-        });
-
-        db.ref('singleModeCar').on('value', (snapshot) => {
-            let data = snapshot.val();
-            if (data) singleModeCar = data;
-            render();
-        });
-
-        db.ref('twoVariantModeLines').on('value', (snapshot) => {
-            let data = snapshot.val();
-            if (data) twoVariantModeLines = data;
-            render();
-        });
-
-        db.ref('twoVariantPair').on('value', (snapshot) => {
-            let data = snapshot.val();
-            if (data) twoVariantPair = data;
-            render();
-        });
-
-        db.ref('systemUpdate').on('value', (snapshot) => {
-            let val = snapshot.val();
-            systemUpdateActive = val ? val.active : false;
-            systemUpdateCompletedState = val ? val.completed : false;
-            renderUpdateOverlay();
-        });
-
-        function save() {
-            db.ref('orders').set(orders);
-            db.ref('singleModeLines').set(singleModeLines);
-            db.ref('singleModeCar').set(singleModeCar);
-            db.ref('twoVariantModeLines').set(twoVariantModeLines);
-            db.ref('twoVariantPair').set(twoVariantPair);
-        }
-
-        function openAdminPasswordModal(enable) {
-            pendingUpdateState = enable;
-            pendingAdminAction = 'update';
-            document.getElementById('adminPassInput').value = '';
-            document.getElementById('adminPassError').style.display = 'none';
-            document.getElementById('adminPasswordModal').style.display = 'flex';
-            setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
-        }
-
-        function closeAdminPasswordModal() {
-            document.getElementById('adminPasswordModal').style.display = 'none';
-        }
-
-        function verifyAdminPassword() {
-            let pass = document.getElementById('adminPassInput').value;
-            let adminObj = workers.find(w => w.name === 'Administrator' && w.pass === pass);
-            if (!adminObj && pass !== ADMIN_PASSWORD) {
-                document.getElementById('adminPassError').style.display = 'block';
-                return;
-            }
-            closeAdminPasswordModal();
-
-            if (pendingAdminAction === 'openUsers') {
-                renderWorkersManagerList();
-                document.getElementById('workersManagerModal').style.display = 'flex';
-                pendingAdminAction = null;
-                return;
-            }
-            closeSettingsModal();
-            if (pendingUpdateState) {
-                db.ref('systemUpdate').set({ active: true, completed: false });
-            } else {
-                db.ref('systemUpdate').set({ active: false, completed: true });
-            }
-        }
-
-        function acknowledgeUpdate() {
-            localStorage.setItem('ack_update_completed_state', systemUpdateCompletedState.toString());
-            document.getElementById('updateBannerOverlay').style.display = 'none';
-        }
-
-        function renderUpdateOverlay() {
-            let overlay = document.getElementById('updateBannerOverlay');
-            let bannerBox = document.getElementById('updateBannerBox');
-            let title = document.getElementById('bannerTitle');
-            let text = document.getElementById('bannerText');
-            let ackState = localStorage.getItem('ack_update_completed_state');
-            let isAlreadyAcked = (ackState === systemUpdateCompletedState.toString());
-
-            if (systemUpdateActive) {
-                bannerBox.className = "update-banner-box";
-                title.innerText = "⚠️ UPOZORNĚNÍ NA ÚDRŽBU";
-                text.innerHTML = "POZOR: Proběhne aktualizace programu připravte se na výpadek.<br><br>Neřiďte se PROGRAMEM !!!";
-                overlay.style.display = 'flex';
-            } else if (systemUpdateCompletedState && !isAlreadyAcked) {
-                bannerBox.className = "update-banner-box completed-box";
-                title.innerText = "✅ HOTOVO";
-                text.innerText = "Program aktualizován, potvrzením dojde k resetu objednávek z důvodu aktualizace.";
-                overlay.style.display = 'flex';
-            } else {
-                overlay.style.display = 'none';
-            }
-        }
-
-        function openSettingsModal() { updateSoundUI(); document.getElementById('settingsModal').style.display = 'flex'; }
-        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
-
-        function checkPassword() {
-            let workerName = document.getElementById('workerSelect').value;
-            let inputPass = document.getElementById('passInput').value;
-            let worker = workers.find(w => w.name === workerName);
-
-            if (worker && worker.pass === inputPass) {
-                sessionStorage.setItem('device_authenticated', 'true');
-                sessionStorage.setItem('active_worker', worker.name);
-                sessionStorage.setItem('active_role', worker.role || 'USER');
-                document.getElementById('loginError').style.display = 'none';
-                updatePresence();
-                showApp();
-            } else {
-                document.getElementById('loginError').style.display = 'block';
-            }
-        }
-
-        function logout() {
-            db.ref('presence/' + deviceId).remove();
-            sessionStorage.removeItem('device_authenticated');
-            sessionStorage.removeItem('active_worker');
-            sessionStorage.removeItem('active_role');
-            document.getElementById('passInput').value = '';
-            document.getElementById('loginError').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('appScreen').style.display = 'none';
-            document.getElementById('updateBannerOverlay').style.display = 'none';
-        }
-
-        function showApp() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('appScreen').style.display = 'block';
-            let workerName = sessionStorage.getItem('active_worker') || '';
-            let role = sessionStorage.getItem('active_role') || '';
-            let badge = document.getElementById('roleBadge');
-
-            if (role.includes('ADMIN')) {
-                badge.innerText = workerName + ' (Správce)';
-                badge.className = 'role-badge admin';
-            } else {
-                badge.innerText = workerName;
-                badge.className = 'role-badge';
-            }
-            setLine(curLine);
-            render();
-        }
-
-        if (sessionStorage.getItem('device_authenticated') === 'true') {
-            updatePresence();
-            showApp();
-        }
-
-        function toggleNotifications(enable) {
-            notificationsEnabled = enable;
-        }
-
-        function triggerNotification(title, bodyText) {
-            if (!notificationsEnabled) return;
-            try {
-                let AudioCtx = window.AudioContext || window.webkitAudioContext;
-                if (!AudioCtx) return;
-                let ctx = new AudioCtx();
-                if (ctx.state === 'suspended') ctx.resume();
-                let osc = ctx.createOscillator();
-                let gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-                gain.gain.setValueAtTime(0.4, ctx.currentTime);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.3);
-            } catch(e){}
         }
 
         function toggleSingleMode(enable) {
@@ -937,19 +514,8 @@
             render();
         }
 
-        function setSingleCar(car, el) { 
-            if (curLine === '1-2') return;
-            singleModeCar[curLine] = car; 
-            save(); 
-            updateDynamicTheme(); 
-        }
-
-        function setTwoPair(pair, el) { 
-            if (curLine === '1-2') return;
-            twoVariantPair[curLine] = pair; 
-            save(); 
-            updateDynamicTheme(); 
-        }
+        function setSingleCar(car) { if (curLine === '1-2') return; singleModeCar[curLine] = car; save(); updateDynamicTheme(); }
+        function setTwoPair(pair) { if (curLine === '1-2') return; twoVariantPair[curLine] = pair; save(); updateDynamicTheme(); }
 
         function updateDynamicTheme() {
             if (curLine === '1-2') return;
@@ -1023,9 +589,9 @@
             render();
         }
 
-        function setCar(c, el) { curCar = c; updateDynamicTheme(); }
-        function setStojany(s, el) { curStojany = s; let cBox = document.getElementById('customStojanBox'); if(cBox) cBox.classList.remove('active'); updateCalculations(); }
-        function enableCustomStojany(el) { let cBox = document.getElementById('customStojanBox'); if(cBox) cBox.classList.add('active'); curStojany = parseInt(document.getElementById('customInput').value) || 1; updateCalculations(); }
+        function setCar(c) { curCar = c; updateDynamicTheme(); }
+        function setStojany(s) { curStojany = s; let cBox = document.getElementById('customStojanBox'); if(cBox) cBox.classList.remove('active'); updateCalculations(); }
+        function enableCustomStojany() { let cBox = document.getElementById('customStojanBox'); if(cBox) cBox.classList.add('active'); curStojany = parseInt(document.getElementById('customInput').value) || 1; updateCalculations(); }
         function onCustomStojanyInput(val) { curStojany = parseInt(val) || 0; updateCalculations(); }
         
         function updateCalculations() {
@@ -1043,11 +609,9 @@
             let ob = Math.ceil(ks / 9);
             let noteInput = document.getElementById('noteInput');
             let note = noteInput ? noteInput.value.trim() : '';
-            let defaultFirst = (curLine === 1) ? 3 : 1;
-            orders.push({ id: Date.now(), line: curLine, car: curCar, stojany: curStojany, total: ob, done: 0, note: note, firstBox: defaultFirst });
+            orders.push({ id: Date.now(), line: curLine, car: curCar, stojany: curStojany, total: ob, done: 0, note: note });
             if (noteInput) noteInput.value = '';
             save();
-            triggerNotification("Objednávka", "Objednávka odeslána");
         }
 
         function cancelOrder(id) { orders = orders.filter(x => x.id !== id); save(); }
@@ -1056,15 +620,8 @@
         function toggleOrderBoxDone(id, boxIndex) {
             let o = orders.find(x => x.id === id);
             if (!o) return;
-            if (boxIndex <= o.done) {
-                o.done = boxIndex - 1;
-            } else {
-                o.done = boxIndex;
-            }
-            if (o.done >= o.total) {
-                orders = orders.filter(x => x.id !== id);
-                expandedOrderId = null;
-            }
+            if (boxIndex <= o.done) { o.done = boxIndex - 1; } else { o.done = boxIndex; }
+            if (o.done >= o.total) { orders = orders.filter(x => x.id !== id); expandedOrderId = null; }
             save();
         }
 
@@ -1075,11 +632,9 @@
             let lineOrders = orders.filter(x => x.line === targetOrder.line);
             let subIndex = lineOrders.findIndex(x => x.id === id);
             let targetSubIndex = subIndex + direction;
-
             if (targetSubIndex < 0 || targetSubIndex >= lineOrders.length) return;
             let neighborOrder = lineOrders[targetSubIndex];
             let neighborIndex = orders.findIndex(x => x.id === neighborOrder.id);
-
             orders[index] = neighborOrder;
             orders[neighborIndex] = targetOrder;
             save();
@@ -1087,6 +642,25 @@
 
         function render() {
             if (sessionStorage.getItem('device_authenticated') !== 'true') return;
+            let section = sessionStorage.getItem('active_section') || 'VYROBA';
+
+            if (section === 'VZV') {
+                let l1Body = document.getElementById('l1Body');
+                let l2Body = document.getElementById('l2Body');
+                let l1Title = document.getElementById('l1Title');
+                let l2Title = document.getElementById('l2Title');
+
+                let l1Orders = orders.filter(x => x.line === 1);
+                let l2Orders = orders.filter(x => x.line === 2);
+
+                if (l1Title) l1Title.innerText = l1Orders.length > 0 ? `${l1Orders[0].car} (${l1Orders[0].stojany} WRT)` : 'Žádná objednávka';
+                if (l2Title) l2Title.innerText = l2Orders.length > 0 ? `${l2Orders[0].car} (${l2Orders[0].stojany} WRT)` : 'Žádná objednávka';
+                
+                if (l1Body) l1Body.innerHTML = l1Orders.length > 0 ? `<button class="btn-zavez" onclick="zavezt(${l1Orders[0].id})">Zavézt obal</button>` : '';
+                if (l2Body) l2Body.innerHTML = l2Orders.length > 0 ? `<button class="btn-zavez" onclick="zavezt(${l2Orders[0].id})">Zavézt obal</button>` : '';
+                return;
+            }
+
             let listA = document.getElementById('listA');
             if (listA) {
                 let htmlContent = '';
@@ -1163,6 +737,19 @@
             }
             if (curLine !== '1-2') updateDynamicTheme();
         }
+
+        function zavezt(id) {
+            let o = orders.find(x => x.id === id);
+            if (o) {
+                o.done++;
+                if (o.done >= o.total) { orders = orders.filter(x => x.id !== id); }
+                save();
+            }
+        }
+
+        function openSettingsModal() { document.getElementById('settingsModal').style.display = 'flex'; }
+        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+        function toggleNotifications(en) { notificationsEnabled = en; }
     </script>
 </body>
 </html>
