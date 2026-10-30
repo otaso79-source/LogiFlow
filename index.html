@@ -856,7 +856,6 @@
             render();
         });
 
-        // OPRAVENO: Posluchač pro čidla teď spolehlivě spustí zvuk na zařízení VZV při změně stavu čidla
         db.ref('repeatBoxes').on('value', (snapshot) => {
             let data = snapshot.val();
             if (data) {
@@ -1244,7 +1243,12 @@
         function triggerNotification(title, bodyText) {
             if (!notificationsEnabled) return;
             try {
-                let ctx = new (window.AudioContext || window.webkitAudioContext)();
+                let AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                let ctx = new AudioCtx();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
                 let osc = ctx.createOscillator();
                 let gain = ctx.createGain();
                 
@@ -1252,7 +1256,7 @@
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(587.33, ctx.currentTime);
                     osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
-                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.4, ctx.currentTime);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
                     osc.start();
@@ -1271,7 +1275,7 @@
                     osc.type = 'triangle';
                     osc.frequency.setValueAtTime(1046.50, ctx.currentTime);
                     osc.frequency.setValueAtTime(1318.51, ctx.currentTime + 0.1);
-                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
                     osc.start();
@@ -1429,6 +1433,7 @@
             document.getElementById('noteInput').value = '';
             lastOrderCount = orders.length;
             save();
+            triggerNotification("Objednávka", "Objednávka odeslána");
         }
 
         function setOrderFirstBox(orderId, chosenBox) {
@@ -1550,8 +1555,15 @@
             let listA = document.getElementById('listA');
             if (listA) {
                 let htmlContent = '';
+                let currentRole = sessionStorage.getItem('active_role') || 'L1';
                 
-                [1, 2].forEach(l => {
+                // Opraveno: Filtr pro zobrazení podle přihlášené role (L1 uvidí jen linku 1, L2 jen linku 2, L12 a VZV obě)
+                let linesToRender = [];
+                if (currentRole === 'L1') linesToRender = [1];
+                else if (currentRole === 'L2') linesToRender = [2];
+                else linesToRender = [1, 2];
+
+                linesToRender.forEach(l => {
                     let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
                     if (singleModeLines[l]) {
                         htmlContent += `<div style="background:#1e293b; padding:10px; border-radius:6px; margin-bottom:6px; border:1px solid #f59e0b; display:flex; justify-content:space-between; align-items:center;"><span>🔒 <b>Režim 1 varianta:</b> ${singleModeCar[l]||'Tiguan'} <span class="${badgeCls}">Linka ${l}</span></span><span style="font-size:0.75rem; color:#f59e0b; font-weight:bold;">Aktivní</span></div>`;
@@ -1561,11 +1573,14 @@
                     }
                 });
 
-                if (orders.length === 0 && !singleModeLines[1] && !singleModeLines[2] && !twoVariantModeLines[1] && !twoVariantModeLines[2]) {
+                let anyActiveMode = linesToRender.some(l => singleModeLines[l] || twoVariantModeLines[l]);
+                let filteredOrders = orders.filter(x => linesToRender.includes(x.line));
+
+                if (filteredOrders.length === 0 && !anyActiveMode) {
                     htmlContent += '<div class="empty">Žádné aktivní objednávky</div>';
                 }
 
-                [1, 2].forEach(l => {
+                linesToRender.forEach(l => {
                     let lineOrders = orders.filter(x => x.line === l);
                     let totalInLine = lineOrders.length;
 
