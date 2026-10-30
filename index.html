@@ -1320,12 +1320,23 @@
                         body.innerHTML = '<div class="empty">Linka je volná</div>';
                     } else {
                         if (isSingle || isTwo) {
-                            title.innerText = isSingle ? `🔒 Režim 1 varianta: ${singleModeCar[l]}` : `🔒 Režim 2 varianty: ${twoVariantPair[l]}`;
+                            title.innerText = isSingle ? `🔒 ${singleModeCar[l]}` : `🔒 ${twoVariantPair[l]}`;
                             next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
                         } else {
                             let cur = lOrders[0];
                             let nxt1 = lOrders[1];
-                            title.innerText = `${cur.car} (${cur.stojany} WRT)`;
+                            
+                            // Výpočet aktuálního boxu místo počtu WRT v nadpisu
+                            let firstB = cur.firstBox || ((l === 1) ? 3 : 1);
+                            let targetBox = '';
+                            if (l === 1) {
+                                targetBox = (firstB === 3) ? ((cur.done % 2 === 0) ? 'Box 3' : 'Box 4') : ((cur.done % 2 === 0) ? 'Box 4' : 'Box 3');
+                            } else {
+                                targetBox = (firstB === 1) ? ((cur.done % 2 === 0) ? 'Box 1' : 'Box 2') : ((cur.done % 2 === 0) ? 'Box 2' : 'Box 1');
+                            }
+
+                            title.innerText = `${cur.car} (${targetBox})`;
+
                             if (nxt1) {
                                 next.className = 'next-txt';
                                 next.innerHTML = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
