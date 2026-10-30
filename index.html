@@ -1366,8 +1366,8 @@
 
                             let isLastBox = (cur.done + 1 >= cur.total);
                             let btnText = isLastBox 
-                                ? `⚠️ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE VÝMĚNA !` 
-                                : `✓ OBAL ZAVES DO BOXU ${targetBox} ! POTÉ POTVRĎ !`;
+                                ? `⚠️ ZAVEZ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE VÝMĚNA !` 
+                                : `✓ ZAVEZ OBAL DO BOXU ${targetBox} ! POTÉ POTVRĎ !`;
                             let btnClass = 'btn-zavez' + (isLastBox ? ' last-box-btn' : '');
 
                             body.innerHTML = `
