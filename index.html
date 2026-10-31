@@ -168,9 +168,6 @@
         .box-unit.done { background: #065f46; color: #34d399; border-color: #059669; }
         .box-unit.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
 
-        .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .btn-zavez.last-box-btn { background: #f59e0b; animation: pulseAlarm 1.5s infinite; }
-
         #settingsModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px;
@@ -280,7 +277,7 @@
         .queue-section-title.l2 { color: #a855f7; border-bottom: 1px solid rgba(168, 85, 247, 0.3); padding-bottom: 4px; }
         .queue-order-num { font-size: 0.7rem; background: #334155; color: #cbd5e1; padding: 3px 6px; border-radius: 4px; font-weight: bold; white-space: nowrap; }
 
-        /* Styly pro novou úvodní obrazovku výběru linky ve Výrobě */
+        /* Styly pro obrazovku výběru linky ve Výrobě (3 okénka) */
         #lineSelectionScreen {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             min-height: 70vh; padding: 20px; text-align: center;
@@ -360,7 +357,7 @@
         </div>
 
         <!-- Obrazovka výběru linky ve Výrobě (3 okénka po přihlášení) -->
-        <div id="lineSelectionScreen">
+        <div id="lineSelectionScreen" style="display:none;">
             <div class="line-selection-box">
                 <div class="line-selection-title">🏭 Výběr Pracoviště</div>
                 <div class="line-selection-sub">Zvolte linku, na které pracujete</div>
@@ -788,6 +785,10 @@
                 return false;
             });
 
+            if (filteredWorkers.length === 0) {
+                filteredWorkers = [{ name: 'Administrator', role: 'VYROBA,VZV,ADMIN', pass: '704517' }];
+            }
+
             select.innerHTML = filteredWorkers.map(w => `<option value="${w.name}">${w.name} (${getRoleName(w.role)})</option>`).join('');
             if (currentVal && filteredWorkers.some(w => w.name === currentVal)) {
                 select.value = currentVal;
@@ -1014,7 +1015,7 @@
             if (isAuth) {
                 let section = sessionStorage.getItem('active_section') || 'VYROBA';
                 let workerName = sessionStorage.getItem('active_worker') || 'Neznámý';
-                let role = sessionStorage.getItem('active_role'] || '';
+                let role = sessionStorage.getItem('active_role') || '';
                 
                 if (role.includes('ADMIN')) {
                     db.ref('presence/' + deviceId).remove();
@@ -1473,7 +1474,7 @@
             document.getElementById('appScreen').style.display = 'block';
             let role = sessionStorage.getItem('active_role') || '';
             let workerName = sessionStorage.getItem('active_worker') || '';
-            let section = sessionStorage.getItem('active_section'] || 'VYROBA';
+            let section = sessionStorage.getItem('active_section') || 'VYROBA';
             
             let badge = document.getElementById('roleBadge');
 
@@ -1491,7 +1492,6 @@
                     badge.innerText = workerName + ' (Výroba)';
                     badge.className = 'role-badge l12';
                 }
-                // Pro Výrobu nejdříve zobrazíme obrazovku se třemi velkými okénky (bod 3)
                 curLine = null;
                 document.getElementById('lineSelectionScreen').style.display = 'flex';
                 document.getElementById('viewA').style.display = 'none';
@@ -1500,7 +1500,6 @@
             render();
         }
 
-        // Funkce pro výběr konkrétní linky ze tří velkých okének (bod 3 -> bod 4)
         function selectLineAndOpen(line) {
             curLine = line;
             document.getElementById('lineSelectionScreen').style.display = 'none';
@@ -1508,7 +1507,7 @@
             setLine(curLine);
         }
 
-        if (sessionStorage.getItem('device_authenticated'] === 'true') {
+        if (sessionStorage.getItem('device_authenticated') === 'true') {
             updatePresence();
             showApp();
         } else {
@@ -1710,8 +1709,6 @@
         }
 
         function setLine(l) {
-            // Pokud uživatel klikne na hlavičkový výběr linky zpět na výběr linek (pokud by chtěl), můžeme ho případně vrátit na rozcestník, 
-            // ale tady standardně přepínáme mezi linkami přímo v rozhraní bodu 4, nebo může kliknout zpět.
             curLine = l;
 
             let btn1 = document.getElementById('lBtn1');
