@@ -1048,7 +1048,7 @@
             if (isAuth) {
                 let section = sessionStorage.getItem('active_section') || 'VYROBA';
                 let workerName = sessionStorage.getItem('active_worker') || 'Neznámý';
-                let role = sessionStorage.getItem('active_role') || '';
+                let role = sessionStorage.getItem('active_role'] || '';
                 
                 if (role.includes('ADMIN')) {
                     db.ref('presence/' + deviceId).remove();
@@ -1380,6 +1380,13 @@
                     btn4.className = 'btn-opt ' + activeCls;
                 }
             }
+        }
+
+        function vzvChangeFirstBox(orderId, boxNum) {
+            let o = orders.find(x => x.id === orderId);
+            if (!o) return;
+            o.firstBox = boxNum;
+            save();
         }
 
         function openAdminPasswordModal(enable) {
@@ -1986,7 +1993,7 @@
                 });
             }
 
-            // --- Vykreslení pro pohled VZV (viewB) s plně dynamickým počtem obalů (total) ---
+            // --- OPRAVENÉ VYKRESLENÍ PRO VZV (viewB) BEZ DUPLICIT ---
             let l1Title = document.getElementById('l1Title');
             let l1Next = document.getElementById('l1Next');
             let l1Body = document.getElementById('l1Body');
@@ -2017,8 +2024,8 @@
                         l1FirstBoxHeader.innerHTML = `
                             <div class="first-box-selector">
                                 <span class="first-box-lbl">Obal zavezen jako první:</span>
-                                <span class="btn-fb ${firstBox === 3 ? 'active-fb' : ''}">BOX 3</span>
-                                <span class="btn-fb ${firstBox === 4 ? 'active-fb' : ''}">BOX 4</span>
+                                <span class="btn-fb ${firstBox === 3 ? 'active-fb' : ''}" onclick="vzvChangeFirstBox(${current.id}, 3)">BOX 3</span>
+                                <span class="btn-fb ${firstBox === 4 ? 'active-fb' : ''}" onclick="vzvChangeFirstBox(${current.id}, 4)">BOX 4</span>
                             </div>
                         `;
                     }
@@ -2068,8 +2075,8 @@
                         l2FirstBoxHeader.innerHTML = `
                             <div class="first-box-selector">
                                 <span class="first-box-lbl">Obal zavezen jako první:</span>
-                                <span class="btn-fb ${firstBox === 1 ? 'active-fb' : ''}">BOX 1</span>
-                                <span class="btn-fb ${firstBox === 2 ? 'active-fb' : ''}">BOX 2</span>
+                                <span class="btn-fb ${firstBox === 1 ? 'active-fb' : ''}" onclick="vzvChangeFirstBox(${current.id}, 1)">BOX 1</span>
+                                <span class="btn-fb ${firstBox === 2 ? 'active-fb' : ''}" onclick="vzvChangeFirstBox(${current.id}, 2)">BOX 2</span>
                             </div>
                         `;
                     }
@@ -2197,4 +2204,4 @@
     </script>
 </body>
 </html>
-!!! Test 15:15 !!!
+!!! Test 16:19 !!!
