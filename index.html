@@ -59,12 +59,11 @@
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-settings { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-        .line-select { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+        .line-select { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px; }
         .line-btn { padding: 10px 4px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.7rem; line-height: 1.3; }
         
         .line-btn.active-1 { border-color: #3b82f6; color: #fff; background: #1e3a8a; }
         .line-btn.active-2 { border-color: #a855f7; color: #fff; background: #581c87; }
-        .line-btn.active-12 { border-color: #10b981; color: #fff; background: #065f46; }
 
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
@@ -416,7 +415,6 @@
             <div class="line-select" id="lineSelectContainer">
                 <div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1<br><span style="font-size:0.6rem; font-weight:normal;">BOX 4 - 3</span></div>
                 <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.6rem; font-weight:normal;">BOX 2 - 1</span></div>
-                <div class="line-btn" id="lBtn12" onclick="setLine('1-2')">Přehled<br><span style="font-size:0.6rem; font-weight:normal;">objednávek</span></div>
             </div>
 
             <div class="accordion-wrapper" id="modesAccordionWrapper">
@@ -716,7 +714,7 @@
                 
                 <div style="background:#1e293b; padding:8px; border-radius:6px; margin-bottom:8px; border:1px solid #334155; text-align:left;">
                     <div style="font-size:0.75rem; color:#94a3b8; font-weight:bold; margin-bottom:4px;">Povolit sekce:</div>
-                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="VYROBA"> Výroba (Linka 1, 2, 1-2)</label>
+                    <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="VYROBA"> Výroba (Linka 1, 2)</label>
                     <label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="VZV"> VZV (Závozy)</label>
                     <label style="display:block; font-size:0.8rem; margin-bottom:3px; color:#fbbf24;"><input type="checkbox" class="role-chk" value="ADMIN"> Administrator (Neviditelný)</label>
                 </div>
@@ -764,7 +762,7 @@
         let expandedOrderId = null;
         let folderOpenState = { 1: false, 2: false };
 
-        let selectedLoginSection = 'VYROBA'; // Výchozí přihlašovací záložka
+        let selectedLoginSection = 'VYROBA';
 
         let deviceId = sessionStorage.getItem('device_id');
         if (!deviceId) {
@@ -810,10 +808,9 @@
             if (!select) return;
             let currentVal = select.value;
 
-            // Filtrování pracovníků podle zvolené sekce (Výroba / VZV)
             let filteredWorkers = workers.filter(w => {
                 let role = w.role || '';
-                if (role.includes('ADMIN')) return true; // Administrátor je vidět všude
+                if (role.includes('ADMIN')) return (selectedLoginSection === 'VYROBA');
                 if (selectedLoginSection === 'VYROBA' && role.includes('VYROBA')) return true;
                 if (selectedLoginSection === 'VZV' && role.includes('VZV')) return true;
                 return false;
@@ -1052,7 +1049,7 @@
                 let workerName = sessionStorage.getItem('active_worker') || 'Neznámý';
                 let role = sessionStorage.getItem('active_role') || '';
                 
-                if (role.includes('ADMIN')) {
+                if (role.includes('ADMIN') && section === 'VYROBA') {
                     db.ref('presence/' + deviceId).remove();
                 } else {
                     db.ref('presence/' + deviceId).set({
@@ -1605,7 +1602,6 @@
         }
 
         function toggleSingleMode(enable) {
-            if (curLine === '1-2') return;
             singleModeLines[curLine] = enable;
             if (enable) {
                 twoVariantModeLines[curLine] = false;
@@ -1620,7 +1616,6 @@
         }
 
         function toggleTwoVariantMode(enable) {
-            if (curLine === '1-2') return;
             twoVariantModeLines[curLine] = enable;
             if (enable) {
                 singleModeLines[curLine] = false;
@@ -1635,14 +1630,12 @@
         }
 
         function setSingleCar(car, el) { 
-            if (curLine === '1-2') return;
             singleModeCar[curLine] = car; 
             save(); 
             updateDynamicTheme(); 
             triggerNotification("Změna režimu", "Změněna varianta");
         }
         function setTwoPair(pair, el) { 
-            if (curLine === '1-2') return;
             twoVariantPair[curLine] = pair; 
             save(); 
             updateDynamicTheme(); 
@@ -1650,7 +1643,6 @@
         }
 
         function updateDynamicTheme() {
-            if (curLine === '1-2') return;
             let activeClass = curLine === 1 ? 'selected-1' : 'selected-2';
             let panelClass = curLine === 1 ? 'single-mode-panel line-1' : 'single-mode-panel line-2';
             let selectorBoxClass = curLine === 1 ? 'mode-selector-box line-1 active' : 'mode-selector-box line-2 active';
@@ -1746,25 +1738,17 @@
 
             let btn1 = document.getElementById('lBtn1');
             let btn2 = document.getElementById('lBtn2');
-            let btn12 = document.getElementById('lBtn12');
             if(btn1) btn1.className = 'line-btn ' + (curLine===1?'active-1':'');
             if(btn2) btn2.className = 'line-btn ' + (curLine===2?'active-2':'');
-            if(btn12) btn12.className = 'line-btn ' + (curLine==='1-2'?'active-12':'');
 
             let modesWrapper = document.getElementById('modesAccordionWrapper');
             let sensorWrapper = document.getElementById('sensorAccordionWrapper');
             let standardSec = document.getElementById('standardOrderSection');
 
-            if (l === '1-2') {
-                if (modesWrapper) modesWrapper.style.display = 'none';
-                if (sensorWrapper) sensorWrapper.style.display = 'none';
-                if (standardSec) standardSec.style.display = 'none';
-            } else {
-                if (modesWrapper) modesWrapper.style.display = 'block';
-                if (sensorWrapper) sensorWrapper.style.display = 'block';
-                if (standardSec) standardSec.style.display = 'block';
-                updateDynamicTheme();
-            }
+            if (modesWrapper) modesWrapper.style.display = 'block';
+            if (sensorWrapper) sensorWrapper.style.display = 'block';
+            if (standardSec) standardSec.style.display = 'block';
+            updateDynamicTheme();
             render();
         }
 
@@ -1783,7 +1767,6 @@
         }
 
         function addOrder() {
-            if (curLine === '1-2') return;
             let ks = curStojany * 12;
             let ob = Math.ceil(ks / 9);
             let noteInput = document.getElementById('noteInput');
@@ -1915,7 +1898,8 @@
             let listA = document.getElementById('listA');
             if (listA) {
                 let htmlContent = '';
-                let linesToRender = curLine === '1-2' ? [1, 2] : [curLine];
+                // Obě linky (Linka 1 i Linka 2) se zobrazují společně[span_3](start_span)[span_3](end_span)
+                let linesToRender = [1, 2];
 
                 linesToRender.forEach(l => {
                     let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
@@ -1994,9 +1978,120 @@
 
                 listA.innerHTML = htmlContent;
             }
-            if (curLine !== '1-2') {
-                updateDynamicTheme();
-            }
+
+            [1, 2].forEach(l => {
+                let lOrders = orders.filter(x => x.line === l);
+                let title = document.getElementById(`l${l}Title`);
+                let next = document.getElementById(`l${l}Next`);
+                let body = document.getElementById(`l${l}Body`);
+                let headerBox = document.getElementById(`l${l}FirstBoxHeader`);
+                let isSingle = singleModeLines[l];
+                let isTwo = twoVariantModeLines[l];
+
+                if (title && next && body) {
+                    if (headerBox) {
+                        let boxA = (l === 1) ? 3 : 1;
+                        let boxB = (l === 1) ? 4 : 2;
+                        let activeOrder = lOrders[0];
+                        let currentFirst = (activeOrder && activeOrder.firstBox) ? activeOrder.firstBox : boxA;
+                        let activeOrderId = activeOrder ? activeOrder.id : 'null';
+                        let isOpen = folderOpenState[l];
+
+                        headerBox.innerHTML = `
+                            <div class="first-box-folder">
+                                <div class="first-box-folder-header ${isOpen ? 'open' : ''}" onclick="toggleFolder(${l})">
+                                    <span>Nastavení zavezení</span>
+                                    <span class="folder-arrow">▼</span>
+                                </div>
+                                <div class="first-box-folder-content ${isOpen ? 'open' : ''}">
+                                    <span class="toggle-title-lbl">Obal zavezen jako první:</span>
+                                    <div class="first-box-toggle-container">
+                                        <button class="btn-toggle-box ${currentFirst === boxA ? 'active' : ''}" onclick="setOrderFirstBox(${activeOrderId}, ${boxA})">BOX ${boxA}</button>
+                                        <button class="btn-toggle-box ${currentFirst === boxB ? 'active' : ''}" onclick="setOrderFirstBox(${activeOrderId}, ${boxB})">BOX ${boxB}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (lOrders.length === 0 && !isSingle && !isTwo) {
+                        title.innerText = 'Žádná objednávka';
+                        next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
+                        body.innerHTML = '<div class="empty">Linka čeká na materiál.<br>NECHTE BOX PRÁZDNÝ DO NOVÉ OBJEDNÁVKY.</div>';
+                    } else {
+                        if (isSingle || isTwo) {
+                            title.innerText = isSingle ? `🔒 ${singleModeCar[l]}` : `🔒 ${twoVariantPair[l]}`;
+                            next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
+                        } else {
+                            let cur = lOrders[0];
+                            let nxt1 = lOrders[1];
+                            
+                            let firstB = cur.firstBox || ((l === 1) ? 3 : 1);
+                            let targetBox = '';
+                            if (l === 1) {
+                                targetBox = (firstB === 3) ? ((cur.done % 2 === 0) ? 'Box 3' : 'Box 4') : ((cur.done % 2 === 0) ? 'Box 4' : 'Box 3');
+                            } else {
+                                targetBox = (firstB === 1) ? ((cur.done % 2 === 0) ? 'Box 1' : 'Box 2') : ((cur.done % 2 === 0) ? 'Box 2' : 'Box 1');
+                            }
+
+                            title.innerText = `${cur.car} (${targetBox})`;
+
+                            if (nxt1) {
+                                next.className = 'next-txt';
+                                next.innerHTML = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
+                            } else {
+                                next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
+                            }
+                        }
+
+                        let boxRangeText = (l === 1) ? '(Box 3 - 4)' : '(Box 1 - 2)';
+                        let modeAlertHtml = isSingle ? `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE: ${singleModeCar[l].toUpperCase()} ${boxRangeText}</div>` : (isTwo ? `<div class="vzv-single-mode-box">⚠️ ${twoVariantPair[l]} ${boxRangeText}</div>` : '');
+
+                        if (isSingle || isTwo) {
+                            body.innerHTML = modeAlertHtml + '<div class="empty" style="color:#fbbf24; font-weight:bold;">Režim je aktivní na lince</div>';
+                        } else if (lOrders.length === 0) {
+                            body.innerHTML = modeAlertHtml + '<div class="empty">Linka čeká na materiál.<br>NECHTE BOX PRÁZDNÝ DO NOVÉ OBJEDNÁVKY.</div>';
+                        } else {
+                            let cur = lOrders[0];
+                            let boxes = '';
+                            for (let i = 1; i <= cur.total; i++) {
+                                boxes += `<div class="box-unit ${i <= cur.done ? 'done' : 'pending'}">#${i}</div>`;
+                            }
+                            
+                            let targetBox = '';
+                            let firstB = cur.firstBox || ((l === 1) ? 3 : 1);
+
+                            if (l === 1) {
+                                if (firstB === 3) {
+                                    targetBox = (cur.done % 2 === 0) ? '3' : '4';
+                                } else {
+                                    targetBox = (cur.done % 2 === 0) ? '4' : '3';
+                                }
+                            } else {
+                                if (firstB === 1) {
+                                    targetBox = (cur.done % 2 === 0) ? '1' : '2';
+                                } else {
+                                    targetBox = (cur.done % 2 === 0) ? '2' : '1';
+                                }
+                            }
+
+                            let isLastBox = (cur.done + 1 >= cur.total);
+                            let btnText = isLastBox 
+                                ? `⚠️ ZAVEZ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE JINÁ VARIANTA !` 
+                                : `✓ ZAVEZ OBAL DO BOXU ${targetBox} ! POTÉ POTVRĎ !`;
+                            let btnClass = 'btn-zavez' + (isLastBox ? ' last-box-btn' : '');
+
+                            body.innerHTML = `
+                                ${modeAlertHtml}
+                                ${cur.note ? `<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>` : ''}
+                                <div class="boxes-row">${boxes}</div>
+                                <button class="${btnClass}" onclick="zavezt(${cur.id})">${btnTest}</button>
+                            `;
+                        }
+                    }
+                }
+            });
+            updateDynamicTheme();
         }
 
         function clearAllRepeatBoxes() {
