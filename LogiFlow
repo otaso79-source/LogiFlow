@@ -59,7 +59,6 @@
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-settings { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-        /* Statická informační lišta */
         .current-line-info {
             background: #1e293b; border: 1px solid #334155; border-radius: 8px;
             padding: 10px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
@@ -287,7 +286,6 @@
         .queue-section-title.l2 { color: #a855f7; border-bottom: 1px solid rgba(168, 85, 247, 0.3); padding-bottom: 4px; }
         .queue-order-num { font-size: 0.7rem; background: #334155; color: #cbd5e1; padding: 3px 6px; border-radius: 4px; font-weight: bold; white-space: nowrap; }
 
-        /* Styly pro úvodní obrazovku výběru pracoviště */
         #lineSelectionScreen {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             min-height: 70vh; padding: 20px; text-align: center;
@@ -322,7 +320,6 @@
         </div>
     </div>
 
-    <!-- Modální okno pro zadání administrátorského hesla -->
     <div id="adminPasswordModal">
         <div class="admin-pwd-box">
             <div style="font-size: 1rem; font-weight: bold; color: #f59e0b;">🔒 Zadejte heslo správce</div>
@@ -336,7 +333,6 @@
         </div>
     </div>
 
-    <!-- Přihlašovací obrazovka -->
     <div id="loginScreen">
         <div class="login-box">
             <div class="login-title">⚡ LogiFlow</div>
@@ -366,7 +362,6 @@
             </div>
         </div>
 
-        <!-- Úvodní obrazovka výběru pracoviště pro Výrobu (4 okénka) -->
         <div id="lineSelectionScreen" style="display:none;">
             <div class="line-selection-box">
                 <div class="line-selection-title">🏭 Výběr Pracoviště</div>
@@ -395,13 +390,11 @@
         <div id="viewA" style="display:none;">
             <div id="alertAreaA"></div>
             
-            <!-- Statické zobrazení jedné linky s barvou podle ikony -->
             <div class="current-line-info" id="singleLineHeaderBox">
                 <div class="current-line-title color-l1" id="currentLineDisplayTitle">Linka 1 (Box: 4 - 3)</div>
                 <button class="btn-back-to-select" onclick="showLineSelection()">↩️ Změnit pracoviště</button>
             </div>
 
-            <!-- Přepínací tlačítka pro volbu obou linek -->
             <div id="bothLinesToggleContainer" style="display:none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                     <div class="lbl" style="margin:0;">Přepnout aktivní linku:</div>
@@ -588,10 +581,11 @@
              
             <div id="vzvSensorAlertArea"></div>
 
+            <!-- Linka 2 -->
             <div class="vzv-card l2">
                 <div class="vzv-hdr">
                     <div>
-                        <span class="badge l2">Box: 1 - 2</span>
+                        <span class="badge l2">Box: 1 - 2 (Linka 2)</span>
                         <h2 id="l2Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
                         <div id="l2Next" class="next-txt none">Následuje ➔ Žádné</div>
                     </div>
@@ -600,10 +594,11 @@
                 <div id="l2Body"></div>
             </div>
             
+            <!-- Linka 1 -->
             <div class="vzv-card l1-card">
                 <div class="vzv-hdr">
                     <div>
-                        <span class="badge">Box: 3 - 4</span>
+                        <span class="badge">Box: 3 - 4 (Linka 1)</span>
                         <h2 id="l1Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
                         <div id="l1Next" class="next-txt none">Následuje ➔ Žádné</div>
                     </div>
@@ -631,7 +626,6 @@
         </div>
     </div>
 
-    <!-- Modální okno Nastavení -->
     <div id="settingsModal">
         <div class="settings-box">
             <div class="settings-header">
@@ -680,7 +674,6 @@
         </div>
     </div>
 
-    <!-- Modální okno pro administraci -->
     <div id="workersManagerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); z-index:10000; align-items:center; justify-content:center; padding:15px;">
         <div class="settings-box" style="max-width:420px;">
             <div class="settings-header">
@@ -1920,6 +1913,59 @@
                 });
             }
 
+            // --- Vykreslení pro pohled VZV (viewB) ---
+            let l1Title = document.getElementById('l1Title');
+            let l1Next = document.getElementById('l1Next');
+            let l1Body = document.getElementById('l1Body');
+            
+            let l2Title = document.getElementById('l2Title');
+            let l2Next = document.getElementById('l2Next');
+            let l2Body = document.getElementById('l2Body');
+
+            if (l1Title && l1Body) {
+                let ordersL1 = orders.filter(x => x.line === 1);
+                if (ordersL1.length > 0) {
+                    let current = ordersL1[0];
+                    let next = ordersL1[1];
+                    l1Title.innerText = `${current.car} (${current.stojany} WRT - ${current.total} obalů)`;
+                    l1Next.innerText = next ? `Následuje ➔ ${next.car} (${next.stojany} WRT)` : "Následuje ➔ Žádné";
+                    l1Next.className = "next-txt";
+
+                    let boxesHtml = '';
+                    for (let i = 1; i <= current.total; i++) {
+                        boxesHtml += `<div class="box-unit ${i <= current.done ? 'done' : 'pending'}">#${i}</div>`;
+                    }
+                    l1Body.innerHTML = `<div class="boxes-row">${boxesHtml}</div>${current.note ? `<div class="note-tag line-1">📝 ${current.note}</div>` : ''}`;
+                } else {
+                    l1Title.innerText = "Žádná objednávka";
+                    l1Next.innerText = "Následuje ➔ Žádné";
+                    l1Next.className = "next-txt none";
+                    l1Body.innerHTML = '<div class="empty">Žádné aktivní objednávky na lince 1</div>';
+                }
+            }
+
+            if (l2Title && l2Body) {
+                let ordersL2 = orders.filter(x => x.line === 2);
+                if (ordersL2.length > 0) {
+                    let current = ordersL2[0];
+                    let next = ordersL2[1];
+                    l2Title.innerText = `${current.car} (${current.stojany} WRT - ${current.total} obalů)`;
+                    l2Next.innerText = next ? `Následuje ➔ ${next.car} (${next.stojany} WRT)` : "Následuje ➔ Žádné";
+                    l2Next.className = "next-txt";
+
+                    let boxesHtml = '';
+                    for (let i = 1; i <= current.total; i++) {
+                        boxesHtml += `<div class="box-unit ${i <= current.done ? 'done' : 'pending'}">#${i}</div>`;
+                    }
+                    l2Body.innerHTML = `<div class="boxes-row">${boxesHtml}</div>${current.note ? `<div class="note-tag line-2">📝 ${current.note}</div>` : ''}`;
+                } else {
+                    l2Title.innerText = "Žádná objednávka";
+                    l2Next.innerText = "Následuje ➔ Žádné";
+                    l2Next.className = "next-txt none";
+                    l2Body.innerHTML = '<div class="empty">Žádné aktivní objednávky na lince 2</div>';
+                }
+            }
+
             let listA = document.getElementById('listA');
             if (listA) {
                 let htmlContent = '';
@@ -2018,4 +2064,4 @@
     </script>
 </body>
 </html>
-Finish
+!!! Oprava VZV !!!
