@@ -59,12 +59,16 @@
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-settings { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-        /* Statická i přepínací lišta */
+        /* Statická informační lišta */
         .current-line-info {
             background: #1e293b; border: 1px solid #334155; border-radius: 8px;
             padding: 10px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
         }
-        .current-line-title { font-size: 0.95rem; font-weight: bold; color: #f59e0b; text-transform: uppercase; }
+        .current-line-title { font-size: 0.95rem; font-weight: bold; text-transform: uppercase; }
+        .current-line-title.color-l1 { color: #3b82f6; }
+        .current-line-title.color-l2 { color: #a855f7; }
+        .current-line-title.color-both { color: #f59e0b; }
+
         .btn-back-to-select { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid #3b82f6; padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
         .line-select-toggle { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px; }
@@ -391,9 +395,9 @@
         <div id="viewA" style="display:none;">
             <div id="alertAreaA"></div>
             
-            <!-- Statické zobrazení jedné linky -->
+            <!-- Statické zobrazení jedné linky s barvou podle ikony -->
             <div class="current-line-info" id="singleLineHeaderBox">
-                <div class="current-line-title" id="currentLineDisplayTitle">LINKA 1 (BOX 4 - 3)</div>
+                <div class="current-line-title color-l1" id="currentLineDisplayTitle">LINKA 1 (BOX 4 - 3)</div>
                 <button class="btn-back-to-select" onclick="showLineSelection()">↩️ Změnit pracoviště</button>
             </div>
 
@@ -1763,9 +1767,17 @@
                 if (bothToggleContainer) bothToggleContainer.style.display = 'none';
 
                 if (displayTitle) {
-                    if (curLine === 1) displayTitle.innerText = 'LINKA 1 (BOX 4 - 3)';
-                    else if (curLine === 2) displayTitle.innerText = 'LINKA 2 (BOX 2 - 1)';
-                    else displayTitle.innerText = 'PŘEHLED OBJEDNÁVEK (LINKA 1 & 2)';
+                    displayTitle.className = 'current-line-title';
+                    if (curLine === 1) {
+                        displayTitle.innerText = 'LINKA 1 (BOX 4 - 3)';
+                        displayTitle.classList.add('color-l1');
+                    } else if (curLine === 2) {
+                        displayTitle.innerText = 'LINKA 2 (BOX 2 - 1)';
+                        displayTitle.classList.add('color-l2');
+                    } else {
+                        displayTitle.innerText = 'PŘEHLED OBJEDNÁVEK (LINKA 1 & 2)';
+                        displayTitle.classList.add('color-both');
+                    }
                 }
             }
 
@@ -2006,4 +2018,4 @@
     </script>
 </body>
 </html>
-!!! Test verze 3 !!!
+!!! Test.verze 1.0.3 !!!
