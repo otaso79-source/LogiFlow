@@ -166,16 +166,22 @@
         .vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid #a855f7; }
         .vzv-card.l1-card { border-top-color: #3b82f6; }
         .vzv-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: #3b82f6; }
+        .badge { font-size: 0.70rem; padding: 3px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: #3b82f6; }
         .badge.l2 { background: #a855f7; }
         .next-txt { font-size: 0.8rem; color: #f59e0b; font-weight: bold; margin-top: 2px; line-height: 1.3; }
         .next-txt.none { color: #64748b; font-weight: normal; }
         
-        .boxes-row { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
-        .box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; cursor: pointer; }
-        
-        .box-unit.done { background: #065f46; color: #34d399; border-color: #059669; }
-        .box-unit.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
+        .boxes-row { display: flex; gap: 4px; margin: 8px 0; }
+        .vzv-box-btn { flex: 1; height: 32px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #94a3b8; font-weight: bold; cursor: pointer; }
+        .vzv-box-btn.done { background: #065f46; color: #34d399; border-color: #059669; }
+        .vzv-box-btn.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
+
+        .first-box-selector { display: flex; align-items: center; gap: 4px; background: #0f172a; padding: 4px; border-radius: 6px; border: 1px solid #334155; }
+        .first-box-lbl { font-size: 0.65rem; color: #94a3b8; font-weight: bold; }
+        .btn-fb { padding: 4px 8px; font-size: 0.7rem; font-weight: bold; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; }
+        .btn-fb.active-fb { background: #f59e0b; color: #0f172a; border-color: #f59e0b; }
+
+        .vzv-action-banner { margin-top: 8px; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 0.8rem; background: #10b981; color: #fff; animation: pulseAlarm 1.5s infinite; }
 
         #settingsModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -561,6 +567,12 @@
                     <input type="number" id="customInput" min="1" max="50" value="4" oninput="onCustomStojanyInput(this.value)">
                 </div>
 
+                <div class="lbl">POČÁTEČNÍ BOX (PRVNÍ ZAVEZENÍ)</div>
+                <div style="display:flex; gap:6px; margin-bottom:8px;" id="firstBoxChoiceContainer">
+                    <button class="btn-opt selected-1" id="btnFirstBox3" onclick="setInitialFirstBox(3)">Začít od Boxu 3</button>
+                    <button class="btn-opt" id="btnFirstBox4" onclick="setInitialFirstBox(4)">Začít od Boxu 4</button>
+                </div>
+
                 <div class="lbl">Poznámka pro VZV (volitelné)</div>
                 <input type="text" id="noteInput" class="note-input" placeholder="Napište poznámku k objednávce..." />
 
@@ -585,7 +597,7 @@
             <div class="vzv-card l2">
                 <div class="vzv-hdr">
                     <div>
-                        <span class="badge l2">Box: 1 - 2 (Linka 2)</span>
+                        <span class="badge l2">Box: 1 - 2</span>
                         <h2 id="l2Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
                         <div id="l2Next" class="next-txt none">Následuje ➔ Žádné</div>
                     </div>
@@ -598,7 +610,7 @@
             <div class="vzv-card l1-card">
                 <div class="vzv-hdr">
                     <div>
-                        <span class="badge">Box: 3 - 4 (Linka 1)</span>
+                        <span class="badge">Box: 3 - 4</span>
                         <h2 id="l1Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
                         <div id="l1Next" class="next-txt none">Následuje ➔ Žádné</div>
                     </div>
@@ -608,7 +620,7 @@
             </div>
 
             <div class="vzv-alert-panel">
-                <div class="vzv-alert-title">⚠️ Hlášení stavu obalů obsluze</div>
+                <div class="vzv-alert-title">⚠️ Hlášení stavu obalů obsluze A</div>
                 <div class="vzv-alert-row">
                     <select id="vzvVariantSelect" class="vzv-select">
                         <option value="Tiguan / Kodiaq">Tiguan / Kodiaq</option>
@@ -617,7 +629,7 @@
                     </select>
                     <input type="number" id="vzvCountInput" class="vzv-num-input" placeholder="zde napiš počet obalu" value="" min="1" max="99">
                 </div>
-                <button class="btn-send-alert" onclick="sendCustomStockAlert()">📢 ODESLAT HLÁŠENÍ OBSLUZE</button>
+                <button class="btn-send-alert" onclick="sendCustomStockAlert()">📢 ODESLAT HLÁŠENÍ OBSLUZE A</button>
             </div>
 
             <div id="doneBanner" class="done-msg" style="display:none;">
@@ -727,6 +739,7 @@
         let selectedSoundType = parseInt(localStorage.getItem('selected_sound_type')) || 1;
 
         let curLine = null, curCar = 'Tiguan', curStojany = 3;
+        let selectedInitialFirstBox = 3;
         let isBothLinesMode = false;
 
         let singleModeLines = { 1: false, 2: false };
@@ -1349,6 +1362,26 @@
             }
         }
 
+        function setInitialFirstBox(boxNum) {
+            selectedInitialFirstBox = boxNum;
+            let btn3 = document.getElementById('btnFirstBox3');
+            let btn4 = document.getElementById('btnFirstBox4');
+            if (curLine === 2) {
+                btn3 = document.getElementById('btnFirstBox1');
+                btn4 = document.getElementById('btnFirstBox2');
+            }
+            if (btn3 && btn4) {
+                let activeCls = curLine === 1 ? 'selected-1' : 'selected-2';
+                if ((curLine === 1 && boxNum === 3) || (curLine === 2 && boxNum === 1)) {
+                    btn3.className = 'btn-opt ' + activeCls;
+                    btn4.className = 'btn-opt';
+                } else {
+                    btn3.className = 'btn-opt';
+                    btn4.className = 'btn-opt ' + activeCls;
+                }
+            }
+        }
+
         function openAdminPasswordModal(enable) {
             pendingUpdateState = enable;
             pendingAdminAction = 'update';
@@ -1735,11 +1768,29 @@
                 let opt = document.getElementById('optCustomWRT'); if(opt) opt.classList.add(activeClass);
                 let cBox = document.getElementById('customStojanBox'); if(cBox) cBox.className = customBoxClass;
             }
+
+            let firstBoxChoiceContainer = document.getElementById('firstBoxChoiceContainer');
+            if (firstBoxChoiceContainer) {
+                if (curLine === 1) {
+                    firstBoxChoiceContainer.innerHTML = `
+                        <button class="btn-opt ${selectedInitialFirstBox === 3 ? activeClass : ''}" id="btnFirstBox3" onclick="setInitialFirstBox(3)">Začít od Boxu 3</button>
+                        <button class="btn-opt ${selectedInitialFirstBox === 4 ? activeClass : ''}" id="btnFirstBox4" onclick="setInitialFirstBox(4)">Začít od Boxu 4</button>
+                    `;
+                } else if (curLine === 2) {
+                    firstBoxChoiceContainer.innerHTML = `
+                        <button class="btn-opt ${selectedInitialFirstBox === 1 ? activeClass : ''}" id="btnFirstBox1" onclick="setInitialFirstBox(1)">Začít od Boxu 1</button>
+                        <button class="btn-opt ${selectedInitialFirstBox === 2 ? activeClass : ''}" id="btnFirstBox2" onclick="setInitialFirstBox(2)">Začít od Boxu 2</button>
+                    `;
+                }
+            }
+
             renderRepeatBoxesUI();
         }
 
         function setLine(l) {
             curLine = l;
+            if (curLine === 1) selectedInitialFirstBox = 3;
+            if (curLine === 2) selectedInitialFirstBox = 1;
 
             let singleHeaderBox = document.getElementById('singleLineHeaderBox');
             let bothToggleContainer = document.getElementById('bothLinesToggleContainer');
@@ -1811,8 +1862,17 @@
             let ob = Math.ceil(ks / 9);
             let noteInput = document.getElementById('noteInput');
             let note = noteInput ? noteInput.value.trim() : '';
-            let defaultFirst = (curLine === 1) ? 3 : 1;
-            orders.push({ id: Date.now(), line: curLine, car: curCar, stojany: curStojany, total: ob, done: 0, note: note, firstBox: defaultFirst });
+            
+            orders.push({ 
+                id: Date.now(), 
+                line: curLine, 
+                car: curCar, 
+                stojany: curStojany, 
+                total: ob, 
+                done: 0, 
+                note: note, 
+                firstBox: selectedInitialFirstBox 
+            });
             if (noteInput) noteInput.value = '';
             lastOrderCount = orders.length;
             save();
@@ -1821,6 +1881,19 @@
 
         function cancelOrder(id) { orders = orders.filter(x => x.id !== id); lastOrderCount = orders.length; save(); }
         function toggleOrderExpand(id) { expandedOrderId = (expandedOrderId === id ? null : id); render(); }
+
+        function toggleVzvBoxDone(id, boxIdx) {
+            let o = orders.find(x => x.id === id);
+            if (!o) return;
+            
+            if (boxIdx === o.done + 1) {
+                o.done++;
+                if (o.done >= o.total) {
+                    orders = orders.filter(x => x.id !== id);
+                }
+                save();
+            }
+        }
 
         function toggleOrderBoxDone(id, boxIndex) {
             let o = orders.find(x => x.id === id);
@@ -1913,34 +1986,62 @@
                 });
             }
 
-            // --- Vykreslení pro pohled VZV (viewB) ---
+            // --- Vykreslení pro pohled VZV (viewB) jako na Foto 1 ---
             let l1Title = document.getElementById('l1Title');
             let l1Next = document.getElementById('l1Next');
             let l1Body = document.getElementById('l1Body');
+            let l1FirstBoxHeader = document.getElementById('l1FirstBoxHeader');
             
             let l2Title = document.getElementById('l2Title');
             let l2Next = document.getElementById('l2Next');
             let l2Body = document.getElementById('l2Body');
+            let l2FirstBoxHeader = document.getElementById('l2FirstBoxHeader');
 
             if (l1Title && l1Body) {
                 let ordersL1 = orders.filter(x => x.line === 1);
                 if (ordersL1.length > 0) {
                     let current = ordersL1[0];
                     let next = ordersL1[1];
-                    l1Title.innerText = `${current.car} (${current.stojany} WRT - ${current.total} obalů)`;
+                    l1Title.innerText = `${current.car} (${current.stojany} WRT)`;
                     l1Next.innerText = next ? `Následuje ➔ ${next.car} (${next.stojany} WRT)` : "Následuje ➔ Žádné";
                     l1Next.className = "next-txt";
 
-                    let boxesHtml = '';
-                    for (let i = 1; i <= current.total; i++) {
-                        boxesHtml += `<div class="box-unit ${i <= current.done ? 'done' : 'pending'}">#${i}</div>`;
+                    let firstBox = current.firstBox || 3;
+                    let secondBox = (firstBox === 3) ? 4 : 3;
+
+                    if (l1FirstBoxHeader) {
+                        l1FirstBoxHeader.innerHTML = `
+                            <div class="first-box-selector">
+                                <span class="first-box-lbl">Obal zavezen jako první:</span>
+                                <span class="btn-fb ${firstBox === 3 ? 'active-fb' : ''}">BOX 3</span>
+                                <span class="btn-fb ${firstBox === 4 ? 'active-fb' : ''}">BOX 4</span>
+                            </div>
+                        `;
                     }
-                    l1Body.innerHTML = `<div class="boxes-row">${boxesHtml}</div>${current.note ? `<div class="note-tag line-1">📝 ${current.note}</div>` : ''}`;
+
+                    let b1Num = firstBox;
+                    let b2Num = secondBox;
+                    let b1Done = current.done >= 1;
+                    let b2Done = current.done >= 2;
+
+                    let bannerBoxTarget = (current.done === 0) ? b1Num : b2Num;
+
+                    l1Body.innerHTML = `
+                        <div class="boxes-row">
+                            <div class="vzv-box-btn ${b1Done ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, 1)">#${b1Num}</div>
+                            <div class="vzv-box-btn ${b2Done ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, 2)">#${b2Num}</div>
+                            <div class="vzv-box-btn" style="opacity:0.3; pointer-events:none;">#3</div>
+                            <div class="vzv-box-btn" style="opacity:0.3; pointer-events:none;">#4</div>
+                        </div>
+                        ${current.done < 2 ? `<div class="vzv-action-banner">✓ ZAVEZ OBAL DO BOXU ${bannerBoxTarget} ! POTÉ POTVRĎ !</div>` : ''}
+                        ${current.note ? `<div class="note-tag line-1" style="margin-top:6px;">📝 ${current.note}</div>` : ''}
+                    `;
                 } else {
                     l1Title.innerText = "Žádná objednávka";
                     l1Next.innerText = "Následuje ➔ Žádné";
                     l1Next.className = "next-txt none";
-                    l1Body.innerHTML = '<div class="empty">Žádné aktivní objednávky na lince 1</div>';
+                    if (l1FirstBoxHeader) l1FirstBoxHeader.innerHTML = '';
+                    l1Body.innerHTML = '<div class="empty">Linka je volná</div>';
                 }
             }
 
@@ -1949,20 +2050,44 @@
                 if (ordersL2.length > 0) {
                     let current = ordersL2[0];
                     let next = ordersL2[1];
-                    l2Title.innerText = `${current.car} (${current.stojany} WRT - ${current.total} obalů)`;
+                    l2Title.innerText = `${current.car} (${current.stojany} WRT)`;
                     l2Next.innerText = next ? `Následuje ➔ ${next.car} (${next.stojany} WRT)` : "Následuje ➔ Žádné";
                     l2Next.className = "next-txt";
 
-                    let boxesHtml = '';
-                    for (let i = 1; i <= current.total; i++) {
-                        boxesHtml += `<div class="box-unit ${i <= current.done ? 'done' : 'pending'}">#${i}</div>`;
+                    let firstBox = current.firstBox || 1;
+                    let secondBox = (firstBox === 1) ? 2 : 1;
+
+                    if (l2FirstBoxHeader) {
+                        l2FirstBoxHeader.innerHTML = `
+                            <div class="first-box-selector">
+                                <span class="first-box-lbl">Obal zavezen jako první:</span>
+                                <span class="btn-fb ${firstBox === 1 ? 'active-fb' : ''}">BOX 1</span>
+                                <span class="btn-fb ${firstBox === 2 ? 'active-fb' : ''}">BOX 2</span>
+                            </div>
+                        `;
                     }
-                    l2Body.innerHTML = `<div class="boxes-row">${boxesHtml}</div>${current.note ? `<div class="note-tag line-2">📝 ${current.note}</div>` : ''}`;
+
+                    let b1Num = firstBox;
+                    let b2Num = secondBox;
+                    let b1Done = current.done >= 1;
+                    let b2Done = current.done >= 2;
+
+                    let bannerBoxTarget = (current.done === 0) ? b1Num : b2Num;
+
+                    l2Body.innerHTML = `
+                        <div class="boxes-row">
+                            <div class="vzv-box-btn ${b1Done ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, 1)">#${b1Num}</div>
+                            <div class="vzv-box-btn ${b2Done ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, 2)">#${b2Num}</div>
+                        </div>
+                        ${current.done < 2 ? `<div class="vzv-action-banner" style="background:#a855f7;">✓ ZAVEZ OBAL DO BOXU ${bannerBoxTarget} ! POTÉ POTVRĎ !</div>` : ''}
+                        ${current.note ? `<div class="note-tag line-2" style="margin-top:6px;">📝 ${current.note}</div>` : ''}
+                    `;
                 } else {
                     l2Title.innerText = "Žádná objednávka";
                     l2Next.innerText = "Následuje ➔ Žádné";
                     l2Next.className = "next-txt none";
-                    l2Body.innerHTML = '<div class="empty">Žádné aktivní objednávky na lince 2</div>';
+                    if (l2FirstBoxHeader) l2FirstBoxHeader.innerHTML = '';
+                    l2Body.innerHTML = '<div class="empty">Linka je volná</div>';
                 }
             }
 
@@ -2064,4 +2189,4 @@
     </script>
 </body>
 </html>
-!!! Oprava VZV !!!
+!!! snad ok !!!
