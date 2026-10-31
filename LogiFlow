@@ -1986,7 +1986,7 @@
                 });
             }
 
-            // --- Vykreslení pro pohled VZV (viewB) ---
+            // --- Vykreslení pro pohled VZV (viewB) s plně dynamickým počtem obalů (total) ---
             let l1Title = document.getElementById('l1Title');
             let l1Next = document.getElementById('l1Next');
             let l1Body = document.getElementById('l1Body');
@@ -2007,7 +2007,11 @@
                     l1Next.className = "next-txt";
 
                     let firstBox = current.firstBox || 3;
-                    let secondBox = (firstBox === 3) ? 4 : 3;
+                    let boxSequence = [];
+                    for (let i = 0; i < current.total; i++) {
+                        let bNum = (firstBox === 3) ? (i % 2 === 0 ? 3 : 4) : (i % 2 === 0 ? 4 : 3);
+                        boxSequence.push(bNum);
+                    }
 
                     if (l1FirstBoxHeader) {
                         l1FirstBoxHeader.innerHTML = `
@@ -2019,19 +2023,20 @@
                         `;
                     }
 
-                    let b1Num = firstBox;
-                    let b2Num = secondBox;
-                    let b1Done = current.done >= 1;
-                    let b2Done = current.done >= 2;
+                    let boxesHtml = '';
+                    boxSequence.forEach((bNum, idx) => {
+                        let boxStep = idx + 1;
+                        let isDone = current.done >= boxStep;
+                        boxesHtml += `<div class="vzv-box-btn ${isDone ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, ${boxStep})">#${bNum}</div>`;
+                    });
 
-                    let bannerBoxTarget = (current.done === 0) ? b1Num : b2Num;
+                    let currentBannerBox = boxSequence[current.done] || boxSequence[boxSequence.length - 1];
 
                     l1Body.innerHTML = `
                         <div class="boxes-row">
-                            <div class="vzv-box-btn ${b1Done ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, 1)">#${b1Num}</div>
-                            <div class="vzv-box-btn ${b2Done ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, 2)">#${b2Num}</div>
+                            ${boxesHtml}
                         </div>
-                        ${current.done < 2 ? `<div class="vzv-action-banner">✓ ZAVEZ OBAL DO BOXU ${bannerBoxTarget} ! POTÉ POTVRĎ !</div>` : ''}
+                        ${current.done < current.total ? `<div class="vzv-action-banner">✓ ZAVEZ OBAL DO BOXU ${currentBannerBox} ! POTÉ POTVRĎ !</div>` : ''}
                         ${current.note ? `<div class="note-tag line-1" style="margin-top:6px;">📝 ${current.note}</div>` : ''}
                     `;
                 } else {
@@ -2053,7 +2058,11 @@
                     l2Next.className = "next-txt";
 
                     let firstBox = current.firstBox || 1;
-                    let secondBox = (firstBox === 1) ? 2 : 1;
+                    let boxSequence = [];
+                    for (let i = 0; i < current.total; i++) {
+                        let bNum = (firstBox === 1) ? (i % 2 === 0 ? 1 : 2) : (i % 2 === 0 ? 2 : 1);
+                        boxSequence.push(bNum);
+                    }
 
                     if (l2FirstBoxHeader) {
                         l2FirstBoxHeader.innerHTML = `
@@ -2065,19 +2074,20 @@
                         `;
                     }
 
-                    let b1Num = firstBox;
-                    let b2Num = secondBox;
-                    let b1Done = current.done >= 1;
-                    let b2Done = current.done >= 2;
+                    let boxesHtml = '';
+                    boxSequence.forEach((bNum, idx) => {
+                        let boxStep = idx + 1;
+                        let isDone = current.done >= boxStep;
+                        boxesHtml += `<div class="vzv-box-btn ${isDone ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, ${boxStep})">#${bNum}</div>`;
+                    });
 
-                    let bannerBoxTarget = (current.done === 0) ? b1Num : b2Num;
+                    let currentBannerBox = boxSequence[current.done] || boxSequence[boxSequence.length - 1];
 
                     l2Body.innerHTML = `
                         <div class="boxes-row">
-                            <div class="vzv-box-btn ${b1Done ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, 1)">#${b1Num}</div>
-                            <div class="vzv-box-btn ${b2Done ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, 2)">#${b2Num}</div>
+                            ${boxesHtml}
                         </div>
-                        ${current.done < 2 ? `<div class="vzv-action-banner" style="background:#a855f7;">✓ ZAVEZ OBAL DO BOXU ${bannerBoxTarget} ! POTÉ POTVRĎ !</div>` : ''}
+                        ${current.done < current.total ? `<div class="vzv-action-banner" style="background:#a855f7;">✓ ZAVEZ OBAL DO BOXU ${currentBannerBox} ! POTÉ POTVRĎ !</div>` : ''}
                         ${current.note ? `<div class="note-tag line-2" style="margin-top:6px;">📝 ${current.note}</div>` : ''}
                     `;
                 } else {
@@ -2187,4 +2197,4 @@
     </script>
 </body>
 </html>
-!!! posledni uprava pred odjezdem 13:52 !!!
+!!! Test 15:15 !!!
