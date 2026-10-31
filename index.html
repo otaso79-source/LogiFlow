@@ -1898,7 +1898,6 @@
             let listA = document.getElementById('listA');
             if (listA) {
                 let htmlContent = '';
-                // Obě linky (Linka 1 i Linka 2) se zobrazují společně[span_3](start_span)[span_3](end_span)
                 let linesToRender = [1, 2];
 
                 linesToRender.forEach(l => {
@@ -2085,7 +2084,7 @@
                                 ${modeAlertHtml}
                                 ${cur.note ? `<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>` : ''}
                                 <div class="boxes-row">${boxes}</div>
-                                <button class="${btnClass}" onclick="zavezt(${cur.id})">${btnTest}</button>
+                                <button class="${btnClass}" onclick="zavezt(${cur.id})">${btnText}</button>
                             `;
                         }
                     }
@@ -2105,3 +2104,11 @@
     </script>
 </body>
 </html>
+"""
+
+# Uložení do souboru s novým názvem (verze v2)
+file_name = "LOGIFLOW_SPOLECNE_OBJEDNAVKA_v2.py"
+with open(file_name, "w", encoding="utf-8") as f:
+    f.write(HTML_CODE)
+
+print(f"Soubor {file_name} byl vytvořen.")
