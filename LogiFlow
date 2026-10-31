@@ -374,11 +374,11 @@
                 <div class="big-line-options">
                     <button class="big-line-btn btn-l1" onclick="selectLineAndOpen(1, false)">
                         <span>Linka 1</span>
-                        <span style="font-size: 0.7rem; font-weight: normal; color: #93c5fd;">BOX 4 - 3</span>
+                        <span style="font-size: 0.7rem; font-weight: normal; color: #93c5fd;">Box: 4 - 3</span>
                     </button>
                     <button class="big-line-btn btn-l2" onclick="selectLineAndOpen(2, false)">
                         <span>Linka 2</span>
-                        <span style="font-size: 0.7rem; font-weight: normal; color: #d8b4fe;">BOX 2 - 1</span>
+                        <span style="font-size: 0.7rem; font-weight: normal; color: #d8b4fe;">Box: 2 - 1</span>
                     </button>
                     <button class="big-line-btn btn-both" onclick="selectLineAndOpen(1, true)">
                         <span>Přehled obou linek 1 - 2</span>
@@ -397,7 +397,7 @@
             
             <!-- Statické zobrazení jedné linky s barvou podle ikony -->
             <div class="current-line-info" id="singleLineHeaderBox">
-                <div class="current-line-title color-l1" id="currentLineDisplayTitle">LINKA 1 (BOX 4 - 3)</div>
+                <div class="current-line-title color-l1" id="currentLineDisplayTitle">Linka 1 (Box: 4 - 3)</div>
                 <button class="btn-back-to-select" onclick="showLineSelection()">↩️ Změnit pracoviště</button>
             </div>
 
@@ -408,8 +408,8 @@
                     <button class="btn-back-to-select" onclick="showLineSelection()">↩️ Změnit pracoviště</button>
                 </div>
                 <div class="line-select-toggle">
-                    <div class="line-toggle-btn active-1" id="toggleBtnL1" onclick="switchActiveLineInBoth(1)">LINKA 1 (BOX 4 - 3)</div>
-                    <div class="line-toggle-btn" id="toggleBtnL2" onclick="switchActiveLineInBoth(2)">LINKA 2 (BOX 2 - 1)</div>
+                    <div class="line-toggle-btn active-1" id="toggleBtnL1" onclick="switchActiveLineInBoth(1)">Linka 1 (Box: 4 - 3)</div>
+                    <div class="line-toggle-btn" id="toggleBtnL2" onclick="switchActiveLineInBoth(2)">Linka 2 (Box: 2 - 1)</div>
                 </div>
             </div>
 
@@ -1769,10 +1769,10 @@
                 if (displayTitle) {
                     displayTitle.className = 'current-line-title';
                     if (curLine === 1) {
-                        displayTitle.innerText = 'LINKA 1 (BOX 4 - 3)';
+                        displayTitle.innerText = 'Linka 1 (Box: 4 - 3)';
                         displayTitle.classList.add('color-l1');
                     } else if (curLine === 2) {
-                        displayTitle.innerText = 'LINKA 2 (BOX 2 - 1)';
+                        displayTitle.innerText = 'Linka 2 (Box: 2 - 1)';
                         displayTitle.classList.add('color-l2');
                     } else {
                         displayTitle.innerText = 'PŘEHLED OBJEDNÁVEK (LINKA 1 & 2)';
@@ -2018,4 +2018,4 @@
     </script>
 </body>
 </html>
-!!! Test.verze 1.0.3 !!!
+Finish
