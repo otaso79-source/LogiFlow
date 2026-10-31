@@ -733,7 +733,9 @@
         const db = firebase.database();
 
         let ADMIN_PASSWORD = '704517';
-        let workers = [];
+        let workers = [
+            { id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'VYROBA,VZV,ADMIN' }
+        ];
 
         let notificationsEnabled = true;
         let selectedSoundType = parseInt(localStorage.getItem('selected_sound_type')) || 1;
@@ -780,10 +782,16 @@
             }
         });
 
+        // OKAMŽITÉ ZAVOLÁNÍ PŘI STARTU PRO JISTOTU
+        renderWorkersDropdown();
+
         db.ref('workers').on('value', (snapshot) => {
             let data = snapshot.val();
             if (data) {
-                workers = Array.isArray(data) ? data : Object.values(data);
+                let loadedWorkers = Array.isArray(data) ? data : Object.values(data);
+                if (loadedWorkers.length > 0) {
+                    workers = loadedWorkers;
+                }
                 let adminObj = workers.find(w => w.name === 'Administrator');
                 if (!adminObj) {
                     adminObj = workers.find(w => w.role && w.role.includes('ADMIN'));
@@ -795,9 +803,7 @@
                     ADMIN_PASSWORD = adminObj.pass;
                 }
             } else {
-                workers = [{ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'VYROBA,VZV,ADMIN' }];
                 db.ref('workers').set(workers);
-                ADMIN_PASSWORD = '704517';
             }
             renderWorkersDropdown();
             if (document.getElementById('workersManagerModal').style.display === 'flex') {
@@ -819,7 +825,7 @@
             });
 
             if (filteredWorkers.length === 0) {
-                filteredWorkers = [{ name: 'Administrator', role: 'VYROBA,VZV,ADMIN', pass: '704517' }];
+                filteredWorkers = workers;
             }
 
             select.innerHTML = filteredWorkers.map(w => `<option value="${w.name}">${w.name} (${getRoleName(w.role)})</option>`).join('');
@@ -1048,7 +1054,7 @@
             if (isAuth) {
                 let section = sessionStorage.getItem('active_section') || 'VYROBA';
                 let workerName = sessionStorage.getItem('active_worker') || 'Neznámý';
-                let role = sessionStorage.getItem('active_role'] || '';
+                let role = sessionStorage.getItem('active_role') || '';
                 
                 if (role.includes('ADMIN')) {
                     db.ref('presence/' + deviceId).remove();
@@ -1993,7 +1999,6 @@
                 });
             }
 
-            // --- OPRAVENÉ VYKRESLENÍ PRO VZV (viewB) BEZ DUPLICIT ---
             let l1Title = document.getElementById('l1Title');
             let l1Next = document.getElementById('l1Next');
             let l1Body = document.getElementById('l1Body');
@@ -2204,4 +2209,4 @@
     </script>
 </body>
 </html>
-!!! Test 16:19 !!!
+!!! oprava 17:24!!!
