@@ -1,1793 +1,1765 @@
-​HTML_CODE =<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Logistik - Systém Závozů</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-​<style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-body { background: #0f172a; color: #f8fafc; padding: 10px; font-size: 14px; }
-​#loginScreen {
-display: flex; flex-direction: column; align-items: center; justify-content: center;
-min-height: 80vh; text-align: center; padding: 20px;
-}
-.login-box {
-background: #1e293b; border: 1px solid #334155; padding: 24px;
-border-radius: 12px; width: 100%; max-width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-}
-.login-title { font-size: 1.4rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; }
-.login-sub { font-size: 0.8rem; color: #94a3b8; margin-bottom: 16px; }
-​.login-select {
-width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
-border-radius: 8px; color: #fff; font-size: 1rem; font-weight: bold; margin-bottom: 12px; outline: none; text-align-last: center;
-}
-.login-select:focus { border-color: #f59e0b; }
-​.login-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
-.btn-login-tab { padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; border: 1px solid #334155; background: #0f172a; color: #94a3b8; cursor: pointer; }
-.btn-login-tab.active-vyroba { border-color: #3b82f6; background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
-.btn-login-tab.active-vzv { border-color: #a855f7; background: rgba(168, 85, 247, 0.2); color: #a855f7; }
-​.login-input {
-width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
-border-radius: 8px; color: #fff; font-size: 1.2rem; text-align: center;
-letter-spacing: 4px; margin-bottom: 12px; outline: none;
-}
-.login-input:focus { border-color: #f59e0b; }
-.btn-login {
-width: 100%; padding: 12px; background: #f59e0b; color: #0f172a;
-border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;
-}
-.login-error { color: #ef4444; font-size: 0.8rem; margin-top: 10px; display: none; }
-​#appScreen { display: none; }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.logo { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
-​.header-right { display: flex; align-items: center; gap: 6px; }
-.role-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; font-weight: bold; background: #1e3a8a; color: #3b82f6; }
-.role-badge.l2 { background: #312e81; color: #818cf8; }
-.role-badge.l12 { background: #065f46; color: #34d399; }
-.role-badge.vzv { background: #581c87; color: #a855f7; }
-.role-badge.admin { background: #78350f; color: #fbbf24; }
-​.btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
-.btn-settings { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
-​.line-select { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px; }
-.line-btn { padding: 10px 4px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.7rem; line-height: 1.3; }
-​.line-btn.active-1 { border-color: #3b82f6; color: #fff; background: #1e3a8a; }
-.line-btn.active-2 { border-color: #a855f7; color: #fff; background: #581c87; }
-​.lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
-.btn-opt { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px 4px; border-radius: 8px; font-weight: bold; text-align: center; cursor: pointer; font-size: 0.85rem; }
-​.btn-opt.selected-1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff; }
-.btn-opt.selected-2 { border-color: #a855f7; background: rgba(168, 85, 247, 0.25); color: #fff; }
-​.accordion-wrapper {
-background: #1e293b; border: 1px solid #334155; border-radius: 8px; margin-bottom: 10px; overflow: hidden;
-transition: all 0.3s ease;
-}
-.accordion-header {
-padding: 12px; background: #1e293b; font-size: 0.85rem; font-weight: bold; color: #f8fafc;
-display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;
-transition: all 0.3s ease;
-}
-.accordion-header .arrow { font-size: 0.8rem; color: #94a3b8; transition: transform 0.2s; }
-.accordion-header.open .arrow { transform: rotate(180deg); }
-.accordion-content {
-display: none; padding: 10px; border-top: 1px solid #334155; background: #0f172a;
-}
-​.accordion-wrapper.active-mode-line-1 { border-color: #3b82f6; }
-.accordion-wrapper.active-mode-line-1 .accordion-header { background: #1e3a8a; color: #ffffff; }
-.accordion-wrapper.active-mode-line-2 { border-color: #a855f7; }
-.accordion-wrapper.active-mode-line-2 .accordion-header { background: #581c87; color: #ffffff; }
-​.accordion-header.alarm-active {
-background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #ef4444;
-animation: pulseHeaderAlarm 1.5s infinite;
-}
-@keyframes pulseHeaderAlarm {
-0% { background: rgba(239, 68, 68, 0.35); }
-50% { background: rgba(239, 68, 68, 0.1); }
-100% { background: rgba(239, 68, 68, 0.35); }
-}
-​.single-mode-panel { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.single-mode-panel.line-1 { border-color: #3b82f6; }
-.single-mode-panel.line-2 { border-color: #a855f7; }
-.single-mode-txt { font-size: 0.8rem; font-weight: bold; color: #f8fafc; }
-​.mode-selector-box { background: #1e293b; border: 1px dashed #334155; border-radius: 8px; padding: 8px; margin-bottom: 10px; display: none; }
-.mode-selector-box.active { display: block; }
-.mode-selector-box.line-1 { border-color: #3b82f6; }
-.mode-selector-box.line-2 { border-color: #a855f7; }
-​.report-panel { background: #1e293b; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; }
-.report-sub-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-bottom: 8px; }
-.btn-report-tab { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 6px 2px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; text-align: center; cursor: pointer; }
-.btn-report-tab.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
-​.box-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
-.box-col { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 6px 2px; }
-.box-col-lbl { font-size: 0.7rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; }
-.box-col-btn { width: 100%; padding: 6px 2px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #64748b; cursor: pointer; }
-.box-col-btn.active { background: #ef4444; color: #fff; border-color: #ef4444; animation: pulseAlarm 1.5s infinite; }
-​@keyframes pulseAlarm {
-0% { opacity: 1; }
-50% { opacity: 0.6; }
-100% { opacity: 1; }
-}
-​.diff-box-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; text-align: center; margin-top: 4px; }
-.diff-box-col { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 4px; }
-.diff-box-title { font-size: 0.65rem; color: #f59e0b; font-weight: bold; margin-bottom: 4px; }
-.diff-car-btn { width: 100%; padding: 5px 2px; font-size: 0.65rem; font-weight: bold; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; margin-bottom: 3px; }
-.diff-car-btn.active { background: #10b981; color: #fff; border-color: #10b981; }
-​.vzv-sensor-alert { background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center; animation: pulseAlarm 1.5s infinite; }
-.vzv-sensor-title { font-size: 0.85rem; font-weight: bold; color: #ef4444; margin-bottom: 6px; text-transform: uppercase; }
-.btn-resolve-sensor { background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-top: 4px; }
-​.custom-stojan-input { margin-top: 6px; display: none; gap: 6px; align-items: center; }
-.custom-stojan-input.active { display: flex; }
-.custom-stojan-input input { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.9rem; width: 100%; font-weight: bold; }
-.custom-stojan-input.line-1 input { border-color: #3b82f6; }
-.custom-stojan-input.line-2 input { border-color: #a855f7; }
-​.note-input { width: 100%; background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; outline: none; }
-.note-input:focus { border-color: #f59e0b; }
-​.box-info { background: #1e293b; border: 1px dashed #334155; border-radius: 8px; padding: 8px; display: flex; justify-space-around: text-align: center; margin-bottom: 12px; }
-.val { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
-.btn-submit { width: 100%; padding: 12px; background: #f59e0b; color: #0f172a; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-​.vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid #a855f7; }
-.vzv-card.l1-card { border-top-color: #3b82f6; }
-.vzv-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-.badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: #3b82f6; }
-.badge.l2 { background: #a855f7; }
-.next-txt { font-size: 0.8rem; color: #f59e0b; font-weight: bold; margin-top: 2px; line-height: 1.3; }
-.next-txt.none { color: #64748b; font-weight: normal; }
-​.boxes-row { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
-.box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; cursor: pointer; }
-​.box-unit.done { background: #065f46; color: #34d399; border-color: #059669; }
-.box-unit.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
-​.btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-.btn-zavez.last-box-btn { background: #f59e0b; animation: pulseAlarm 1.5s infinite; }
-​.first-box-folder {
-background: #0f172a;
-border: 1px solid #334155;
-border-radius: 6px;
-overflow: hidden;
-width: 155px;
-flex-shrink: 0;
-}
-.first-box-folder-header {
-font-size: 0.6rem;
-color: #f59e0b;
-font-weight: bold;
-padding: 5px 6px;
-text-transform: uppercase;
-text-align: center;
-letter-spacing: 0.5px;
-cursor: pointer;
-display: flex;
-justify-content: space-between;
-align-items: center;
-user-select: none;
-background: #0f172a;
-}
-.first-box-folder-header .folder-arrow {
-font-size: 0.6rem;
-color: #94a3b8;
-transition: transform 0.2s;
-}
-.first-box-folder-header.open .folder-arrow {
-transform: rotate(180deg);
-}
-.first-box-folder-content {
-display: none;
-padding: 6px;
-border-top: 1px solid #334155;
-background: #162032;
-text-align: center;
-}
-.first-box-folder-content.open {
-display: block;
-}
-.first-box-toggle-container {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-gap: 2px;
-font-size: 0.7rem;
-margin-top: 2px;
-}
-.toggle-title-lbl {
-font-size: 0.6rem;
-color: #94a3b8;
-margin-bottom: 2px;
-font-weight: bold;
-display: block;
-text-align: center;
-}
-.btn-toggle-box {
-padding: 3px 6px;
-border-radius: 4px;
-font-weight: bold;
-font-size: 0.7rem;
-border: none;
-cursor: pointer;
-color: #64748b;
-background: transparent;
-}
-.btn-toggle-box.active {
-background: #f59e0b;
-color: #0f172a;
-}
-​#settingsModal {
-display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-background: rgba(15, 23, 42, 0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px;
-}
-.settings-box {
-background: #1e293b; border: 2px solid #f59e0b; border-radius: 12px;
-width: 100%; max-width: 380px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-max-height: 90vh; overflow-y: auto;
-}
-.settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.settings-title { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
-.btn-close { background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
-​.settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: #0f172a; padding: 10px; border-radius: 8px; }
-​.banner-btns { display: flex; gap: 4px; background: #0f172a; padding: 3px; border-radius: 6px; }
-.btn-yn { padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: none; cursor: pointer; color: #64748b; background: transparent; }
-.btn-yn.active-yes { background: #10b981; color: #fff; }
-.btn-yn.active-no { background: #ef4444; color: #fff; }
-​.settings-online-counter {
-background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px;
-display: flex; justify-content: space-around; text-align: center; font-size: 0.8rem;
-}
-.online-val-a { color: #3b82f6; font-weight: bold; font-size: 1rem; }
-.online-val-b { color: #a855f7; font-weight: bold; font-size: 1rem; }
-​#adminPasswordModal {
-display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-background: rgba(15, 23, 42, 0.85); z-index: 10000; align-items: center; justify-content: center; padding: 15px;
-}
-.admin-pwd-box {
-background: #1e293b; border: 2px solid #f59e0b; border-radius: 12px;
-width: 100%; max-width: 320px; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-}
-.admin-pwd-input {
-width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
-border-radius: 8px; color: #fff; font-size: 1.2rem; text-align: center;
-letter-spacing: 4px; margin: 15px 0; outline: none;
-}
-.admin-pwd-input:focus { border-color: #f59e0b; }
-.admin-pwd-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.btn-admin-action { padding: 10px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; font-size: 0.9rem; }
-.btn-admin-cancel { background: #334155; color: #94a3b8; }
-.btn-admin-ok { background: #f59e0b; color: #0f172a; }
-​#updateBannerOverlay {
-display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-background: rgba(15, 23, 42, 0.95); z-index: 9999; align-items: center; justify-content: center; padding: 20px; text-align: center;
-}
-.update-banner-box {
-background: #1e293b; border: 3px solid #ef4444; border-radius: 16px;
-width: 100%; max-width: 380px; padding: 24px; box-shadow: 0 15px 40px rgba(239, 68, 68, 0.4);
-}
-.update-banner-title { font-size: 1.2rem; font-weight: bold; color: #ef4444; margin-bottom: 12px; text-transform: uppercase; cursor: pointer; user-select: none; }
-.update-banner-text { font-size: 0.95rem; color: #f8fafc; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
-.btn-update-ack { width: 100%; padding: 14px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; display: none; }
-​.update-banner-box.completed-box {
-border: 3px solid #10b981;
-box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
-}
-.update-banner-box.completed-box .update-banner-title {
-color: #10b981;
-}
-.update-banner-box.completed-box .btn-update-ack {
-background: #10b981;
-display: block;
-}
-​.vzv-alert-panel { background: #1e293b; border: 1px solid #ef4444; border-radius: 8px; padding: 10px; margin-top: 16px; }
-.vzv-alert-title { font-size: 0.8rem; font-weight: bold; color: #ef4444; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
-.vzv-alert-row { display: flex; gap: 6px; margin-bottom: 8px; }
-.vzv-select { flex: 1; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; outline: none; }
-.vzv-num-input { width: 140px; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.75rem; text-align: center; font-weight: bold; outline: none; }
-.btn-send-alert { width: 100%; padding: 9px; background: #ef4444; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-​.empty { text-align: center; color: #94a3b8; padding: 12px; font-size: 0.75rem; font-weight: bold; line-height: 1.4; }
-.done-msg { background: #065f46; color: #34d399; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
-​.note-tag { padding: 4px 8px; font-size: 0.75rem; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
-.note-tag.line-1 { background: rgba(59, 130, 246, 0.15); border-left: 3px solid #3b82f6; color: #93c5fd; }
-.note-tag.line-2 { background: rgba(168, 85, 247, 0.15); border-left: 3px solid #a855f7; color: #d8b4fe; }
-​.vzv-single-mode-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.75rem; color: #fbbf24; font-weight: bold; text-align: center; line-height: 1.4; }
-​.btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 4px; flex-shrink: 0; }
-.btn-move { background: rgba(51, 65, 85, 0.5); border: 1px solid #334155; color: #94a3b8; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-left: 4px; flex-shrink: 0; }
-.btn-move:hover { background: #334155; color: #fff; }
-​.stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.80rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
-.btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
-​.wrt-badge-1 { background: rgba(59, 130, 246, 0.25); border: 1px solid #3b82f6; color: #93c5fd; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
-.wrt-badge-2 { background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #d8b4fe; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
-​.editable-progress {
-color: #f59e0b; font-weight: bold; white-space: nowrap; margin-left: 6px;
-background: rgba(245, 158, 11, 0.15); padding: 4px 8px; border-radius: 6px; cursor: pointer;
-border: 1px dashed #f59e0b; font-size: 0.75rem;
-}
-​.order-expand-menu { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px; margin-top: 8px; }
-.expand-menu-title { font-size: 0.75rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; text-align: center; }
-​.queue-section-box { background: #162032; border: 1px solid #334155; border-radius: 8px; padding: 8px; margin-bottom: 10px; }
-.queue-section-title { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-.queue-section-title.l1 { color: #3b82f6; border-bottom: 1px solid rgba(59, 130, 246, 0.3); padding-bottom: 4px; }
-.queue-section-title.l2 { color: #a855f7; border-bottom: 1px solid rgba(168, 85, 247, 0.3); padding-bottom: 4px; }
-.queue-order-num { font-size: 0.7rem; background: #334155; color: #cbd5e1; padding: 3px 6px; border-radius: 4px; font-weight: bold; white-space: nowrap; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Logistik - Systém Závozů</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background: #0f172a; color: #f8fafc; padding: 10px; font-size: 14px; }
+        
+        #loginScreen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 80vh; text-align: center; padding: 20px;
+        }
+        .login-box {
+            background: #1e293b; border: 1px solid #334155; padding: 24px;
+            border-radius: 12px; width: 100%; max-width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .login-title { font-size: 1.4rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; }
+        .login-sub { font-size: 0.8rem; color: #94a3b8; margin-bottom: 16px; }
+        
+        .login-mode-select { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
+        .login-mode-btn { padding: 10px 4px; font-size: 0.8rem; font-weight: bold; border-radius: 6px; cursor: pointer; border: 2px solid #334155; background: #1e293b; color: #94a3b8; text-align: center; }
+        .login-mode-btn.active-l1 { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
+        .login-mode-btn.active-l2 { background: #312e81; border-color: #6366f1; color: #fff; }
+        .login-mode-btn.active-l12 { background: #065f46; border-color: #10b981; color: #fff; }
+        .login-mode-btn.active-vzv { background: #581c87; border-color: #a855f7; color: #fff; }
+
+        .login-input {
+            width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
+            border-radius: 8px; color: #fff; font-size: 1.2rem; text-align: center;
+            letter-spacing: 4px; margin-bottom: 12px; outline: none;
+        }
+        .login-input:focus { border-color: #f59e0b; }
+        .btn-login {
+            width: 100%; padding: 12px; background: #f59e0b; color: #0f172a;
+            border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;
+        }
+        .login-error { color: #ef4444; font-size: 0.8rem; margin-top: 10px; display: none; }
+
+        #appScreen { display: none; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .logo { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
+        
+        .header-right { display: flex; align-items: center; gap: 6px; }
+        .role-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; font-weight: bold; background: #1e3a8a; color: #3b82f6; }
+        .role-badge.l2 { background: #312e81; color: #818cf8; }
+        .role-badge.l12 { background: #065f46; color: #34d399; }
+        .role-badge.vzv { background: #581c87; color: #a855f7; }
+
+        .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-settings { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+        .line-select { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .line-btn { padding: 10px 6px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.75rem; line-height: 1.3; }
+        
+        .line-btn.active-1 { border-color: #3b82f6; color: #fff; background: #1e3a8a; }
+        .line-btn.active-2 { border-color: #a855f7; color: #fff; background: #581c87; }
+
+        .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
+        .btn-opt { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 10px 4px; border-radius: 8px; font-weight: bold; text-align: center; cursor: pointer; font-size: 0.85rem; }
+        
+        .btn-opt.selected-1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff; }
+        .btn-opt.selected-2 { border-color: #a855f7; background: rgba(168, 85, 247, 0.25); color: #fff; }
+
+        .accordion-wrapper {
+            background: #1e293b; border: 1px solid #334155; border-radius: 8px; margin-bottom: 10px; overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .accordion-header {
+            padding: 12px; background: #1e293b; font-size: 0.85rem; font-weight: bold; color: #f8fafc;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;
+            transition: all 0.3s ease;
+        }
+        .accordion-header .arrow { font-size: 0.8rem; color: #94a3b8; transition: transform 0.2s; }
+        .accordion-header.open .arrow { transform: rotate(180deg); }
+        .accordion-content {
+            display: none; padding: 10px; border-top: 1px solid #334155; background: #0f172a;
+        }
+
+        .accordion-wrapper.active-mode-line-1 { border-color: #3b82f6; }
+        .accordion-wrapper.active-mode-line-1 .accordion-header { background: #1e3a8a; color: #ffffff; }
+        .accordion-wrapper.active-mode-line-2 { border-color: #a855f7; }
+        .accordion-wrapper.active-mode-line-2 .accordion-header { background: #581c87; color: #ffffff; }
+
+        .accordion-header.alarm-active {
+            background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #ef4444;
+            animation: pulseHeaderAlarm 1.5s infinite;
+        }
+        @keyframes pulseHeaderAlarm {
+            0% { background: rgba(239, 68, 68, 0.35); }
+            50% { background: rgba(239, 68, 68, 0.1); }
+            100% { background: rgba(239, 68, 68, 0.35); }
+        }
+
+        .single-mode-panel { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .single-mode-panel.line-1 { border-color: #3b82f6; }
+        .single-mode-panel.line-2 { border-color: #a855f7; }
+        .single-mode-txt { font-size: 0.8rem; font-weight: bold; color: #f8fafc; }
+
+        .mode-selector-box { background: #1e293b; border: 1px dashed #334155; border-radius: 8px; padding: 8px; margin-bottom: 10px; display: none; }
+        .mode-selector-box.active { display: block; }
+        .mode-selector-box.line-1 { border-color: #3b82f6; }
+        .mode-selector-box.line-2 { border-color: #a855f7; }
+
+        .report-panel { background: #1e293b; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; }
+        .report-sub-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-bottom: 8px; }
+        .btn-report-tab { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 6px 2px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; text-align: center; cursor: pointer; }
+        .btn-report-tab.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+        .box-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
+        .box-col { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 6px 2px; }
+        .box-col-lbl { font-size: 0.7rem; color: #94a3b8; font-weight: bold; margin-bottom: 4px; }
+        .box-col-btn { width: 100%; padding: 6px 2px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #64748b; cursor: pointer; }
+        .box-col-btn.active { background: #ef4444; color: #fff; border-color: #ef4444; animation: pulseAlarm 1.5s infinite; }
+
+        @keyframes pulseAlarm {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .diff-box-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; text-align: center; margin-top: 4px; }
+        .diff-box-col { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 4px; }
+        .diff-box-title { font-size: 0.65rem; color: #f59e0b; font-weight: bold; margin-bottom: 4px; }
+        .diff-car-btn { width: 100%; padding: 5px 2px; font-size: 0.65rem; font-weight: bold; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; margin-bottom: 3px; }
+        .diff-car-btn.active { background: #10b981; color: #fff; border-color: #10b981; }
+
+        .vzv-sensor-alert { background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center; animation: pulseAlarm 1.5s infinite; }
+        .vzv-sensor-title { font-size: 0.85rem; font-weight: bold; color: #ef4444; margin-bottom: 6px; text-transform: uppercase; }
+        .btn-resolve-sensor { background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-top: 4px; }
+
+        .custom-stojan-input { margin-top: 6px; display: none; gap: 6px; align-items: center; }
+        .custom-stojan-input.active { display: flex; }
+        .custom-stojan-input input { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.9rem; width: 100%; font-weight: bold; }
+        .custom-stojan-input.line-1 input { border-color: #3b82f6; }
+        .custom-stojan-input.line-2 input { border-color: #a855f7; }
+
+        .note-input { width: 100%; background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 12px; outline: none; }
+        .note-input:focus { border-color: #f59e0b; }
+
+        .box-info { background: #1e293b; border: 1px dashed #334155; border-radius: 8px; padding: 8px; display: flex; justify-content: space-around; text-align: center; margin-bottom: 12px; }
+        .val { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
+        .btn-submit { width: 100%; padding: 12px; background: #f59e0b; color: #0f172a; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+
+        .vzv-card { background: #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; border-top: 4px solid #a855f7; }
+        .vzv-card.l1-card { border-top-color: #3b82f6; }
+        .vzv-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; background: #3b82f6; }
+        .badge.l2 { background: #a855f7; }
+        .next-txt { font-size: 0.8rem; color: #f59e0b; font-weight: bold; margin-top: 2px; line-height: 1.3; }
+        .next-txt.none { color: #64748b; font-weight: normal; }
+        
+        .boxes-row { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
+        .box-unit { flex: 1; min-width: 30px; height: 26px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748b; font-weight: bold; cursor: pointer; }
+        
+        .box-unit.done { background: #065f46; color: #34d399; border-color: #059669; }
+        .box-unit.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
+
+        .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-zavez.last-box-btn { background: #f59e0b; animation: pulseAlarm 1.5s infinite; }
+
+        .first-box-folder {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            overflow: hidden;
+            width: 155px;
+            flex-shrink: 0;
+        }
+        .first-box-folder-header {
+            font-size: 0.6rem;
+            color: #f59e0b;
+            font-weight: bold;
+            padding: 5px 6px;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            background: #0f172a;
+        }
+        .first-box-folder-header .folder-arrow {
+            font-size: 0.6rem;
+            color: #94a3b8;
+            transition: transform 0.2s;
+        }
+        .first-box-folder-header.open .folder-arrow {
+            transform: rotate(180deg);
+        }
+        .first-box-folder-content {
+            display: none;
+            padding: 6px;
+            border-top: 1px solid #334155;
+            background: #162032;
+            text-align: center;
+        }
+        .first-box-folder-content.open {
+            display: block;
+        }
+        .first-box-toggle-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-size: 0.7rem;
+            margin-top: 2px;
+        }
+        .toggle-title-lbl {
+            font-size: 0.6rem;
+            color: #94a3b8;
+            margin-bottom: 2px;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+        }
+        .btn-toggle-box {
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.7rem;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            background: transparent;
+        }
+        .btn-toggle-box.active {
+            background: #f59e0b;
+            color: #0f172a;
+        }
+
+        #settingsModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px;
+        }
+        .settings-box {
+            background: #1e293b; border: 2px solid #f59e0b; border-radius: 12px;
+            width: 100%; max-width: 360px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .settings-title { font-size: 1.1rem; font-weight: bold; color: #f59e0b; }
+        .btn-close { background: transparent; border: none; color: #94a3b8; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
+
+        .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: #0f172a; padding: 10px; border-radius: 8px; }
+
+        .banner-btns { display: flex; gap: 4px; background: #0f172a; padding: 3px; border-radius: 6px; }
+        .btn-yn { padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; border: none; cursor: pointer; color: #64748b; background: transparent; }
+        .btn-yn.active-yes { background: #10b981; color: #fff; }
+        .btn-yn.active-no { background: #ef4444; color: #fff; }
+
+        .settings-online-counter {
+            background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px;
+            display: flex; justify-content: space-around; text-align: center; font-size: 0.8rem;
+        }
+        .online-val-a { color: #3b82f6; font-weight: bold; font-size: 1rem; }
+        .online-val-b { color: #a855f7; font-weight: bold; font-size: 1rem; }
+
+        #adminPasswordModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85); z-index: 10000; align-items: center; justify-content: center; padding: 15px;
+        }
+        .admin-pwd-box {
+            background: #1e293b; border: 2px solid #f59e0b; border-radius: 12px;
+            width: 100%; max-width: 320px; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+        .admin-pwd-input {
+            width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
+            border-radius: 8px; color: #fff; font-size: 1.2rem; text-align: center;
+            letter-spacing: 4px; margin: 15px 0; outline: none;
+        }
+        .admin-pwd-input:focus { border-color: #f59e0b; }
+        .admin-pwd-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn-admin-action { padding: 10px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; font-size: 0.9rem; }
+        .btn-admin-cancel { background: #334155; color: #94a3b8; }
+        .btn-admin-ok { background: #f59e0b; color: #0f172a; }
+
+        #updateBannerOverlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95); z-index: 9999; align-items: center; justify-content: center; padding: 20px; text-align: center;
+        }
+        .update-banner-box {
+            background: #1e293b; border: 3px solid #ef4444; border-radius: 16px;
+            width: 100%; max-width: 380px; padding: 24px; box-shadow: 0 15px 40px rgba(239, 68, 68, 0.4);
+        }
+        .update-banner-title { font-size: 1.2rem; font-weight: bold; color: #ef4444; margin-bottom: 12px; text-transform: uppercase; cursor: pointer; user-select: none; }
+        .update-banner-text { font-size: 0.95rem; color: #f8fafc; font-weight: bold; line-height: 1.5; margin-bottom: 20px; }
+        .btn-update-ack { width: 100%; padding: 14px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; display: none; }
+
+        .update-banner-box.completed-box {
+            border: 3px solid #10b981;
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+        .update-banner-box.completed-box .update-banner-title {
+            color: #10b981;
+        }
+        .update-banner-box.completed-box .btn-update-ack {
+            background: #10b981;
+            display: block;
+        }
+
+        .vzv-alert-panel { background: #1e293b; border: 1px solid #ef4444; border-radius: 8px; padding: 10px; margin-top: 16px; }
+        .vzv-alert-title { font-size: 0.8rem; font-weight: bold; color: #ef4444; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+        .vzv-alert-row { display: flex; gap: 6px; margin-bottom: 8px; }
+        .vzv-select { flex: 1; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; outline: none; }
+        .vzv-num-input { width: 140px; background: #0f172a; border: 1px solid #334155; color: #fff; padding: 8px; border-radius: 6px; font-size: 0.75rem; text-align: center; font-weight: bold; outline: none; }
+        .btn-send-alert { width: 100%; padding: 9px; background: #ef4444; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+
+        .empty { text-align: center; color: #94a3b8; padding: 12px; font-size: 0.75rem; font-weight: bold; line-height: 1.4; }
+        .done-msg { background: #065f46; color: #34d399; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-top: 10px; }
+        
+        .note-tag { padding: 4px 8px; font-size: 0.75rem; margin: 4px 0 8px 0; border-radius: 0 4px 4px 0; }
+        .note-tag.line-1 { background: rgba(59, 130, 246, 0.15); border-left: 3px solid #3b82f6; color: #93c5fd; }
+        .note-tag.line-2 { background: rgba(168, 85, 247, 0.15); border-left: 3px solid #a855f7; color: #d8b4fe; }
+
+        .vzv-single-mode-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.75rem; color: #fbbf24; font-weight: bold; text-align: center; line-height: 1.4; }
+
+        .btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 4px; flex-shrink: 0; }
+        .btn-move { background: rgba(51, 65, 85, 0.5); border: 1px solid #334155; color: #94a3b8; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-left: 4px; flex-shrink: 0; }
+        .btn-move:hover { background: #334155; color: #fff; }
+
+        .stock-alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.80rem; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+        .btn-dismiss { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        
+        .wrt-badge-1 { background: rgba(59, 130, 246, 0.25); border: 1px solid #3b82f6; color: #93c5fd; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+        .wrt-badge-2 { background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #d8b4fe; font-weight: bold; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+        
+        .editable-progress {
+            color: #f59e0b; font-weight: bold; white-space: nowrap; margin-left: 6px;
+            background: rgba(245, 158, 11, 0.15); padding: 4px 8px; border-radius: 6px; cursor: pointer;
+            border: 1px dashed #f59e0b; font-size: 0.75rem;
+        }
+
+        .order-expand-menu { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px; margin-top: 8px; }
+        .expand-menu-title { font-size: 0.75rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; text-align: center; }
+
+        .queue-section-box { background: #162032; border: 1px solid #334155; border-radius: 8px; padding: 8px; margin-bottom: 10px; }
+        .queue-section-title { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .queue-section-title.l1 { color: #3b82f6; border-bottom: 1px solid rgba(59, 130, 246, 0.3); padding-bottom: 4px; }
+        .queue-section-title.l2 { color: #a855f7; border-bottom: 1px solid rgba(168, 85, 247, 0.3); padding-bottom: 4px; }
+        .queue-order-num { font-size: 0.7rem; background: #334155; color: #cbd5e1; padding: 3px 6px; border-radius: 4px; font-weight: bold; white-space: nowrap; }
+    </style>
 </head>
 <body>
-​<div id="updateBannerOverlay">
-<div class="update-banner-box" id="updateBannerBox">
-<div class="update-banner-title" id="bannerTitle" onclick="openAdminPasswordModal(true)" title="Kliknutím zadat heslo správce">⚠️ UPOZORNĚNÍ NA ÚDRŽBU</div>
-<div class="update-banner-text" id="bannerText">Načítání...</div>
-<button class="btn-update-ack" id="bannerAckBtn" onclick="acknowledgeUpdate()">OK</button>
-</div>
-</div>
-​<!-- Modální okno pro zadání administrátorského hesla -->
-<div id="adminPasswordModal">
-<div class="admin-pwd-box">
-<div style="font-size: 1rem; font-weight: bold; color: #f59e0b;">🔒 Zadejte heslo správce</div>
-<div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Pro přístup ke správě nebo režimu údržby</div>
-<input type="password" id="adminPassInput" class="admin-pwd-input" placeholder="••••••" autofocus onkeydown="if(event.key==='Enter') verifyAdminPassword()">
-<div id="adminPassError" style="color: #ef4444; font-size: 0.75rem; margin-bottom: 8px; display: none;">⚠️ Nesprávné heslo!</div>
-<div class="admin-pwd-btns">
-<button class="btn-admin-action btn-admin-cancel" onclick="closeAdminPasswordModal()">Zrušit</button>
-<button class="btn-admin-action btn-admin-ok" onclick="verifyAdminPassword()">Potvrdit</button>
-</div>
-</div>
-</div>
-​<!-- Přihlašovací obrazovka s volbou Výroba | VZV a filtrováním pracovníků -->
-<div id="loginScreen">
-<div class="login-box">
-<div class="login-title">⚡ LogiFlow</div>
-<div class="login-sub">Zvolte sekci a pracovníka</div>
-​<div class="login-tabs">
-<button class="btn-login-tab active-vyroba" id="loginTabVyroba" onclick="setLoginSection('VYROBA')">Výroba</button>
-<button class="btn-login-tab" id="loginTabVzv" onclick="setLoginSection('VZV')">VZV</button>
-</div>
-​<select id="workerSelect" class="login-select" onchange="onWorkerSelectChange()">
-<!-- Naplní se dynamicky podle zvolené sekce -->
-</select>
-​<input type="password" id="passInput" class="login-input" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
-<button class="btn-login" type="button" onclick="checkPassword()">VSTOUPIT DO SYSTÉMU</button>
-<div id="loginError" class="login-error">⚠️ Nesprávné heslo! Zkuste to znovu.</div>
-</div>
-</div>
-​<div id="appScreen">
-<div class="header">
-<div class="logo">⚡ LogiFlow</div>
-<div class="header-right">
-<button class="btn-settings" onclick="openSettingsModal()" title="Nastavení">⚙️ Nastavení</button>
-<span id="roleBadge" class="role-badge">Linka 1</span>
-<button class="btn-logout" onclick="logout()" title="Odhlásit tento telefon">🔓 Odhlásit</button>
-</div>
-</div>
-​<div id="viewA">
-<div id="alertAreaA"></div>
-<div class="lbl" id="lineSelectContainerLbl">Vyberte Linku</div>
-<div class="line-select" id="lineSelectContainer">
-<div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1
-<span style="font-size:0.6rem; font-weight:normal;">BOX 4 - 3</span></div>
-<div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2
-<span style="font-size:0.6rem; font-weight:normal;">BOX 2 - 1</span></div>
-</div>
-​<div class="accordion-wrapper" id="modesAccordionWrapper">
-<div class="accordion-header" id="modesAccordionHeader" onclick="toggleAccordion('modesAccordionContent', 'modesAccordionHeader')">
-<span>Výroba jedné nebo dvou variant se stejným obalem :</span>
-<span class="arrow">▼</span>
-</div>
-<div class="accordion-content" id="modesAccordionContent">
-<div class="single-mode-panel line-1" id="singleModePanel">
-<div class="single-mode-txt">🔒 Režim: Jede pouze 1 varianta</div>
-<div class="banner-btns">
-<button class="btn-yn" id="btnSingleYes" onclick="toggleSingleMode(true)">ZAP</button>
-<button class="btn-yn active-no" id="btnSingleNo" onclick="toggleSingleMode(false)">VYP</button>
-</div>
-</div>
-​<div class="mode-selector-box line-1" id="singleModeSelectBox">
-<div class="lbl" style="margin-top:0;">Vyberte variantu pro režim:</div>
-<div class="grid-3" id="singleCarGrid" style="margin-bottom:0;">
-<div class="btn-opt" onclick="setSingleCar('Tiguan', this)">Tiguan</div>
-<div class="btn-opt" onclick="setSingleCar('Kodiaq', this)">Kodiaq</div>
-<div class="btn-opt" onclick="setSingleCar('Tayron', this)">Tayron</div>
-<div class="btn-opt" onclick="setSingleCar('Audi', this)">Audi</div>
-<div class="btn-opt" onclick="setSingleCar('Seat', this)">Seat</div>
-</div>
-</div>
-​<div class="single-mode-panel line-1" id="twoVariantPanel">
-<div class="single-mode-txt">🔒 Režim: Jedou 2 varianty (stejný obal)</div>
-<div class="banner-btns">
-<button class="btn-yn" id="btnTwoYes" onclick="toggleTwoVariantMode(true)">ZAP</button>
-<button class="btn-yn active-no" id="btnTwoNo" onclick="toggleTwoVariantMode(false)">VYP</button>
-</div>
-</div>
-​<div class="mode-selector-box line-1" id="twoModeSelectBox">
-<div class="lbl" style="margin-top:0;">Vyberte dvojici variant pro kontrolu:</div>
-<div class="grid-2" id="twoPairGrid" style="margin-bottom:0;">
-<div class="btn-opt" onclick="setTwoPair('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
-<div class="btn-opt" onclick="setTwoPair('Audi / Seat', this)">Audi / Seat</div>
-</div>
-</div>
-</div>
-</div>
-​<div class="accordion-wrapper" id="sensorAccordionWrapper">
-<div class="accordion-header" id="sensorAccordionHeader" onclick="toggleAccordion('sensorAccordionContent', 'sensorAccordionHeader')">
-<span id="sensorAccordionTitle">Info pro VZV: čidla, jiný obal, vadný obal, přivez prázdný</span>
-<span class="arrow">▼</span>
-</div>
-<div class="accordion-content" id="sensorAccordionContent">
-<div class="report-panel">
-<div class="report-sub-tabs">
-<button class="btn-report-tab active" id="tabReportSensors" onclick="setReportTab('sensors')">1. Čidla</button>
-<button class="btn-report-tab" id="tabReportDiff" onclick="setReportTab('diff')">2. Jiný obal</button>
-<button class="btn-report-tab" id="tabReportDefect" onclick="setReportTab('defect')">3. Vadný obal</button>
-<button class="btn-report-tab" id="tabReportEmpty" onclick="setReportTab('empty')">4. Přivez prázdný</button>
-</div>
-​<div id="reportSubSensors">
-<div class="repeat-title" style="margin-top:4px;">Opakuj zavezení, bedna není na čidlech :</div>
-<div class="box-grid-4">
-<div class="box-col"><div class="box-col-lbl">Box 4</div><button class="box-col-btn" id="repeatBox4" onclick="toggleRepeatBox(4)">VYP</button></div>
-<div class="box-col"><div class="box-col-lbl">Box 3</div><button class="box-col-btn" id="repeatBox3" onclick="toggleRepeatBox(3)">VYP</button></div>
-<div class="box-col"><div class="box-col-lbl">Box 2</div><button class="box-col-btn" id="repeatBox2" onclick="toggleRepeatBox(2)">VYP</button></div>
-<div class="box-col"><div class="box-col-lbl">Box 1</div><button class="box-col-btn" id="repeatBox1" onclick="toggleRepeatBox(1)">VYP</button></div>
-</div>
-</div>
-​<div id="reportSubDiff" style="display:none;">
-<div class="repeat-title" style="margin-top:4px; color:#f59e0b;">Obal se neshoduje s variantou. (vyberte box a správnou variantu):</div>
-<div class="diff-box-grid">
-<div class="diff-box-col" id="diffColBox4">
-<div class="diff-box-title">Box 4</div>
-<button class="diff-car-btn" onclick="toggleDiffReport(4, 'Tiguan')">Tiguan</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(4, 'Kodiaq')">Kodiaq</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(4, 'Tayron')">Tayron</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(4, 'Audi')">Audi</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(4, 'Seat')">Seat</button>
-</div>
-<div class="diff-box-col" id="diffColBox3">
-<div class="diff-box-title">Box 3</div>
-<button class="diff-car-btn" onclick="toggleDiffReport(3, 'Tiguan')">Tiguan</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(3, 'Kodiaq')">Kodiaq</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(3, 'Tayron')">Tayron</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(3, 'Audi')">Audi</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(3, 'Seat')">Seat</button>
-</div>
-<div class="diff-box-col" id="diffColBox2">
-<div class="diff-box-title">Box 2</div>
-<button class="diff-car-btn" onclick="toggleDiffReport(2, 'Tiguan')">Tiguan</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(2, 'Kodiaq')">Kodiaq</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(2, 'Tayron')">Tayron</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(2, 'Audi')">Audi</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(2, 'Seat')">Seat</button>
-</div>
-<div class="diff-box-col" id="diffColBox1">
-<div class="diff-box-title">Box 1</div>
-<button class="diff-car-btn" onclick="toggleDiffReport(1, 'Tiguan')">Tiguan</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(1, 'Kodiaq')">Kodiaq</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(1, 'Tayron')">Tayron</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(1, 'Audi')">Audi</button>
-<button class="diff-car-btn" onclick="toggleDiffReport(1, 'Seat')">Seat</button>
-</div>
-</div>
-</div>
-​<div id="reportSubDefect" style="display:none;">
-<div class="repeat-title" style="margin-top:4px; color:#ef4444;">Obal je vadný, křivý. Vyměň ho (vyberte box):</div>
-<div class="box-grid-4">
-<div class="box-col"><div class="box-col-lbl">Box 4</div><button class="box-col-btn" id="defectBox4" onclick="toggleDefectReport(4)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
-<div class="box-col"><div class="box-col-lbl">Box 3</div><button class="box-col-btn" id="defectBox3" onclick="toggleDefectReport(3)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
-<div class="box-col"><div class="box-col-lbl">Box 2</div><button class="box-col-btn" id="defectBox2" onclick="toggleDefectReport(2)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
-<div class="box-col"><div class="box-col-lbl">Box 1</div><button class="box-col-btn" id="defectBox1" onclick="toggleDefectReport(1)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
-</div>
-</div>
-​<div id="reportSubEmpty" style="display:none;">
-<div class="repeat-title" style="margin-top:4px; color:#10b981;">Přivez prázdný obal na pracoviště (vyberte variantu a počet):</div>
-<div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; align-items:center;">
-<select id="emptyVariantSelect" class="vzv-select" style="flex:1; min-width:130px;">
-<option value="Tiguan">Tiguan</option>
-<option value="Kodiaq">Kodiaq</option>
-<option value="Tayron">Tayron</option>
-<option value="Audi">Audi</option>
-<option value="Seat">Seat</option>
-</select>
-<input type="number" id="emptyCountInput" class="vzv-num-input" placeholder="počet obalů" min="1" max="99" style="width:110px;">
-<button class="btn-send-alert" onclick="sendEmptyReport()" style="background:#10b981; margin-top:0; width:100%;">📢 ODESLAT POŽADAVEK NA VZV</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-​<div id="standardOrderSection">
-<div class="lbl" id="productLbl">Produkt</div>
-<div class="grid-3" id="carGrid">
-<div class="btn-opt selected-1" onclick="setCar('Tiguan', this)">Tiguan</div>
-<div class="btn-opt" onclick="setCar('Kodiaq', this)">Kodiaq</div>
-<div class="btn-opt" onclick="setCar('Tayron', this)">Tayron</div>
-<div class="btn-opt" onclick="setCar('Audi', this)">Audi</div>
-<div class="btn-opt" onclick="setCar('Seat', this)">Seat</div>
-</div>
-​<div class="lbl">Počet Stojanů WRT</div>
-<div class="grid-3" id="stojanGrid">
-<div class="btn-opt selected-1" id="opt3WRT" onclick="setStojany(3, this)">3 WRT</div>
-<div class="btn-opt" id="opt6WRT" onclick="setStojany(6, this)">6 WRT</div>
-<div class="btn-opt" id="optCustomWRT" onclick="enableCustomStojany(this)">✏️ Vlastní</div>
-</div>
-​<div class="custom-stojan-input line-1" id="customStojanBox">
-<span style="font-size:0.8rem; color:#94a3b8; white-space:nowrap;">Zadejte počet:</span>
-<input type="number" id="customInput" min="1" max="50" value="4" oninput="onCustomStojanyInput(this.value)">
-</div>
-​<div class="lbl">Poznámka pro VZV (volitelné)</div>
-<input type="text" id="noteInput" class="note-input" placeholder="Napište poznámku k objednávce..." />
-​<div class="box-info">
-<div><div class="val" id="lblKs">36 ks</div><div style="font-size:0.65rem; color:#94a3b8;">CELKEM</div></div>
-<div><div class="val" id="lblOb">4 obaly</div><div style="font-size:0.65rem; color:#94a3b8;">K ZAVÁŽENÍ (po 9ks)</div></div>
-</div>
-​<button class="btn-submit" onclick="addOrder()">POSLAT OBJEDNÁVKU VZV</button>
-</div>
-​<div class="lbl" style="margin-top:16px;">Odesláno na VZV (Probíhají objednávky / Aktivní režimy)</div>
-<div id="listA"></div>
-</div>
-​<div id="viewB" style="display:none;">
-<div class="lbl">Přehled linek pro závoz VZV</div>
-​<div id="vzvSensorAlertArea"></div>
-​<div class="vzv-card l2">
-<div class="vzv-hdr">
-<div>
-<span class="badge l2">Box: 1 - 2</span>
-<h2 id="l2Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
-<div id="l2Next" class="next-txt none">Následuje ➔ Žádné</div>
-</div>
-<div id="l2FirstBoxHeader"></div>
-</div>
-<div id="l2Body"></div>
-</div>
-​<div class="vzv-card l1-card">
-<div class="vzv-hdr">
-<div>
-<span class="badge">Box: 3 - 4</span>
-<h2 id="l1Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
-<div id="l1Next" class="next-txt none">Následuje ➔ Žádné</div>
-</div>
-<div id="l1FirstBoxHeader"></div>
-</div>
-<div id="l1Body"></div>
-</div>
-​<div class="vzv-alert-panel">
-<div class="vzv-alert-title">⚠️ Hlášení stavu obalů obsluze</div>
-<div class="vzv-alert-row">
-<select id="vzvVariantSelect" class="vzv-select">
-<option value="Tiguan / Kodiaq">Tiguan / Kodiaq</option>
-<option value="Audi / Seat">Audi / Seat</option>
-<option value="Tayron">Tayron</option>
-</select>
-<input type="number" id="vzvCountInput" class="vzv-num-input" placeholder="zde napiš počet obalu" value="" min="1" max="99">
-</div>
-<button class="btn-send-alert" onclick="sendCustomStockAlert()">📢 ODESLAT HLÁŠENÍ OBSLUZE</button>
-</div>
-​<div id="doneBanner" class="done-msg" style="display:none;">
-✓ Vše zpracováno! Čekám na novou objednávku.
-</div>
-</div>
-</div>
-​<!-- Modální okno Nastavení -->
-<div id="settingsModal">
-<div class="settings-box">
-<div class="settings-header">
-<div class="settings-title">⚙️ Nastavení systému</div>
-<button class="btn-close" onclick="closeSettingsModal()">✕</button>
-</div>
-​<div class="settings-online-counter">
-<div>Obsluha online: 
-<span id="countOnlineA" class="online-val-a">0</span></div>
-<div style="border-left: 1px solid #334155; padding-left: 10px;">VZV online: 
-<span id="countOnlineB" class="online-val-b">0</span></div>
-</div>
-​<div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:8px; border:1px solid #f59e0b;">
-<span style="font-size:0.85rem; font-weight:bold; color:#f59e0b;">🔒 Administrátor (Uživatelé a přehled)</span>
-<div style="font-size:0.75rem; color:#94a3b8;">Správa uživatelů, hesel a kontrola přihlášených zařízení.</div>
-<button class="btn-admin-action btn-admin-ok" onclick="openAdminForUsers()" style="width:100%; margin-top:4px;">🔑 Otevřít administraci</button>
-</div>
-​<div class="settings-row">
-<span style="font-size:0.85rem; font-weight:bold;">🔔 Zvukové notifikace</span>
-<div class="banner-btns">
-<button class="btn-yn active-yes" id="setNotifYes" onclick="toggleNotifications(true)">ANO</button>
-<button class="btn-yn" id="setNotifNo" onclick="toggleNotifications(false)">NE</button>
-</div>
-</div>
-​<div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:6px;">
-<span style="font-size:0.85rem; font-weight:bold;">🎵 Výběr zvuku upozornění</span>
-<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; width:100%;">
-<button class="btn-yn" id="soundOpt1" onclick="setSoundType(1)" style="font-size:0.65rem; padding:6px 2px;">1. Pípnutí</button>
-<button class="btn-yn" id="soundOpt2" onclick="setSoundType(2)" style="font-size:0.65rem; padding:6px 2px;">2. Alarm</button>
-<button class="btn-yn" id="soundOpt3" onclick="setSoundType(3)" style="font-size:0.65rem; padding:6px 2px;">3. Cinkot</button>
-</div>
-</div>
-​<div style="background:#0f172a; padding:12px; border-radius:8px; margin-top:12px; border:1px solid #ef4444;">
-<div style="font-size:0.85rem; font-weight:bold; color:#ef4444; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-<span>🔒</span> Režim údržby / Aktualizace
-</div>
-<div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Aktivuje výstrahu na všech zařízeních. Vyžaduje heslo správce.</div>
-<div class="banner-btns" style="width:100%; display:grid; grid-template-columns:1fr 1fr;">
-<button class="btn-yn" id="setUpdateYes" onclick="openAdminPasswordModal(true)">ZAPNOUT</button>
-<button class="btn-yn active-no" id="setUpdateNo" onclick="openAdminPasswordModal(false)">VYPNOUT</button>
-</div>
-</div>
-</div>
-</div>
-​<!-- Modální okno pro administraci (správa uživatelů, posun v seznamu, hesla) -->
-<div id="workersManagerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); z-index:10000; align-items:center; justify-content:center; padding:15px;">
-<div class="settings-box" style="max-width:420px;">
-<div class="settings-header">
-<div class="settings-title">👥 Administrace uživatelů</div>
-<button class="btn-close" onclick="closeWorkersManager()">✕</button>
-</div>
-​<div style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #38bdf8; margin-bottom:12px;">
-<div style="font-size:0.85rem; font-weight:bold; color:#38bdf8; margin-bottom:6px;">🔑 Změna mého hesla (Administrátor):</div>
-<input type="password" id="oldPassInput" placeholder="Původní heslo" class="admin-pwd-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
-<input type="password" id="newPassInput" placeholder="Nové heslo" class="admin-pwd-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
-<button class="btn-admin-action btn-admin-ok" onclick="changeMyPassword()" style="width:100%; padding:8px;">Změnit heslo</button>
-</div>
-​<div class="lbl" style="color:#f59e0b; margin-top:0;">🟢 Aktivní přihlášení uživatelé:</div>
-<div id="activeSessionsContainer" style="max-height:120px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px; background:#0f172a; padding:8px; border-radius:8px; border:1px solid #334155;">
-<!-- Načte se dynamicky -->
-</div>
-​<div class="lbl" style="color:#f59e0b;">📋 Seznam uživatelů a hesel (možnost posunu):</div>
-<div id="workersListContainer" style="max-height:180px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px;"></div>
-​<div style="background:#0f172a; padding:10px; border-radius:8px; border:1px dashed #f59e0b; margin-bottom:10px;">
-<div style="font-size:0.8rem; font-weight:bold; color:#f59e0b; margin-bottom:6px;">➕ Přidat nového uživatele (oprávnění):</div>
-<input type="text" id="newWorkerName" placeholder="Jméno (např. Ota)" class="login-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
-<input type="text" id="newWorkerPass" placeholder="Heslo" class="login-input" style="font-size:0.85rem; padding:8px; margin-bottom:6px; text-align:left; letter-spacing:normal;">
-​<div style="background:#1e293b; padding:8px; border-radius:6px; margin-bottom:8px; border:1px solid #334155; text-align:left;">
-<div style="font-size:0.75rem; color:#94a3b8; font-weight:bold; margin-bottom:4px;">Povolit sekce:</div>
-<label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="VYROBA"> Výroba (Linka 1, 2)</label>
-<label style="display:block; font-size:0.8rem; margin-bottom:3px;"><input type="checkbox" class="role-chk" value="VZV"> VZV (Závozy)</label>
-<label style="display:block; font-size:0.8rem; margin-bottom:3px; color:#fbbf24;"><input type="checkbox" class="role-chk" value="ADMIN"> Administrator (Neviditelný)</label>
-</div>
-​<button class="btn-admin-action btn-admin-ok" onclick="addNewWorker()" style="width:100%; padding:8px;">+ Přidat uživatele</button>
-</div>
-<button class="btn-admin-action btn-admin-cancel" onclick="closeWorkersManager()" style="width:100%;">Zavřít</button>
-</div>
-</div>
-​<script>
-const firebaseConfig = {
-databaseURL: "https://logiflow-app-default-rtdb.europe-west1.firebasedatabase.app"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-​let ADMIN_PASSWORD = '704517';
-let workers = [];
-​let notificationsEnabled = true;
-let selectedSoundType = parseInt(localStorage.getItem('selected_sound_type')) || 1;
-​let curLine = 1, curCar = 'Tiguan', curStojany = 3;
-let singleModeLines = { 1: false, 2: false };
-let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' };
-let twoVariantModeLines = { 1: false, 2: false };
-let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
-let repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
-let diffBoxes = { 1: {1:'', 2:'', 3:'', 4:''}, 2: {1:'', 2:'', 3:'', 4:''} };
-let defectBoxes = { 1: {1:false, 2:false, 3:false, 4:false}, 2: {1:false, 2:false, 3:false, 4:false} };
-​let activeReportSubTab = 'sensors';
-let vzvVatAlerts = [];
-​let systemUpdateActive = false;
-let systemUpdateCompletedState = false;
-let pendingUpdateState = false;
-let pendingAdminAction = null;
-​let orders = [];
-let stockAlerts = [];
-let lastOrderCount = 0;
-let lastVzvAlertCount = 0;
-let expandedOrderId = null;
-let folderOpenState = { 1: false, 2: false };
-​let selectedLoginSection = 'VYROBA';
-​let deviceId = sessionStorage.getItem('device_id');
-if (!deviceId) {
-deviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
-sessionStorage.setItem('device_id', deviceId);
-}
-​db.ref('forceLogout/' + deviceId).on('value', (snapshot) => {
-if (snapshot.val() === true) {
-db.ref('forceLogout/' + deviceId).remove();
-logout();
-alert('Byli jste správcem na dálku odhlášeni.');
-}
-});
-​db.ref('workers').on('value', (snapshot) => {
-let data = snapshot.val();
-if (data) {
-workers = Array.isArray(data) ? data : Object.values(data);
-let adminObj = workers.find(w => w.name === 'Administrator');
-if (!adminObj) {
-adminObj = workers.find(w => w.role && w.role.includes('ADMIN'));
-}
-if (!adminObj) {
-workers.push({ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'VYROBA,VZV,ADMIN' });
-db.ref('workers').set(workers);
-} else {
-ADMIN_PASSWORD = adminObj.pass;
-}
-} else {
-workers = [{ id: 'adminAcc', name: 'Administrator', pass: '704517', role: 'VYROBA,VZV,ADMIN' }];
-db.ref('workers').set(workers);
-ADMIN_PASSWORD = '704517';
-}
-renderWorkersDropdown();
-if (document.getElementById('workersManagerModal').style.display === 'flex') {
-renderWorkersManagerList();
-}
-});
-​function renderWorkersDropdown() {
-let select = document.getElementById('workerSelect');
-if (!select) return;
-let currentVal = select.value;
-​let filteredWorkers = workers.filter(w => {
-let role = w.role || '';
-if (role.includes('ADMIN')) return (selectedLoginSection === 'VYROBA');
-if (selectedLoginSection === 'VYROBA' && role.includes('VYROBA')) return true;
-if (selectedLoginSection === 'VZV' && role.includes('VZV')) return true;
-return false;
-});
-​select.innerHTML = filteredWorkers.map(w => <option value="${w.name}">${w.name} (${getRoleName(w.role)})</option>).join('');
-if (currentVal && filteredWorkers.some(w => w.name === currentVal)) {
-select.value = currentVal;
-}
-}
-​function getRoleName(role) {
-if (!role) return '';
-let parts = role.split(',').map(r => r.trim());
-let names = [];
-parts.forEach(r => {
-if (r === 'VYROBA') names.push('Výroba');
-else if (r === 'VZV') names.push('VZV');
-else if (r === 'ADMIN') names.push('Administrator');
-else names.push(r);
-});
-return names.join(' + ');
-}
-​function setLoginSection(section) {
-selectedLoginSection = section;
-let btnVyroba = document.getElementById('loginTabVyroba');
-let btnVzv = document.getElementById('loginTabVzv');
-if (btnVyroba && btnVzv) {
-btnVyroba.className = 'btn-login-tab ' + (section === 'VYROBA' ? 'active-vyroba' : '');
-btnVzv.className = 'btn-login-tab ' + (section === 'VZV' ? 'active-vzv' : '');
-}
-renderWorkersDropdown();
-}
-​function onWorkerSelectChange() {
-document.getElementById('passInput').value = '';
-document.getElementById('loginError').style.display = 'none';
-}
-​function openAdminForUsers() {
-closeSettingsModal();
-pendingAdminAction = 'openUsers';
-document.getElementById('adminPassInput').value = '';
-document.getElementById('adminPassError').style.display = 'none';
-document.getElementById('adminPasswordModal').style.display = 'flex';
-setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
-}
-​function closeWorkersManager() {
-document.getElementById('workersManagerModal').style.display = 'none';
-}
-​function renderWorkersManagerList() {
-let container = document.getElementById('workersListContainer');
-container.innerHTML = workers.map((w, idx) => <div style="background:#0f172a; padding:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; border:1px solid #334155;"> <div> <div style="font-weight:bold; font-size:0.85rem; color:#f59e0b;">${w.name} <span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">[${getRoleName(w.role)}]</span></div> <div style="font-size:0.75rem; color:#94a3b8;">Heslo: <b>${w.pass}</b></div> </div> <div style="display:flex; align-items:center; gap:2px;"> ${idx > 0 ?<button class="btn-move" onclick="moveWorker(${idx}, -1)" title="Posunout nahoru">▲</button>: ''} ${idx < workers.length - 1 ?<button class="btn-move" onclick="moveWorker(${idx}, 1)" title="Posunout dolů">▼</button>: ''} ${w.name !== 'Administrator' ?<button class="btn-delete" onclick="deleteWorker(${idx})" title="Smazat">✖</button>:<span style="font-size:0.65rem; color:#f59e0b; font-weight:bold; margin-left:4px;">Chráněno</span>} </div> </div> ).join('');
-​db.ref('presence').once('value', (snapshot) => {
-let data = snapshot.val() || {};
-let activeContainer = document.getElementById('activeSessionsContainer');
-let html = '';
-let now = Date.now();
-​let entries = Object.entries(data);
-if (entries.length === 0) {
-activeContainer.innerHTML = '<div style="font-size:0.75rem; color:#94a3b8; text-align:center;">Žádní aktivní uživatelé online</div>';
-return;
-}
-​entries.forEach(([devId, info]) => {
-if (info && info.timestamp && (now - info.timestamp < 20000)) {
-let timeStr = new Date(info.timestamp).toLocaleTimeString();
-html += <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; border-bottom:1px solid #334155; padding-bottom:4px; margin-bottom:4px;"> <div><b>${info.worker}</b> [${info.section}] <br><span style="color:#94a3b8;">Od: ${timeStr}</span></div> <button class="btn-delete" style="background:rgba(239,68,68,0.3); color:#ef4444; width:auto; padding:2px 6px; font-size:0.7rem;" onclick="forceLogoutDevice('${devId}')">Odhlásit</button> </div>;
-}
-});
-activeContainer.innerHTML = html || '<div style="font-size:0.75rem; color:#94a3b8; text-align:center;">Žádní aktivní uživatelé online</div>';
-});
-}
-​function moveWorker(index, direction) {
-let targetIndex = index + direction;
-if (targetIndex < 0 || targetIndex >= workers.length) return;
-let temp = workers[index];
-workers[index] = workers[targetIndex];
-workers[targetIndex] = temp;
-db.ref('workers').set(workers);
-}
-​function forceLogoutDevice(targetDevId) {
-if (confirm('Opravdu chcete tohoto uživatele na dálku odhlásit?')) {
-db.ref('forceLogout/' + targetDevId).set(true);
-setTimeout(renderWorkersManagerList, 500);
-}
-}
-​function addNewWorker() {
-let name = document.getElementById('newWorkerName').value.trim();
-let pass = document.getElementById('newWorkerPass').value.trim();
-​let checkedRoles = [];
-document.querySelectorAll('.role-chk:checked').forEach(chk => {
-checkedRoles.push(chk.value);
-});
-​if (!name || !pass) {
-alert('Vyplňte jméno i heslo uživatele!');
-return;
-}
-if (checkedRoles.length === 0) {
-alert('Zvolte alespoň jednu sekci / roli!');
-return;
-}
-​let roleString = checkedRoles.join(',');
-​workers.push({ id: 'w_' + Date.now(), name: name, pass: pass, role: roleString });
-db.ref('workers').set(workers);
-​document.getElementById('newWorkerName').value = '';
-document.getElementById('newWorkerPass').value = '';
-document.querySelectorAll('.role-chk').forEach(chk => chk.checked = false);
-​renderWorkersManagerList();
-renderWorkersDropdown();
-}
-​function deleteWorker(index) {
-if (workers[index].name === 'Administrator') {
-alert('Hlavního administrátora nelze smazat!');
-return;
-}
-if (workers.length <= 1) {
-alert('Musí zůstat alespoň jeden uživatel!');
-return;
-}
-workers.splice(index, 1);
-db.ref('workers').set(workers);
-renderWorkersManagerList();
-renderWorkersDropdown();
-}
-​function changeMyPassword() {
-let oldP = document.getElementById('oldPassInput').value;
-let newP = document.getElementById('newPassInput').value;
-let currentWorkerName = sessionStorage.getItem('active_worker');
-​if (!oldP || !newP) {
-alert('Vyplňte obě kolonky pro změnu hesla!');
-return;
-}
-​let w = workers.find(x => x.name === currentWorkerName);
-if (!w || w.pass !== oldP) {
-alert('Původní heslo není správné!');
-return;
-}
-​w.pass = newP;
-db.ref('workers').set(workers);
-if (w.name === 'Administrator' || (w.role && w.role.includes('ADMIN'))) {
-ADMIN_PASSWORD = newP;
-}
-document.getElementById('oldPassInput').value = '';
-document.getElementById('newPassInput').value = '';
-alert('Heslo bylo úspěšně změněno!');
-closeWorkersManager();
-}
-​function setSoundType(type) {
-selectedSoundType = type;
-localStorage.setItem('selected_sound_type', type);
-updateSoundUI();
-triggerNotification("Test", "Test zvuku");
-}
-​function updateSoundUI() {
-for (let i = 1; i <= 3; i++) {
-let btn = document.getElementById(soundOpt${i});
-if (btn) {
-btn.className = 'btn-yn ' + (selectedSoundType === i ? 'active-yes' : '');
-}
-}
-}
-​function toggleFolder(lineNum) {
-folderOpenState[lineNum] = !folderOpenState[lineNum];
-render();
-}
-​function toggleAccordion(contentId, headerId) {
-let content = document.getElementById(contentId);
-let header = document.getElementById(headerId);
-if (content.style.display === 'block') {
-content.style.display = 'none';
-header.classList.remove('open');
-} else {
-content.style.display = 'block';
-header.classList.add('open');
-}
-}
-​function setReportTab(tab) {
-activeReportSubTab = tab;
-document.getElementById('tabReportSensors').className = 'btn-report-tab ' + (tab === 'sensors' ? 'active' : '');
-document.getElementById('tabReportDiff').className = 'btn-report-tab ' + (tab === 'diff' ? 'active' : '');
-document.getElementById('tabReportDefect').className = 'btn-report-tab ' + (tab === 'defect' ? 'active' : '');
-document.getElementById('tabReportEmpty').className = 'btn-report-tab ' + (tab === 'empty' ? 'active' : '');
-​document.getElementById('reportSubSensors').style.display = tab === 'sensors' ? 'block' : 'none';
-document.getElementById('reportSubDiff').style.display = tab === 'diff' ? 'block' : 'none';
-document.getElementById('reportSubDefect').style.display = tab === 'defect' ? 'block' : 'none';
-document.getElementById('reportSubEmpty').style.display = tab === 'empty' ? 'block' : 'none';
-}
-​function updatePresence() {
-let isAuth = sessionStorage.getItem('device_authenticated') === 'true';
-if (isAuth) {
-let section = sessionStorage.getItem('active_section') || 'VYROBA';
-let workerName = sessionStorage.getItem('active_worker') || 'Neznámý';
-let role = sessionStorage.getItem('active_role') || '';
-​if (role.includes('ADMIN') && section === 'VYROBA') {
-db.ref('presence/' + deviceId).remove();
-} else {
-db.ref('presence/' + deviceId).set({
-section: section,
-worker: workerName,
-timestamp: firebase.database.ServerValue.TIMESTAMP
-});
-}
-} else {
-db.ref('presence/' + deviceId).remove();
-}
-}
-​setInterval(updatePresence, 5000);
-​window.addEventListener('beforeunload', () => {
-db.ref('presence/' + deviceId).remove();
-});
-​db.ref('presence').on('value', (snapshot) => {
-let data = snapshot.val() || {};
-let countA = 0;
-let countB = 0;
-let now = Date.now();
-​Object.values(data).forEach(item => {
-if (item && item.timestamp && (now - item.timestamp < 15000)) {
-if (item.section === 'VYROBA') countA++;
-if (item.section === 'VZV') countB++;
-}
-});
-​let elA = document.getElementById('countOnlineA');
-let elB = document.getElementById('countOnlineB');
-if (elA) elA.innerText = countA;
-if (elB) elB.innerText = countB;
-});
-​db.ref('orders').on('value', (snapshot) => {
-let rawOrders = snapshot.val() || [];
-let updatedOrders = Array.isArray(rawOrders) ? rawOrders : Object.values(rawOrders);
-if (updatedOrders.length > lastOrderCount) {
-let newest = updatedOrders[updatedOrders.length - 1];
-triggerNotification("⚡ Nová objednávka na VZV!", ${newest.car} (${newest.stojany} WRT) - Linka ${newest.line});
-}
-orders = updatedOrders;
-lastOrderCount = orders.length;
-render();
-});
-​db.ref('alerts').on('value', (snapshot) => {
-let rawAlerts = snapshot.val() || [];
-stockAlerts = Array.isArray(rawAlerts) ? rawAlerts : Object.values(rawAlerts);
-render();
-});
-​db.ref('vzvVatAlerts').on('value', (snapshot) => {
-let raw = snapshot.val() || [];
-let updatedVatAlerts = Array.isArray(raw) ? raw : Object.values(raw);
-if (updatedVatAlerts.length > lastVzvAlertCount) {
-triggerNotification("⚠️ Upozornění!", "Nové hlášení v systému");
-}
-vzvVatAlerts = updatedVatAlerts;
-lastVzvAlertCount = vzvVatAlerts.length;
-render();
-});
-​db.ref('singleModeLines').on('value', (snapshot) => {
-let data = snapshot.val();
-if (data) {
-if (singleModeLines[1] !== data[1] || singleModeLines[2] !== data[2]) {
-triggerNotification("🔒 Změna režimu", "Režim 1 varianta byl změněn");
-}
-singleModeLines = data;
-}
-render();
-});
-​db.ref('singleModeCar').on('value', (snapshot) => {
-let data = snapshot.val();
-if (data) singleModeCar = data;
-render();
-});
-​db.ref('twoVariantModeLines').on('value', (snapshot) => {
-let data = snapshot.val();
-if (data) {
-if (twoVariantModeLines[1] !== data[1] || twoVariantModeLines[2] !== data[2]) {
-triggerNotification("🔒 Změna režimu", "Režim 2 varianty byl změněn");
-}
-twoVariantModeLines = data;
-}
-render();
-});
-​db.ref('twoVariantPair').on('value', (snapshot) => {
-let data = snapshot.val();
-if (data) twoVariantPair = data;
-render();
-});
-​db.ref('repeatBoxes').on('value', (snapshot) => {
-let data = snapshot.val();
-if (data) {
-let activeBefore = Object.values(repeatBoxes).some(Boolean);
-let activeNow = Object.values(data).some(Boolean);
-if (!activeBefore && activeNow) {
-triggerNotification("⚠️ Upozornění", "Hlášení čidel aktivováno");
-}
-repeatBoxes = data;
-}
-render();
-});
-​db.ref('diffBoxes').on('value', (snapshot) => {
-let data = snapshot.val();
-if (data) diffBoxes = data;
-render();
-});
-​db.ref('defectBoxes').on('value', (snapshot) => {
-let data = snapshot.val();
-if (data) defectBoxes = data;
-render();
-});
-​db.ref('systemUpdate').on('value', (snapshot) => {
-let val = snapshot.val();
-let newActive = val ? val.active : false;
-let newCompleted = val ? val.completed : false;
-​systemUpdateActive = newActive;
-systemUpdateCompletedState = newCompleted;
-renderUpdateOverlay();
-});
-​function save() {
-db.ref('orders').set(orders);
-db.ref('alerts').set(stockAlerts);
-db.ref('vzvVatAlerts').set(vzvVatAlerts);
-db.ref('singleModeLines').set(singleModeLines);
-db.ref('singleModeCar').set(singleModeCar);
-db.ref('twoVariantModeLines').set(twoVariantModeLines);
-db.ref('twoVariantPair').set(twoVariantPair);
-db.ref('repeatBoxes').set(repeatBoxes);
-db.ref('diffBoxes').set(diffBoxes);
-db.ref('defectBoxes').set(defectBoxes);
-}
-​function toggleRepeatBox(boxNum) {
-repeatBoxes[boxNum] = !repeatBoxes[boxNum];
-if (repeatBoxes[boxNum]) {
-triggerNotification("⚠️ Čidla", Box ${boxNum} není na čidlech!);
-}
-save();
-renderRepeatBoxesUI();
-}
-​function toggleDiffReport(boxNum, carName) {
-if (!diffBoxes[curLine]) diffBoxes[curLine] = {1:'', 2:'', 3:'', 4:''};
-let currentVal = diffBoxes[curLine][boxNum];
-if (currentVal === carName) {
-diffBoxes[curLine][boxNum] = '';
-vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'diff'));
-} else {
-diffBoxes[curLine][boxNum] = carName;
-vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'diff'));
-vzvVatAlerts.push({
-id: Date.now() + Math.random(),
-line: curLine,
-box: boxNum,
-type: 'diff',
-text: Na lince ${curLine}, boxu #${boxNum}: Obal neodpovídá zvolené variantě.<br>ZAVEZ SPRÁVNÝ OBAL: ${carName}
-});
-triggerNotification("⚠️ Jiný obal", Hlášení pro linku ${curLine}, box #${boxNum});
-}
-save();
-renderRepeatBoxesUI();
-}
-​function getAccusativeCar(car) {
-let upper = car.toUpperCase();
-if (upper === 'TIGUAN') return 'TIGUANA';
-if (upper === 'KODIAQ') return 'KODIAQA';
-if (upper === 'TAYRON') return 'TAYRONA';
-if (upper === 'AUDI') return 'AUDI';
-if (upper === 'SEAT') return 'SEAT';
-return upper;
-}
-​function toggleDefectReport(boxNum) {
-if (!defectBoxes[curLine]) defectBoxes[curLine] = {};
-let isActive = !!defectBoxes[curLine][boxNum];
-defectBoxes[curLine][boxNum] = !isActive;
-​if (defectBoxes[curLine][boxNum]) {
-vzvVatAlerts.push({
-id: Date.now() + Math.random(),
-line: curLine,
-box: boxNum,
-type: 'defect',
-text: Na lince ${curLine}, Box #${boxNum}: Obal je vadný, křivý. Vyměň ho!
-});
-triggerNotification("⚠️ Vadný obal", Nahlášen vadný obal na lince ${curLine});
-} else {
-vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'defect'));
-}
-save();
-}
-​function sendEmptyReport() {
-let variant = document.getElementById('emptyVariantSelect').value;
-let count = document.getElementById('emptyCountInput').value;
-if (!count) {
-return;
-}
-let variantAcc = getAccusativeCar(variant);
-vzvVatAlerts.push({
-id: Date.now() + Math.random(),
-line: curLine,
-type: 'empty',
-text: Na lince ${curLine}: Přivez prázdný obal na pracoviště (${variantAcc}, ${count} ks).
-});
-triggerNotification("⚠️ Prázdný obal", Požadavek na prázdný obal (linka ${curLine}));
-document.getElementById('emptyCountInput').value = '';
-save();
-}
-​function dismissVzvVatAlert(alertId) {
-let alertObj = vzvVatAlerts.find(a => a.id === alertId);
-if (alertObj) {
-if (alertObj.type === 'defect') {
-if (defectBoxes[alertObj.line]) defectBoxes[alertObj.line][alertObj.box] = false;
-}
-if (alertObj.type === 'diff') {
-if (diffBoxes[alertObj.line]) diffBoxes[alertObj.line][alertObj.box] = '';
-}
-}
-vzvVatAlerts = vzvVatAlerts.filter(a => a.id !== alertId);
-save();
-}
-​function renderRepeatBoxesUI() {
-let activeSensors = [];
-for (let i = 1; i <= 4; i++) {
-let btn = document.getElementById(repeatBox${i});
-if (btn) {
-if (repeatBoxes[i]) {
-btn.innerText = "ZAP";
-btn.className = "box-col-btn active";
-activeSensors.push(i);
-} else {
-btn.innerText = "VYP";
-btn.className = "box-col-btn";
-}
-}
-}
-​for (let b = 1; b <= 4; b++) {
-let col = document.getElementById(diffColBox${b});
-if (col) {
-let selectedCar = diffBoxes[curLine] ? diffBoxes[curLine][b] : '';
-let buttons = col.querySelectorAll('.diff-car-btn');
-buttons.forEach(btn => {
-if (btn.innerText === selectedCar) {
-btn.className = 'diff-car-btn active';
-} else {
-btn.className = 'diff-car-btn';
-}
-});
-}
-}
-​for (let b = 1; b <= 4; b++) {
-let defBtn = document.getElementById(defectBox${b});
-if (defBtn) {
-let isDef = defectBoxes[curLine] && defectBoxes[curLine][b];
-if (isDef) {
-defBtn.innerText = "ZAP";
-defBtn.className = "box-col-btn active";
-} else {
-defBtn.innerText = "Nahlásit";
-defBtn.className = "box-col-btn";
-defBtn.style.background = "#ef4444";
-defBtn.style.color = "#fff";
-defBtn.style.borderColor = "#ef4444";
-}
-}
-}
-​let sensorHeader = document.getElementById('sensorAccordionHeader');
-let sensorTitle = document.getElementById('sensorAccordionTitle');
-if (sensorHeader && sensorTitle) {
-let hasActiveDefect = false;
-if (defectBoxes[1]) { Object.values(defectBoxes[1]).forEach(v => { if(v) hasActiveDefect = true; }); }
-if (defectBoxes[2]) { Object.values(defectBoxes[2]).forEach(v => { if(v) hasActiveDefect = true; }); }
-​let hasActiveDiff = false;
-if (diffBoxes[1]) { Object.values(diffBoxes[1]).forEach(v => { if(v) hasActiveDiff = true; }); }
-if (diffBoxes[2]) { Object.values(diffBoxes[2]).forEach(v => { if(v) hasActiveDiff = true; }); }
-​if (activeSensors.length > 0 || vzvVatAlerts.length > 0 || hasActiveDefect || hasActiveDiff) {
-sensorHeader.classList.add('alarm-active');
-sensorTitle.innerHTML = ⚠️ Info pro VZV (Aktivní hlášení...);
-} else {
-sensorHeader.classList.remove('alarm-active');
-sensorTitle.innerText = "Info pro VZV: čidla, jiný obal, vadný obal, přivez prázdný";
-}
-}
-}
-​function openAdminPasswordModal(enable) {
-pendingUpdateState = enable;
-pendingAdminAction = 'update';
-document.getElementById('adminPassInput').value = '';
-document.getElementById('adminPassError').style.display = 'none';
-document.getElementById('adminPasswordModal').style.display = 'flex';
-setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
-}
-​function closeAdminPasswordModal() {
-document.getElementById('adminPasswordModal').style.display = 'none';
-}
-​function verifyAdminPassword() {
-let pass = document.getElementById('adminPassInput').value;
-let adminObj = workers.find(w => w.role && w.role.includes('ADMIN') && w.pass === pass);
-​if (!adminObj && pass !== ADMIN_PASSWORD) {
-document.getElementById('adminPassError').style.display = 'block';
-return;
-}
-closeAdminPasswordModal();
-​if (pendingAdminAction === 'openUsers') {
-renderWorkersManagerList();
-document.getElementById('workersManagerModal').style.display = 'flex';
-pendingAdminAction = null;
-return;
-}
-​closeSettingsModal();
-​if (systemUpdateActive && pendingUpdateState === true && document.getElementById('updateBannerOverlay').style.display === 'flex') {
-logout();
-return;
-}
-​if (pendingUpdateState) {
-db.ref('systemUpdate').set({ active: true, completed: false });
-} else {
-db.ref('systemUpdate').set({ active: false, completed: true });
-}
-}
-​function acknowledgeUpdate() {
-localStorage.setItem('ack_update_completed_state', systemUpdateCompletedState.toString());
-document.getElementById('updateBannerOverlay').style.display = 'none';
-}
-​function renderUpdateOverlay() {
-let overlay = document.getElementById('updateBannerOverlay');
-let bannerBox = document.getElementById('updateBannerBox');
-let title = document.getElementById('bannerTitle');
-let text = document.getElementById('bannerText');
-​let ackState = localStorage.getItem('ack_update_completed_state');
-let isAlreadyAcked = (ackState === systemUpdateCompletedState.toString());
-​if (systemUpdateActive) {
-bannerBox.className = "update-banner-box";
-title.innerText = "⚠️ UPOZORNĚNÍ NA ÚDRŽBU";
-text.innerHTML = "POZOR: Proběhne aktualizace programu připravte se na výpadek.
 
-Neřiďte se PROGRAMEM !!!";
-overlay.style.display = 'flex';
-} else if (systemUpdateCompletedState && !isAlreadyAcked) {
-bannerBox.className = "update-banner-box completed-box";
-title.innerText = "✅ HOTOVO";
-text.innerText = "Program aktualizován, potvrzením dojde k resetu objednávek z důvodu aktualizace.";
-overlay.style.display = 'flex';
-} else {
-overlay.style.display = 'none';
-}
-​let btnYes = document.getElementById('setUpdateYes');
-let btnNo = document.getElementById('setUpdateNo');
-if (btnYes && btnNo) {
-if (systemUpdateActive) {
-btnYes.className = 'btn-yn active-yes';
-btnNo.className = 'btn-yn';
-} else {
-btnYes.className = 'btn-yn';
-btnNo.className = 'btn-yn active-no';
-}
-}
-}
-​function openSettingsModal() {
-updateSoundUI();
-document.getElementById('settingsModal').style.display = 'flex';
-}
-function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
-​function checkPassword() {
-let workerName = document.getElementById('workerSelect').value;
-let inputPass = document.getElementById('passInput').value;
-​let worker = workers.find(w => w.name === workerName);
-if (worker && worker.pass === inputPass) {
-let role = worker.role || '';
-let isAdmin = role.includes('ADMIN');
-​if (!isAdmin) {
-if (selectedLoginSection === 'VYROBA' && !role.includes('VYROBA')) {
-document.getElementById('loginError').innerText = '⚠️ Nemáte oprávnění pro Výrobu!';
-document.getElementById('loginError').style.display = 'block';
-return;
-}
-if (selectedLoginSection === 'VZV' && !role.includes('VZV')) {
-document.getElementById('loginError').innerText = '⚠️ Nemáte oprávnění pro VZV!';
-document.getElementById('loginError').style.display = 'block';
-return;
-}
-}
-​sessionStorage.setItem('device_authenticated', 'true');
-sessionStorage.setItem('active_role', role);
-sessionStorage.setItem('active_worker', worker.name);
-sessionStorage.setItem('active_section', isAdmin ? selectedLoginSection : (selectedLoginSection === 'VZV' ? 'VZV' : 'VYROBA'));
-​document.getElementById('loginError').style.display = 'none';
-updatePresence();
-showApp();
-} else {
-document.getElementById('loginError').innerText = '⚠️ Nesprávné heslo! Zkuste to znovu.';
-document.getElementById('loginError').style.display = 'block';
-}
-}
-​function logout() {
-db.ref('presence/' + deviceId).remove();
-sessionStorage.removeItem('device_authenticated');
-sessionStorage.removeItem('active_role');
-sessionStorage.removeItem('active_worker');
-sessionStorage.removeItem('active_section');
-document.getElementById('passInput').value = '';
-document.getElementById('loginError').style.display = 'none';
-document.getElementById('loginScreen').style.display = 'flex';
-document.getElementById('appScreen').style.display = 'none';
-document.getElementById('updateBannerOverlay').style.display = 'none';
-}
-​function showApp() {
-document.getElementById('loginScreen').style.display = 'none';
-document.getElementById('appScreen').style.display = 'block';
-let role = sessionStorage.getItem('active_role') || '';
-let workerName = sessionStorage.getItem('active_worker') || '';
-let section = sessionStorage.getItem('active_section') || 'VYROBA';
-​let badge = document.getElementById('roleBadge');
-let lineSelectContainer = document.getElementById('lineSelectContainer');
-let lineSelectContainerLbl = document.getElementById('lineSelectContainerLbl');
-​if (section === 'VZV') {
-badge.innerText = workerName + ' (VZV)';
-badge.className = 'role-badge vzv';
-} else {
-if (role.includes('ADMIN')) {
-badge.innerText = workerName + ' (Správce)';
-badge.className = 'role-badge admin';
-} else {
-badge.innerText = workerName + ' (Výroba)';
-badge.className = 'role-badge l12';
-}
-if (lineSelectContainer) lineSelectContainer.style.display = 'grid';
-if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'block';
-}
-​let isVzvOnly = (section === 'VZV');
-document.getElementById('viewA').style.display = !isVzvOnly ? 'block' : 'none';
-document.getElementById('viewB').style.display = isVzvOnly ? 'block' : 'none';
-​if (!isVzvOnly) {
-setLine(curLine);
-}
-render();
-}
-​if (sessionStorage.getItem('device_authenticated') === 'true') {
-updatePresence();
-showApp();
-} else {
-setLoginSection('VYROBA');
-}
-​function toggleNotifications(enable) {
-notificationsEnabled = enable;
-const setYes = document.getElementById('setNotifYes');
-const setNo = document.getElementById('setNotifNo');
-if (enable) {
-if(setYes) setYes.className = 'btn-yn active-yes';
-if(setNo) setNo.className = 'btn-yn';
-} else {
-if(setYes) setYes.className = 'btn-yn';
-if(setNo) setNo.className = 'btn-yn active-no';
-}
-}
-​function triggerNotification(title, bodyText) {
-if (!notificationsEnabled) return;
-try {
-let AudioCtx = window.AudioContext || window.webkitAudioContext;
-if (!AudioCtx) return;
-let ctx = new AudioCtx();
-if (ctx.state === 'suspended') {
-ctx.resume();
-}
-let osc = ctx.createOscillator();
-let gain = ctx.createGain();
-​if (selectedSoundType === 1) {
-osc.type = 'sine';
-osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
-gain.gain.setValueAtTime(0.4, ctx.currentTime);
-osc.connect(gain);
-gain.connect(ctx.destination);
-osc.start();
-osc.stop(ctx.currentTime + 0.4);
-} else if (selectedSoundType === 2) {
-osc.type = 'sawtooth';
-osc.frequency.setValueAtTime(400, ctx.currentTime);
-osc.frequency.setValueAtTime(800, ctx.currentTime + 0.1);
-osc.frequency.setValueAtTime(400, ctx.currentTime + 0.2);
-gain.gain.setValueAtTime(0.4, ctx.currentTime);
-osc.connect(gain);
-gain.connect(ctx.destination);
-osc.start();
-osc.stop(ctx.currentTime + 0.35);
-} else {
-osc.type = 'triangle';
-osc.frequency.setValueAtTime(1046.50, ctx.currentTime);
-osc.frequency.setValueAtTime(1318.51, ctx.currentTime + 0.1);
-gain.gain.setValueAtTime(0.3, ctx.currentTime);
-osc.connect(gain);
-gain.connect(ctx.destination);
-osc.start();
-osc.stop(ctx.currentTime + 0.5);
-}
-} catch(e){}
-}
-​function toggleSingleMode(enable) {
-singleModeLines[curLine] = enable;
-if (enable) {
-twoVariantModeLines[curLine] = false;
-if (!singleModeCar[curLine]) singleModeCar[curLine] = 'Tiguan';
-triggerNotification("Režim aktivován", "Zapnut režim 1 varianta");
-} else {
-singleModeLines[curLine] = false;
-}
-save();
-updateDynamicTheme();
-render();
-}
-​function toggleTwoVariantMode(enable) {
-twoVariantModeLines[curLine] = enable;
-if (enable) {
-singleModeLines[curLine] = false;
-if (!twoVariantPair[curLine]) twoVariantPair[curLine] = 'Tiguan / Kodiaq';
-triggerNotification("Režim aktivován", "Zapnut režim 2 varianty");
-} else {
-twoVariantModeLines[curLine] = false;
-}
-save();
-updateDynamicTheme();
-render();
-}
-​function setSingleCar(car, el) {
-singleModeCar[curLine] = car;
-save();
-updateDynamicTheme();
-triggerNotification("Změna režimu", "Změněna varianta");
-}
-function setTwoPair(pair, el) {
-twoVariantPair[curLine] = pair;
-save();
-updateDynamicTheme();
-triggerNotification("Změna režimu", "Změněna dvojice variant");
-}
-​function updateDynamicTheme() {
-let activeClass = curLine === 1 ? 'selected-1' : 'selected-2';
-let panelClass = curLine === 1 ? 'single-mode-panel line-1' : 'single-mode-panel line-2';
-let selectorBoxClass = curLine === 1 ? 'mode-selector-box line-1 active' : 'mode-selector-box line-2 active';
-let customBoxClass = curLine === 1 ? 'custom-stojan-input line-1 active' : 'custom-stojan-input line-2 active';
-​let sPanel = document.getElementById('singleModePanel');
-let tPanel = document.getElementById('twoVariantPanel');
-let sBox = document.getElementById('singleModeSelectBox');
-let tBox = document.getElementById('twoModeSelectBox');
-​if (sPanel) sPanel.className = panelClass;
-if (tPanel) tPanel.className = panelClass;
-if (sBox) sBox.className = selectorBoxClass;
-if (tBox) tBox.className = selectorBoxClass;
-​let isSingleActive = singleModeLines[curLine];
-let bSingleYes = document.getElementById('btnSingleYes');
-let bSingleNo = document.getElementById('btnSingleNo');
-if (bSingleYes) bSingleYes.className = 'btn-yn ' + (isSingleActive ? 'active-yes' : '');
-if (bSingleNo) bSingleNo.className = 'btn-yn ' + (!isSingleActive ? 'active-no' : '');
-​let isTwoActive = twoVariantModeLines[curLine];
-let bTwoYes = document.getElementById('btnTwoYes');
-let bTwoNo = document.getElementById('btnTwoNo');
-if (bTwoYes) bTwoYes.className = 'btn-yn ' + (isTwoActive ? 'active-yes' : '');
-if (bTwoNo) bTwoNo.className = 'btn-yn ' + (!isTwoActive ? 'active-no' : '');
-​let accordionWrapper = document.getElementById('modesAccordionWrapper');
-if (accordionWrapper) {
-accordionWrapper.classList.remove('active-mode-line-1', 'active-mode-line-2');
-if (isSingleActive || isTwoActive) {
-accordionWrapper.classList.add(curLine === 1 ? 'active-mode-line-1' : 'active-mode-line-2');
-}
-}
-​let singleSelectBox = document.getElementById('singleModeSelectBox');
-let twoSelectBox = document.getElementById('twoModeSelectBox');
-let standardSection = document.getElementById('standardOrderSection');
-​if (singleSelectBox && twoSelectBox && standardSection) {
-if (isSingleActive) {
-singleSelectBox.style.display = 'block';
-twoSelectBox.style.display = 'none';
-standardSection.style.display = 'none';
-} else if (isTwoActive) {
-singleSelectBox.style.display = 'none';
-twoSelectBox.style.display = 'block';
-standardSection.style.display = 'none';
-} else {
-singleSelectBox.style.display = 'none';
-twoSelectBox.style.display = 'none';
-standardSection.style.display = 'block';
-}
-}
-​let currentSingleCar = singleModeCar[curLine] || 'Tiguan';
-let singleCarGrid = document.getElementById('singleCarGrid');
-let cars = ['Tiguan', 'Kodiaq', 'Tayron', 'Audi', 'Seat'];
-if (singleCarGrid) {
-singleCarGrid.innerHTML = cars.map(c => <div class="btn-opt ${currentSingleCar === c ? activeClass : ''}" onclick="setSingleCar('${c}', this)">${c}</div>).join('');
-}
-​let currentPair = twoVariantPair[curLine] || 'Tiguan / Kodiaq';
-let twoPairGrid = document.getElementById('twoPairGrid');
-let pairs = ['Tiguan / Kodiaq', 'Audi / Seat'];
-if (twoPairGrid) {
-twoPairGrid.innerHTML = pairs.map(p => <div class="btn-opt ${currentPair === p ? activeClass : ''}" onclick="setTwoPair('${p}', this)">${p}</div>).join('');
-}
-​document.querySelectorAll('#carGrid .btn-opt').forEach(b => {
-b.classList.remove('selected-1', 'selected-2');
-if (b.innerText === curCar) b.classList.add(activeClass);
-});
-​document.querySelectorAll('#opt3WRT, #opt6WRT, #optCustomWRT').forEach(b => b.classList.remove('selected-1', 'selected-2'));
-if (curStojany === 3) {
-let opt = document.getElementById('opt3WRT'); if(opt) opt.classList.add(activeClass);
-} else if (curStojany === 6) {
-let opt = document.getElementById('opt6WRT'); if(opt) opt.classList.add(activeClass);
-} else {
-let opt = document.getElementById('optCustomWRT'); if(opt) opt.classList.add(activeClass);
-let cBox = document.getElementById('customStojanBox'); if(cBox) cBox.className = customBoxClass;
-}
-renderRepeatBoxesUI();
-}
-​function setLine(l) {
-curLine = l;
-​let btn1 = document.getElementById('lBtn1');
-let btn2 = document.getElementById('lBtn2');
-if(btn1) btn1.className = 'line-btn ' + (curLine=1?'active-1':'');
-if(btn2) btn2.className = 'line-btn ' + (curLine=2?'active-2':'');
-​let modesWrapper = document.getElementById('modesAccordionWrapper');
-let sensorWrapper = document.getElementById('sensorAccordionWrapper');
-let standardSec = document.getElementById('standardOrderSection');
-​if (modesWrapper) modesWrapper.style.display = 'block';
-if (sensorWrapper) sensorWrapper.style.display = 'block';
-if (standardSec) standardSec.style.display = 'block';
-updateDynamicTheme();
-render();
-}
-​function setCar(c, el) { curCar = c; updateDynamicTheme(); }
-function setStojany(s, el) { curStojany = s; let cBox = document.getElementById('customStojanBox'); if(cBox) cBox.classList.remove('active'); updateDynamicTheme(); updateCalculations(); }
-function enableCustomStojany(el) { let cBox = document.getElementById('customStojanBox'); if(cBox) cBox.classList.add('active'); curStojany = parseInt(document.getElementById('customInput').value) || 1; updateDynamicTheme(); updateCalculations(); }
-function onCustomStojanyInput(val) { curStojany = parseInt(val) || 0; updateCalculations(); }
-​function updateCalculations() {
-let ks = curStojany * 12;
-let ob = Math.ceil(ks / 9);
-let kLbl = document.getElementById('lblKs');
-let oLbl = document.getElementById('lblOb');
-if (kLbl) kLbl.innerText = ks + ' ks';
-if (oLbl) oLbl.innerText = ob + ' obaly';
-}
-​function addOrder() {
-let ks = curStojany * 12;
-let ob = Math.ceil(ks / 9);
-let noteInput = document.getElementById('noteInput');
-let note = noteInput ? noteInput.value.trim() : '';
-let defaultFirst = (curLine === 1) ? 3 : 1;
-orders.push({ id: Date.now(), line: curLine, car: curCar, stojany: curStojany, total: ob, done: 0, note: note, firstBox: defaultFirst });
-if (noteInput) noteInput.value = '';
-lastOrderCount = orders.length;
-save();
-triggerNotification("Objednávka", "Objednávka odeslána");
-}
-​function setOrderFirstBox(orderId, chosenBox) {
-if (orderId === 'null') return;
-let o = orders.find(x => x.id === orderId);
-if (o) {
-o.firstBox = parseInt(chosenBox);
-save();
-render();
-}
-}
-​function cancelOrder(id) { orders = orders.filter(x => x.id !== id); lastOrderCount = orders.length; save(); }
-function toggleOrderExpand(id) { expandedOrderId = (expandedOrderId === id ? null : id); render(); }
-​function toggleOrderBoxDone(id, boxIndex) {
-let o = orders.find(x => x.id === id);
-if (!o) return;
-​if (boxIndex <= o.done) {
-o.done = boxIndex - 1;
-} else {
-o.done = boxIndex;
-}
-​o.note = (o.note ? o.note + " | " : "") + "Obsluha srovnala počet obalů";
-​if (o.done >= o.total) {
-orders = orders.filter(x => x.id !== id);
-expandedOrderId = null;
-}
-lastOrderCount = orders.length;
-save();
-}
-​function moveOrder(id, direction) {
-let index = orders.findIndex(x => x.id === id);
-if (index === -1) return;
-let targetOrder = orders[index];
-​let lineOrders = orders.filter(x => x.line === targetOrder.line);
-let subIndex = lineOrders.findIndex(x => x.id === id);
-let targetSubIndex = subIndex + direction;
-​if (targetSubIndex < 0 || targetSubIndex >= lineOrders.length) return;
-let neighborOrder = lineOrders[targetSubIndex];
-let neighborIndex = orders.findIndex(x => x.id === neighborOrder.id);
-​orders[index] = neighborOrder;
-orders[neighborIndex] = targetOrder;
-save();
-}
-​function sendCustomStockAlert() {
-let variant = document.getElementById('vzvVariantSelect').value;
-let count = document.getElementById('vzvCountInput').value;
-if (!count) { return; }
-stockAlerts.push({ id: Date.now(), variant: variant, count: count });
-triggerNotification("⚠️ Hlášení", VZV poslal hlášení pro ${variant});
-document.getElementById('vzvCountInput').value = '';
-save();
-}
-​function dismissAlert(alertId) { stockAlerts = stockAlerts.filter(a => a.id !== alertId); save(); }
-​function zavezt(id) {
-let o = orders.find(x => x.id === id);
-if (o) {
-o.done++;
-if (o.done >= o.total) {
-orders = orders.filter(x => x.id !== id);
-lastOrderCount = orders.length;
-}
-save();
-}
-}
-​function render() {
-if (sessionStorage.getItem('device_authenticated') !== 'true') return;
-renderRepeatBoxesUI();
-​let vzvSensorAlertArea = document.getElementById('vzvSensorAlertArea');
-if (vzvSensorAlertArea) {
-let activeSensors = [];
-for (let i = 1; i <= 4; i++) { if (repeatBoxes[i]) activeSensors.push(i); }
-​let vatHtml = '';
-vzvVatAlerts.forEach(v => {
-vatHtml += <div class="vzv-sensor-alert" style="margin-bottom:8px;"> <div class="vzv-sensor-title">⚠️ UPOZORNĚNÍ OD OBSLUHY</div> <div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">${v.text}</div> <button class="btn-resolve-sensor" onclick="dismissVzvVatAlert(${v.id})">✓ OK / POTVRĎ</button> </div>;
-});
-​if (activeSensors.length > 0 || vzvVatAlerts.length > 0) {
-let sensorText = activeSensors.length > 0 ? <div class="vzv-sensor-alert"><div class="vzv-sensor-title">⚠️ Opakuj zavezení, bedna není na čidlech !</div><div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">Boxy: ${activeSensors.join(', ')}</div><button class="btn-resolve-sensor" onclick="clearAllRepeatBoxes()">✓ OK / VYŘEŠENO</button></div> : '';
-vzvSensorAlertArea.innerHTML = vatHtml + sensorText;
-} else {
-vzvSensorAlertArea.innerHTML = '';
-}
-}
-​let alertArea = document.getElementById('alertAreaA');
-if (alertArea) {
-alertArea.innerHTML = '';
-stockAlerts.forEach(a => {
-alertArea.innerHTML += <div class="stock-alert-box"> <span>⚠️ <b>VZV hlásí:</b> Pro variantu <b>${a.variant}</b> zbývá <b>${a.count} obalů</b>!</span> <button class="btn-dismiss" onclick="dismissAlert(${a.id})">✕ Rozumím</button> </div>;
-});
-}
-​let listA = document.getElementById('listA');
-if (listA) {
-let htmlContent = '';
-let linesToRender = [1, 2];
-​linesToRender.forEach(l => {
-let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
-if (singleModeLines[l]) {
-htmlContent += <div style="background:#1e293b; padding:10px; border-radius:6px; margin-bottom:6px; border:1px solid #f59e0b; display:flex; justify-content:space-between; align-items:center;"><span>🔒 <b>Režim 1 varianta:</b> ${singleModeCar[l]||'Tiguan'} <span class="${badgeCls}">Linka ${l}</span></span><span style="font-size:0.75rem; color:#f59e0b; font-weight:bold;">Aktivní</span></div>;
-}
-if (twoVariantModeLines[l]) {
-htmlContent += <div style="background:#1e293b; padding:10px; border-radius:6px; margin-bottom:6px; border:1px solid #f59e0b; display:flex; justify-content:space-between; align-items:center;"><span>🔒 <b>Režim 2 varianty:</b> ${twoVariantPair[l]||''} <span class="${badgeCls}">Linka ${l}</span></span><span style="font-size:0.75rem; color:#f59e0b; font-weight:bold;">Aktivní</span></div>;
-}
-});
-​let anyActiveMode = linesToRender.some(l => singleModeLines[l] || twoVariantModeLines[l]);
-let filteredOrders = orders.filter(x => linesToRender.includes(x.line));
-​if (filteredOrders.length === 0 && !anyActiveMode) {
-htmlContent += '<div class="empty">Žádné aktivní objednávky</div>';
-}
-​linesToRender.forEach(l => {
-let lineOrders = orders.filter(x => x.line === l);
-let totalInLine = lineOrders.length;
-​if (totalInLine > 0) {
-let lineTitleClass = l === 1 ? 'l1' : 'l2';
-let lineBadgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
-htmlContent += <div class="queue-section-box"> <div class="queue-section-title ${lineTitleClass}">📍 Linka ${l} - Fronta zpracování</div>;
-​lineOrders.forEach((o, index) => {
-let lineClass = o.line === 1 ? 'line-1' : 'line-2';
-let noteHtml = o.note ? <div class="note-tag ${lineClass}">📝 ${o.note}</div> : '';
-let remainingWRT = Math.max(0, o.stojany - o.done);
-let isExpanded = (expandedOrderId === o.id);
-let queueNum = index + 1;
-​let expandMenuHtml = '';
-if (isExpanded) {
-let boxesHtml = '';
-for (let i = 1; i <= o.total; i++) {
-boxesHtml += <div class="box-unit ${i <= o.done ? 'done' : 'pending'}" onclick="toggleOrderBoxDone(${o.id}, ${i})">#${i}</div>;
-}
-​expandMenuHtml = <div class="order-expand-menu"> <div class="expand-menu-title">⚠️ SROVNÁT POČET</div> <div class="boxes-row" style="margin:4px 0 0 0;">${boxesHtml}</div> </div>;
-}
-​let moveButtonsHtml = '';
-if (index > 0) {
-moveButtonsHtml += <button class="btn-move" onclick="moveOrder(${o.id}, -1)" title="Posunout nahoru">▲</button>;
-}
-if (index < totalInLine - 1) {
-moveButtonsHtml += <button class="btn-move" onclick="moveOrder(${o.id}, 1)" title="Posunout dolů">▼</button>;
-}
-​htmlContent += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px; border:1px solid #334155;">
-<div style="display:flex; justify-content:space-between; align-items:center; gap:4px;">
-<span class="queue-order-num">{queueNum}.</span>
-<span style="flex-grow:1; font-size:0.85rem;"><b>{o.car}</b> <span class="${lineBadgeCls}">Zbývá {remainingWRT}/{o.stojany} WRT</span></span>
-​${moveButtonsHtml}
-​<span onclick="toggleOrderExpand(${o.id})" class="editable-progress">📦 {o.done}/{o.total} obalů</span>
-<button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
-</div>
-${noteHtml}
-${expandMenuHtml}
-</div>; }); htmlContent += </div>`;
-}
-});
-​listA.innerHTML = htmlContent;
-}
-​[1, 2].forEach(l => {
-let lOrders = orders.filter(x => x.line === l);
-let title = document.getElementById(l${l}Title);
-let next = document.getElementById(l${l}Next);
-let body = document.getElementById(l${l}Body);
-let headerBox = document.getElementById(l${l}FirstBoxHeader);
-let isSingle = singleModeLines[l];
-let isTwo = twoVariantModeLines[l];
-​if (title && next && body) {
-if (headerBox) {
-let boxA = (l === 1) ? 3 : 1;
-let boxB = (l === 1) ? 4 : 2;
-let activeOrder = lOrders[0];
-let currentFirst = (activeOrder && activeOrder.firstBox) ? activeOrder.firstBox : boxA;
-let activeOrderId = activeOrder ? activeOrder.id : 'null';
-let isOpen = folderOpenState[l];
-​headerBox.innerHTML = <div class="first-box-folder"> <div class="first-box-folder-header ${isOpen ? 'open' : ''}" onclick="toggleFolder(${l})"> <span>Nastavení zavezení</span> <span class="folder-arrow">▼</span> </div> <div class="first-box-folder-content ${isOpen ? 'open' : ''}"> <span class="toggle-title-lbl">Obal zavezen jako první:</span> <div class="first-box-toggle-container"> <button class="btn-toggle-box ${currentFirst === boxA ? 'active' : ''}" onclick="setOrderFirstBox(${activeOrderId}, ${boxA})">BOX ${boxA}</button> <button class="btn-toggle-box ${currentFirst === boxB ? 'active' : ''}" onclick="setOrderFirstBox(${activeOrderId}, ${boxB})">BOX ${boxB}</button> </div> </div> </div>;
-}
-​if (lOrders.length === 0 && !isSingle && !isTwo) {
-title.innerText = 'Žádná objednávka';
-next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
-body.innerHTML = '<div class="empty">Linka čeká na materiál.
-NECHTE BOX PRÁZDNÝ DO NOVÉ OBJEDNÁVKY.</div>';
-} else {
-if (isSingle || isTwo) {
-title.innerText = isSingle ? 🔒 ${singleModeCar[l]} : 🔒 ${twoVariantPair[l]};
-next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
-} else {
-let cur = lOrders[0];
-let nxt1 = lOrders[1];
-​let firstB = cur.firstBox || ((l === 1) ? 3 : 1);
-let targetBox = '';
-if (l === 1) {
-targetBox = (firstB === 3) ? ((cur.done % 2 === 0) ? 'Box 3' : 'Box 4') : ((cur.done % 2 === 0) ? 'Box 4' : 'Box 3');
-} else {
-targetBox = (firstB === 1) ? ((cur.done % 2 === 0) ? 'Box 1' : 'Box 2') : ((cur.done % 2 === 0) ? 'Box 2' : 'Box 1');
-}
-​title.innerText = ${cur.car} (${targetBox});
-​if (nxt1) {
-next.className = 'next-txt';
-next.innerHTML = Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.);
-} else {
-next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
-}
-}
-​let boxRangeText = (l === 1) ? '(Box 3 - 4)' : '(Box 1 - 2)';
-let modeAlertHtml = isSingle ? <div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE: ${singleModeCar[l].toUpperCase()} ${boxRangeText}</div> : (isTwo ? <div class="vzv-single-mode-box">⚠️ ${twoVariantPair[l]} ${boxRangeText}</div> : '');
-​if (isSingle || isTwo) {
-body.innerHTML = modeAlertHtml + '<div class="empty" style="color:#fbbf24; font-weight:bold;">Režim je aktivní na lince</div>';
-} else if (lOrders.length === 0) {
-body.innerHTML = modeAlertHtml + '<div class="empty">Linka čeká na materiál.
-NECHTE BOX PRÁZDNÝ DO NOVÉ OBJEDNÁVKY.</div>';
-} else {
-let cur = lOrders[0];
-let boxes = '';
-for (let i = 1; i <= cur.total; i++) {
-boxes += <div class="box-unit ${i <= cur.done ? 'done' : 'pending'}">#${i}</div>;
-}
-​let targetBox = '';
-let firstB = cur.firstBox || ((l === 1) ? 3 : 1);
-​if (l === 1) {
-if (firstB === 3) {
-targetBox = (cur.done % 2 === 0) ? '3' : '4';
-} else {
-targetBox = (cur.done % 2 === 0) ? '4' : '3';
-}
-} else {
-if (firstB === 1) {
-targetBox = (cur.done % 2 === 0) ? '1' : '2';
-} else {
-targetBox = (cur.done % 2 === 0) ? '2' : '1';
-}
-}
-​let isLastBox = (cur.done + 1 >= cur.total);
-let btnText = isLastBox
-? ⚠️ ZAVEZ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE JINÁ VARIANTA !
-: ✓ ZAVEZ OBAL DO BOXU ${targetBox} ! POTÉ POTVRĎ !;
-let btnClass = 'btn-zavez' + (isLastBox ? ' last-box-btn' : '');
-​body.innerHTML = ${modeAlertHtml} ${cur.note ?<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>: ''} <div class="boxes-row">${boxes}</div> <button class="${btnClass}" onclick="zavezt(${cur.id})">${btnText}</button>;
-}
-}
-}
-});
-updateDynamicTheme();
-}
-​function clearAllRepeatBoxes() {
-repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
-diffBoxes = { 1: {1:'', 2:'', 3:'', 4:''}, 2: {1:'', 2:'', 3:'', 4:''} };
-defectBoxes = { 1: {1:false, 2:false, 3:false, 4:false}, 2: {1:false, 2:false, 3:false, 4:false} };
-vzvVatAlerts = [];
-save();
-render();
-}
-</script>
+    <div id="updateBannerOverlay">
+        <div class="update-banner-box" id="updateBannerBox">
+            <div class="update-banner-title" id="bannerTitle" onclick="openAdminPasswordModal(true)" title="Kliknutím zadat heslo správce">⚠️ UPOZORNĚNÍ NA ÚDRŽBU</div>
+            <div class="update-banner-text" id="bannerText">Načítání...</div>
+            <button class="btn-update-ack" id="bannerAckBtn" onclick="acknowledgeUpdate()">OK</button>
+        </div>
+    </div>
+
+    <div id="adminPasswordModal">
+        <div class="admin-pwd-box">
+            <div style="font-size: 1rem; font-weight: bold; color: #f59e0b;">🔒 Zadejte heslo správce</div>
+            <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Pro přístup nebo změnu režimu</div>
+            <input type="password" id="adminPassInput" class="admin-pwd-input" placeholder="••••••" autofocus onkeydown="if(event.key==='Enter') verifyAdminPassword()">
+            <div id="adminPassError" style="color: #ef4444; font-size: 0.75rem; margin-bottom: 8px; display: none;">⚠️ Nesprávné heslo!</div>
+            <div class="admin-pwd-btns">
+                <button class="btn-admin-action btn-admin-cancel" onclick="closeAdminPasswordModal()">Zrušit</button>
+                <button class="btn-admin-action btn-admin-ok" onclick="verifyAdminPassword()">Potvrdit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loginScreen">
+        <div class="login-box">
+            <div class="login-title">⚡ LogiFlow</div>
+            <div class="login-sub">Zvolte roli a zadejte heslo</div>
+            
+            <div class="login-mode-select" style="grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px;">
+                <button type="button" id="loginBtnL1" class="login-mode-btn active-l1" onclick="setLoginMode('L1')">Linka 1</button>
+                <button type="button" id="loginBtnL2" class="login-mode-btn" onclick="setLoginMode('L2')">Linka 2</button>
+                <button type="button" id="loginBtnL12" class="login-mode-btn" onclick="setLoginMode('L12')">Linka 1-2</button>
+                <button type="button" id="loginBtnVZV" class="login-mode-btn" onclick="setLoginMode('VZV')">VZV</button>
+            </div>
+
+            <input type="password" id="passInput" class="login-input" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
+            <button class="btn-login" type="button" onclick="checkPassword()">VSTOUPIT DO SYSTÉMU</button>
+            <div id="loginError" class="login-error">⚠️ Nesprávné heslo! Zkuste to znovu.</div>
+        </div>
+    </div>
+
+    <div id="appScreen">
+        <div class="header">
+            <div class="logo">⚡ LogiFlow</div>
+            <div class="header-right">
+                <button class="btn-settings" onclick="openSettingsModal()" title="Nastavení">⚙️ Nastavení</button>
+                <span id="roleBadge" class="role-badge">Linka 1</span>
+                <button class="btn-logout" onclick="logout()" title="Odhlásit tento telefon">🔓 Odhlásit</button>
+            </div>
+        </div>
+
+        <div id="viewA">
+            <div id="alertAreaA"></div>
+            <div class="lbl" id="lineSelectContainerLbl">Vyberte Linku</div>
+            <div class="line-select" id="lineSelectContainer">
+                <div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1<br><span style="font-size:0.65rem; font-weight:normal;">BOX 4 - 3</span></div>
+                <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.65rem; font-weight:normal;">BOX 2 - 1</span></div>
+            </div>
+
+            <div class="accordion-wrapper" id="modesAccordionWrapper">
+                <div class="accordion-header" id="modesAccordionHeader" onclick="toggleAccordion('modesAccordionContent', 'modesAccordionHeader')">
+                    <span>Výroba jedné nebo dvou variant se stejným obalem :</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="accordion-content" id="modesAccordionContent">
+                    <div class="single-mode-panel line-1" id="singleModePanel">
+                        <div class="single-mode-txt">🔒 Režim: Jede pouze 1 varianta</div>
+                        <div class="banner-btns">
+                            <button class="btn-yn" id="btnSingleYes" onclick="toggleSingleMode(true)">ZAP</button>
+                            <button class="btn-yn active-no" id="btnSingleNo" onclick="toggleSingleMode(false)">VYP</button>
+                        </div>
+                    </div>
+
+                    <div class="mode-selector-box line-1" id="singleModeSelectBox">
+                        <div class="lbl" style="margin-top:0;">Vyberte variantu pro režim:</div>
+                        <div class="grid-3" id="singleCarGrid" style="margin-bottom:0;">
+                            <div class="btn-opt" onclick="setSingleCar('Tiguan', this)">Tiguan</div>
+                            <div class="btn-opt" onclick="setSingleCar('Kodiaq', this)">Kodiaq</div>
+                            <div class="btn-opt" onclick="setSingleCar('Tayron', this)">Tayron</div>
+                            <div class="btn-opt" onclick="setSingleCar('Audi', this)">Audi</div>
+                            <div class="btn-opt" onclick="setSingleCar('Seat', this)">Seat</div>
+                        </div>
+                    </div>
+
+                    <div class="single-mode-panel line-1" id="twoVariantPanel">
+                        <div class="single-mode-txt">🔒 Režim: Jedou 2 varianty (stejný obal)</div>
+                        <div class="banner-btns">
+                            <button class="btn-yn" id="btnTwoYes" onclick="toggleTwoVariantMode(true)">ZAP</button>
+                            <button class="btn-yn active-no" id="btnTwoNo" onclick="toggleTwoVariantMode(false)">VYP</button>
+                        </div>
+                    </div>
+
+                    <div class="mode-selector-box line-1" id="twoModeSelectBox">
+                        <div class="lbl" style="margin-top:0;">Vyberte dvojici variant pro kontrolu:</div>
+                        <div class="grid-2" id="twoPairGrid" style="margin-bottom:0;">
+                            <div class="btn-opt" onclick="setTwoPair('Tiguan / Kodiaq', this)">Tiguan / Kodiaq</div>
+                            <div class="btn-opt" onclick="setTwoPair('Audi / Seat', this)">Audi / Seat</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-wrapper">
+                <div class="accordion-header" id="sensorAccordionHeader" onclick="toggleAccordion('sensorAccordionContent', 'sensorAccordionHeader')">
+                    <span id="sensorAccordionTitle">Info pro VZV: čidla, jiný obal, vadný obal, přivez prázdný</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="accordion-content" id="sensorAccordionContent">
+                    <div class="report-panel">
+                        <div class="report-sub-tabs">
+                            <button class="btn-report-tab active" id="tabReportSensors" onclick="setReportTab('sensors')">1. Čidla</button>
+                            <button class="btn-report-tab" id="tabReportDiff" onclick="setReportTab('diff')">2. Jiný obal</button>
+                            <button class="btn-report-tab" id="tabReportDefect" onclick="setReportTab('defect')">3. Vadný obal</button>
+                            <button class="btn-report-tab" id="tabReportEmpty" onclick="setReportTab('empty')">4. Přivez prázdný</button>
+                        </div>
+
+                        <div id="reportSubSensors">
+                            <div class="repeat-title" style="margin-top:4px;">Opakuj zavezení, bedna není na čidlech :</div>
+                            <div class="box-grid-4">
+                                <div class="box-col"><div class="box-col-lbl">Box 4</div><button class="box-col-btn" id="repeatBox4" onclick="toggleRepeatBox(4)">VYP</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 3</div><button class="box-col-btn" id="repeatBox3" onclick="toggleRepeatBox(3)">VYP</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 2</div><button class="box-col-btn" id="repeatBox2" onclick="toggleRepeatBox(2)">VYP</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 1</div><button class="box-col-btn" id="repeatBox1" onclick="toggleRepeatBox(1)">VYP</button></div>
+                            </div>
+                        </div>
+
+                        <div id="reportSubDiff" style="display:none;">
+                            <div class="repeat-title" style="margin-top:4px; color:#f59e0b;">Obal se neshoduje s variantou. (vyberte box a správnou variantu):</div>
+                            <div class="diff-box-grid">
+                                <div class="diff-box-col" id="diffColBox4">
+                                    <div class="diff-box-title">Box 4</div>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(4, 'Tiguan')">Tiguan</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(4, 'Kodiaq')">Kodiaq</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(4, 'Tayron')">Tayron</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(4, 'Audi')">Audi</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(4, 'Seat')">Seat</button>
+                                </div>
+                                <div class="diff-box-col" id="diffColBox3">
+                                    <div class="diff-box-title">Box 3</div>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(3, 'Tiguan')">Tiguan</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(3, 'Kodiaq')">Kodiaq</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(3, 'Tayron')">Tayron</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(3, 'Audi')">Audi</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(3, 'Seat')">Seat</button>
+                                </div>
+                                <div class="diff-box-col" id="diffColBox2">
+                                    <div class="diff-box-title">Box 2</div>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(2, 'Tiguan')">Tiguan</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(2, 'Kodiaq')">Kodiaq</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(2, 'Tayron')">Tayron</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(2, 'Audi')">Audi</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(2, 'Seat')">Seat</button>
+                                </div>
+                                <div class="diff-box-col" id="diffColBox1">
+                                    <div class="diff-box-title">Box 1</div>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(1, 'Tiguan')">Tiguan</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(1, 'Kodiaq')">Kodiaq</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(1, 'Tayron')">Tayron</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(1, 'Audi')">Audi</button>
+                                    <button class="diff-car-btn" onclick="toggleDiffReport(1, 'Seat')">Seat</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="reportSubDefect" style="display:none;">
+                            <div class="repeat-title" style="margin-top:4px; color:#ef4444;">Obal je vadný, křivý. Vyměň ho (vyberte box):</div>
+                            <div class="box-grid-4">
+                                <div class="box-col"><div class="box-col-lbl">Box 4</div><button class="box-col-btn" id="defectBox4" onclick="toggleDefectReport(4)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 3</div><button class="box-col-btn" id="defectBox3" onclick="toggleDefectReport(3)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 2</div><button class="box-col-btn" id="defectBox2" onclick="toggleDefectReport(2)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                                <div class="box-col"><div class="box-col-lbl">Box 1</div><button class="box-col-btn" id="defectBox1" onclick="toggleDefectReport(1)" style="background:#ef4444; color:#fff; border-color:#ef4444;">Nahlásit</button></div>
+                            </div>
+                        </div>
+
+                        <div id="reportSubEmpty" style="display:none;">
+                            <div class="repeat-title" style="margin-top:4px; color:#10b981;">Přivez prázdný obal na pracoviště (vyberte variantu a počet):</div>
+                            <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; align-items:center;">
+                                <select id="emptyVariantSelect" class="vzv-select" style="flex:1; min-width:130px;">
+                                    <option value="Tiguan">Tiguan</option>
+                                    <option value="Kodiaq">Kodiaq</option>
+                                    <option value="Tayron">Tayron</option>
+                                    <option value="Audi">Audi</option>
+                                    <option value="Seat">Seat</option>
+                                </select>
+                                <input type="number" id="emptyCountInput" class="vzv-num-input" placeholder="počet obalů" min="1" max="99" style="width:110px;">
+                                <button class="btn-send-alert" onclick="sendEmptyReport()" style="background:#10b981; margin-top:0; width:100%;">📢 ODESLAT POŽADAVEK NA VZV</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="standardOrderSection">
+                <div class="lbl" id="productLbl">Produkt</div>
+                <div class="grid-3" id="carGrid">
+                    <div class="btn-opt selected-1" onclick="setCar('Tiguan', this)">Tiguan</div>
+                    <div class="btn-opt" onclick="setCar('Kodiaq', this)">Kodiaq</div>
+                    <div class="btn-opt" onclick="setCar('Tayron', this)">Tayron</div>
+                    <div class="btn-opt" onclick="setCar('Audi', this)">Audi</div>
+                    <div class="btn-opt" onclick="setCar('Seat', this)">Seat</div>
+                </div>
+
+                <div class="lbl">Počet Stojanů WRT</div>
+                <div class="grid-3" id="stojanGrid">
+                    <div class="btn-opt selected-1" id="opt3WRT" onclick="setStojany(3, this)">3 WRT</div>
+                    <div class="btn-opt" id="opt6WRT" onclick="setStojany(6, this)">6 WRT</div>
+                    <div class="btn-opt" id="optCustomWRT" onclick="enableCustomStojany(this)">✏️ Vlastní</div>
+                </div>
+
+                <div class="custom-stojan-input line-1" id="customStojanBox">
+                    <span style="font-size:0.8rem; color:#94a3b8; white-space:nowrap;">Zadejte počet:</span>
+                    <input type="number" id="customInput" min="1" max="50" value="4" oninput="onCustomStojanyInput(this.value)">
+                </div>
+
+                <div class="lbl">Poznámka pro VZV (volitelné)</div>
+                <input type="text" id="noteInput" class="note-input" placeholder="Napište poznámku k objednávce..." />
+
+                <div class="box-info">
+                    <div><div class="val" id="lblKs">36 ks</div><div style="font-size:0.65rem; color:#94a3b8;">CELKEM</div></div>
+                    <div><div class="val" id="lblOb">4 obaly</div><div style="font-size:0.65rem; color:#94a3b8;">K ZAVÁŽENÍ (po 9ks)</div></div>
+                </div>
+
+                <button class="btn-submit" onclick="addOrder()">POSLAT OBJEDNÁVKU VZV</button>
+            </div>
+
+            <div class="lbl" style="margin-top:16px;">Odesláno na VZV (Probíhají objednávky / Aktivní režimy)</div>
+            <div id="listA"></div>
+        </div>
+
+        <div id="viewB" style="display:none;">
+            <div class="lbl">Přehled linek pro závoz VZV</div>
+             
+            <div id="vzvSensorAlertArea"></div>
+
+            <div class="vzv-card l2">
+                <div class="vzv-hdr">
+                    <div>
+                        <span class="badge l2">Box: 1 - 2</span>
+                        <h2 id="l2Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
+                        <div id="l2Next" class="next-txt none">Následuje ➔ Žádné</div>
+                    </div>
+                    <div id="l2FirstBoxHeader"></div>
+                </div>
+                <div id="l2Body"></div>
+            </div>
+            
+            <div class="vzv-card l1-card">
+                <div class="vzv-hdr">
+                    <div>
+                        <span class="badge">Box: 3 - 4</span>
+                        <h2 id="l1Title" style="font-size:1.1rem; margin-top:2px;">-</h2>
+                        <div id="l1Next" class="next-txt none">Následuje ➔ Žádné</div>
+                    </div>
+                    <div id="l1FirstBoxHeader"></div>
+                </div>
+                <div id="l1Body"></div>
+            </div>
+
+            <div class="vzv-alert-panel">
+                <div class="vzv-alert-title">⚠️ Hlášení stavu obalů obsluze</div>
+                <div class="vzv-alert-row">
+                    <select id="vzvVariantSelect" class="vzv-select">
+                        <option value="Tiguan / Kodiaq">Tiguan / Kodiaq</option>
+                        <option value="Audi / Seat">Audi / Seat</option>
+                        <option value="Tayron">Tayron</option>
+                    </select>
+                    <input type="number" id="vzvCountInput" class="vzv-num-input" placeholder="zde napiš počet obalu" value="" min="1" max="99">
+                </div>
+                <button class="btn-send-alert" onclick="sendCustomStockAlert()">📢 ODESLAT HLÁŠENÍ OBSLUZE</button>
+            </div>
+
+            <div id="doneBanner" class="done-msg" style="display:none;">
+                ✓ Vše zpracováno! Čekám na novou objednávku.
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsModal">
+        <div class="settings-box">
+            <div class="settings-header">
+                <div class="settings-title">⚙️ Nastavení systému</div>
+                <button class="btn-close" onclick="closeSettingsModal()">✕</button>
+            </div>
+
+            <div class="settings-online-counter">
+                <div>Obsluha online: <br><span id="countOnlineA" class="online-val-a">0</span></div>
+                <div style="border-left: 1px solid #334155; padding-left: 10px;">VZV online: <br><span id="countOnlineB" class="online-val-b">0</span></div>
+            </div>
+
+            <div class="settings-row">
+                <span style="font-size:0.85rem; font-weight:bold;">🔔 Zvukové notifikace</span>
+                <div class="banner-btns">
+                    <button class="btn-yn active-yes" id="setNotifYes" onclick="toggleNotifications(true)">ANO</button>
+                    <button class="btn-yn" id="setNotifNo" onclick="toggleNotifications(false)">NE</button>
+                </div>
+            </div>
+
+            <div class="settings-row" style="flex-direction:column; align-items:flex-start; gap:6px;">
+                <span style="font-size:0.85rem; font-weight:bold;">🎵 Výběr zvuku upozornění</span>
+                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; width:100%;">
+                    <button class="btn-yn" id="soundOpt1" onclick="setSoundType(1)" style="font-size:0.65rem; padding:6px 2px;">1. Pípnutí</button>
+                    <button class="btn-yn" id="soundOpt2" onclick="setSoundType(2)" style="font-size:0.65rem; padding:6px 2px;">2. Alarm</button>
+                    <button class="btn-yn" id="soundOpt3" onclick="setSoundType(3)" style="font-size:0.65rem; padding:6px 2px;">3. Cinkot</button>
+                </div>
+            </div>
+
+            <div style="background:#0f172a; padding:12px; border-radius:8px; margin-top:12px; border:1px solid #ef4444;">
+                <div style="font-size:0.85rem; font-weight:bold; color:#ef4444; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                    <span>🔒</span> Režim údržby / Aktualizace
+                </div>
+                <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Aktivuje výstrahu na všech zařízeních. Vyžaduje heslo správce.</div>
+                <div class="banner-btns" style="width:100%; display:grid; grid-template-columns:1fr 1fr;">
+                    <button class="btn-yn" id="setUpdateYes" onclick="openAdminPasswordModal(true)">ZAPNOUT</button>
+                    <button class="btn-yn active-no" id="setUpdateNo" onclick="openAdminPasswordModal(false)">VYPNOUT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            databaseURL: "https://logiflow-app-default-rtdb.europe-west1.firebasedatabase.app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const SYSTEM_PASSWORD = '1234';
+        const ADMIN_PASSWORD = '704517';
+        let notificationsEnabled = true;
+        let selectedSoundType = parseInt(localStorage.getItem('selected_sound_type')) || 1;
+
+        let curLine = 1, curCar = 'Tiguan', curStojany = 3;
+        let singleModeLines = { 1: false, 2: false };
+        let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' };
+        let twoVariantModeLines = { 1: false, 2: false };
+        let twoVariantPair = { 1: 'Tiguan / Kodiaq', 2: 'Tiguan / Kodiaq' };
+        let repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
+        let diffBoxes = { 1: {1:'', 2:'', 3:'', 4:''}, 2: {1:'', 2:'', 3:'', 4:''} };
+        let defectBoxes = { 1: {1:false, 2:false, 3:false, 4:false}, 2: {1:false, 2:false, 3:false, 4:false} };
+        
+        let activeReportSubTab = 'sensors';
+        let vzvVatAlerts = [];
+        
+        let systemUpdateActive = false;
+        let systemUpdateCompletedState = false;
+        let pendingUpdateState = false;
+
+        let orders = [];
+        let stockAlerts = [];
+        let lastOrderCount = 0;
+        let lastVzvAlertCount = 0;
+        let selectedLoginMode = 'L1';
+        let expandedOrderId = null;
+
+        let folderOpenState = { 1: false, 2: false };
+
+        let deviceId = sessionStorage.getItem('device_id');
+        if (!deviceId) {
+            deviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
+            sessionStorage.setItem('device_id', deviceId);
+        }
+
+        function setSoundType(type) {
+            selectedSoundType = type;
+            localStorage.setItem('selected_sound_type', type);
+            updateSoundUI();
+            triggerNotification("Test", "Test zvuku");
+        }
+
+        function updateSoundUI() {
+            for (let i = 1; i <= 3; i++) {
+                let btn = document.getElementById(`soundOpt${i}`);
+                if (btn) {
+                    btn.className = 'btn-yn ' + (selectedSoundType === i ? 'active-yes' : '');
+                }
+            }
+        }
+
+        function toggleFolder(lineNum) {
+            folderOpenState[lineNum] = !folderOpenState[lineNum];
+            render();
+        }
+
+        function toggleAccordion(contentId, headerId) {
+            let content = document.getElementById(contentId);
+            let header = document.getElementById(headerId);
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                header.classList.remove('open');
+            } else {
+                content.style.display = 'block';
+                header.classList.add('open');
+            }
+        }
+
+        function setReportTab(tab) {
+            activeReportSubTab = tab;
+            document.getElementById('tabReportSensors').className = 'btn-report-tab ' + (tab === 'sensors' ? 'active' : '');
+            document.getElementById('tabReportDiff').className = 'btn-report-tab ' + (tab === 'diff' ? 'active' : '');
+            document.getElementById('tabReportDefect').className = 'btn-report-tab ' + (tab === 'defect' ? 'active' : '');
+            document.getElementById('tabReportEmpty').className = 'btn-report-tab ' + (tab === 'empty' ? 'active' : '');
+
+            document.getElementById('reportSubSensors').style.display = tab === 'sensors' ? 'block' : 'none';
+            document.getElementById('reportSubDiff').style.display = tab === 'diff' ? 'block' : 'none';
+            document.getElementById('reportSubDefect').style.display = tab === 'defect' ? 'block' : 'none';
+            document.getElementById('reportSubEmpty').style.display = tab === 'empty' ? 'block' : 'none';
+        }
+
+        function updatePresence() {
+            let isAuth = sessionStorage.getItem('device_authenticated') === 'true';
+            if (isAuth) {
+                let role = sessionStorage.getItem('active_role') || 'L1';
+                db.ref('presence/' + deviceId).set({
+                    role: role,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+            } else {
+                db.ref('presence/' + deviceId).remove();
+            }
+        }
+
+        setInterval(updatePresence, 5000);
+
+        window.addEventListener('beforeunload', () => {
+            db.ref('presence/' + deviceId).remove();
+        });
+
+        db.ref('presence').on('value', (snapshot) => {
+            let data = snapshot.val() || {};
+            let countA = 0;
+            let countB = 0;
+            let now = Date.now();
+
+            Object.values(data).forEach(item => {
+                if (item && item.timestamp && (now - item.timestamp < 15000)) {
+                    if (item.role !== 'VZV') countA++;
+                    if (item.role === 'VZV') countB++;
+                }
+            });
+
+            document.getElementById('countOnlineA').innerText = countA;
+            document.getElementById('countOnlineB').innerText = countB;
+        });
+
+        db.ref('orders').on('value', (snapshot) => {
+            let rawOrders = snapshot.val() || [];
+            let updatedOrders = Array.isArray(rawOrders) ? rawOrders : Object.values(rawOrders);
+            if (updatedOrders.length > lastOrderCount) {
+                let newest = updatedOrders[updatedOrders.length - 1];
+                triggerNotification("⚡ Nová objednávka na VZV!", `${newest.car} (${newest.stojany} WRT) - Linka ${newest.line}`);
+            }
+            orders = updatedOrders;
+            lastOrderCount = orders.length;
+            render();
+        });
+
+        db.ref('alerts').on('value', (snapshot) => {
+            let rawAlerts = snapshot.val() || [];
+            stockAlerts = Array.isArray(rawAlerts) ? rawAlerts : Object.values(rawAlerts);
+            render();
+        });
+
+        db.ref('vzvVatAlerts').on('value', (snapshot) => {
+            let raw = snapshot.val() || [];
+            let updatedVatAlerts = Array.isArray(raw) ? raw : Object.values(raw);
+            if (updatedVatAlerts.length > lastVzvAlertCount) {
+                triggerNotification("⚠️ Upozornění!", "Nové hlášení v systému");
+            }
+            vzvVatAlerts = updatedVatAlerts;
+            lastVzvAlertCount = vzvVatAlerts.length;
+            render();
+        });
+
+        db.ref('singleModeLines').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) {
+                if (singleModeLines[1] !== data[1] || singleModeLines[2] !== data[2]) {
+                    triggerNotification("🔒 Změna režimu", "Režim 1 varianta byl změněn");
+                }
+                singleModeLines = data;
+            }
+            render();
+        });
+
+        db.ref('singleModeCar').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) singleModeCar = data;
+            render();
+        });
+
+        db.ref('twoVariantModeLines').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) {
+                if (twoVariantModeLines[1] !== data[1] || twoVariantModeLines[2] !== data[2]) {
+                    triggerNotification("🔒 Změna režimu", "Režim 2 varianty byl změněn");
+                }
+                twoVariantModeLines = data;
+            }
+            render();
+        });
+
+        db.ref('twoVariantPair').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) twoVariantPair = data;
+            render();
+        });
+
+        db.ref('repeatBoxes').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) {
+                let activeBefore = Object.values(repeatBoxes).some(Boolean);
+                let activeNow = Object.values(data).some(Boolean);
+                if (!activeBefore && activeNow) {
+                    triggerNotification("⚠️ Upozornění", "Hlášení čidel aktivováno");
+                }
+                repeatBoxes = data;
+            }
+            render();
+        });
+
+        db.ref('diffBoxes').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) diffBoxes = data;
+            render();
+        });
+
+        db.ref('defectBoxes').on('value', (snapshot) => {
+            let data = snapshot.val();
+            if (data) defectBoxes = data;
+            render();
+        });
+
+        db.ref('systemUpdate').on('value', (snapshot) => {
+            let val = snapshot.val();
+            let newActive = val ? val.active : false;
+            let newCompleted = val ? val.completed : false;
+
+            systemUpdateActive = newActive;
+            systemUpdateCompletedState = newCompleted;
+            renderUpdateOverlay();
+        });
+
+        function save() {
+            db.ref('orders').set(orders);
+            db.ref('alerts').set(stockAlerts);
+            db.ref('vzvVatAlerts').set(vzvVatAlerts);
+            db.ref('singleModeLines').set(singleModeLines);
+            db.ref('singleModeCar').set(singleModeCar);
+            db.ref('twoVariantModeLines').set(twoVariantModeLines);
+            db.ref('twoVariantPair').set(twoVariantPair);
+            db.ref('repeatBoxes').set(repeatBoxes);
+            db.ref('diffBoxes').set(diffBoxes);
+            db.ref('defectBoxes').set(defectBoxes);
+        }
+
+        function toggleRepeatBox(boxNum) {
+            repeatBoxes[boxNum] = !repeatBoxes[boxNum];
+            if (repeatBoxes[boxNum]) {
+                triggerNotification("⚠️ Čidla", `Box ${boxNum} není na čidlech!`);
+            }
+            save();
+            renderRepeatBoxesUI();
+        }
+
+        function toggleDiffReport(boxNum, carName) {
+            if (!diffBoxes[curLine]) diffBoxes[curLine] = {1:'', 2:'', 3:'', 4:''};
+            let currentVal = diffBoxes[curLine][boxNum];
+            if (currentVal === carName) {
+                diffBoxes[curLine][boxNum] = '';
+                vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'diff'));
+            } else {
+                diffBoxes[curLine][boxNum] = carName;
+                vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'diff'));
+                vzvVatAlerts.push({
+                    id: Date.now() + Math.random(),
+                    line: curLine,
+                    box: boxNum,
+                    type: 'diff',
+                    text: `Na lince ${curLine}, boxu #${boxNum}: Obal neodpovídá zvolené variantě.<br>ZAVEZ SPRÁVNÝ OBAL: ${carName}`
+                });
+                triggerNotification("⚠️ Jiný obal", `Hlášení pro linku ${curLine}, box #${boxNum}`);
+            }
+            save();
+            renderRepeatBoxesUI();
+        }
+
+        function getAccusativeCar(car) {
+            let upper = car.toUpperCase();
+            if (upper === 'TIGUAN') return 'TIGUANA';
+            if (upper === 'KODIAQ') return 'KODIAQA';
+            if (upper === 'TAYRON') return 'TAYRONA';
+            if (upper === 'AUDI') return 'AUDI';
+            if (upper === 'SEAT') return 'SEAT';
+            return upper;
+        }
+
+        function toggleDefectReport(boxNum) {
+            if (!defectBoxes[curLine]) defectBoxes[curLine] = {};
+            let isActive = !!defectBoxes[curLine][boxNum];
+            defectBoxes[curLine][boxNum] = !isActive;
+
+            if (defectBoxes[curLine][boxNum]) {
+                vzvVatAlerts.push({
+                    id: Date.now() + Math.random(),
+                    line: curLine,
+                    box: boxNum,
+                    type: 'defect',
+                    text: `Na lince ${curLine}, Box #${boxNum}: Obal je vadný, křivý. Vyměň ho!`
+                });
+                triggerNotification("⚠️ Vadný obal", `Nahlášen vadný obal na lince ${curLine}`);
+            } else {
+                vzvVatAlerts = vzvVatAlerts.filter(a => !(a.line === curLine && a.box === boxNum && a.type === 'defect'));
+            }
+            save();
+        }
+
+        function sendEmptyReport() {
+            let variant = document.getElementById('emptyVariantSelect').value;
+            let count = document.getElementById('emptyCountInput').value;
+            if (!count) {
+                return;
+            }
+            let variantAcc = getAccusativeCar(variant);
+            vzvVatAlerts.push({
+                id: Date.now() + Math.random(),
+                line: curLine,
+                type: 'empty',
+                text: `Na lince ${curLine}: Přivez prázdný obal na pracoviště (${variantAcc}, ${count} ks).`
+            });
+            triggerNotification("⚠️ Prázdný obal", `Požadavek na prázdný obal (linka ${curLine})`);
+            document.getElementById('emptyCountInput').value = '';
+            save();
+        }
+
+        function dismissVzvVatAlert(alertId) {
+            let alertObj = vzvVatAlerts.find(a => a.id === alertId);
+            if (alertObj) {
+                if (alertObj.type === 'defect') {
+                    if (defectBoxes[alertObj.line]) defectBoxes[alertObj.line][alertObj.box] = false;
+                }
+                if (alertObj.type === 'diff') {
+                    if (diffBoxes[alertObj.line]) diffBoxes[alertObj.line][alertObj.box] = '';
+                }
+            }
+            vzvVatAlerts = vzvVatAlerts.filter(a => a.id !== alertId);
+            save();
+        }
+
+        function renderRepeatBoxesUI() {
+            let activeSensors = [];
+            for (let i = 1; i <= 4; i++) {
+                let btn = document.getElementById(`repeatBox${i}`);
+                if (btn) {
+                    if (repeatBoxes[i]) {
+                        btn.innerText = "ZAP";
+                        btn.className = "box-col-btn active";
+                        activeSensors.push(i);
+                    } else {
+                        btn.innerText = "VYP";
+                        btn.className = "box-col-btn";
+                    }
+                }
+            }
+
+            for (let b = 1; b <= 4; b++) {
+                let col = document.getElementById(`diffColBox${b}`);
+                if (col) {
+                    let selectedCar = diffBoxes[curLine] ? diffBoxes[curLine][b] : '';
+                    let buttons = col.querySelectorAll('.diff-car-btn');
+                    buttons.forEach(btn => {
+                        if (btn.innerText === selectedCar) {
+                            btn.className = 'diff-car-btn active';
+                        } else {
+                            btn.className = 'diff-car-btn';
+                        }
+                    });
+                }
+            }
+
+            for (let b = 1; b <= 4; b++) {
+                let defBtn = document.getElementById(`defectBox${b}`);
+                if (defBtn) {
+                    let isDef = defectBoxes[curLine] && defectBoxes[curLine][b];
+                    if (isDef) {
+                        defBtn.innerText = "ZAP";
+                        defBtn.className = "box-col-btn active";
+                    } else {
+                        defBtn.innerText = "Nahlásit";
+                        defBtn.className = "box-col-btn";
+                        defBtn.style.background = "#ef4444";
+                        defBtn.style.color = "#fff";
+                        defBtn.style.borderColor = "#ef4444";
+                    }
+                }
+            }
+
+            let sensorHeader = document.getElementById('sensorAccordionHeader');
+            let sensorTitle = document.getElementById('sensorAccordionTitle');
+            if (sensorHeader && sensorTitle) {
+                let hasActiveDefect = false;
+                if (defectBoxes[1]) { Object.values(defectBoxes[1]).forEach(v => { if(v) hasActiveDefect = true; }); }
+                if (defectBoxes[2]) { Object.values(defectBoxes[2]).forEach(v => { if(v) hasActiveDefect = true; }); }
+
+                let hasActiveDiff = false;
+                if (diffBoxes[1]) { Object.values(diffBoxes[1]).forEach(v => { if(v) hasActiveDiff = true; }); }
+                if (diffBoxes[2]) { Object.values(diffBoxes[2]).forEach(v => { if(v) hasActiveDiff = true; }); }
+
+                if (activeSensors.length > 0 || vzvVatAlerts.length > 0 || hasActiveDefect || hasActiveDiff) {
+                    sensorHeader.classList.add('alarm-active');
+                    sensorTitle.innerHTML = `⚠️ Info pro VZV (Aktivní hlášení...)`;
+                } else {
+                    sensorHeader.classList.remove('alarm-active');
+                    sensorTitle.innerText = "Info pro VZV: čidla, jiný obal, vadný obal, přivez prázdný";
+                }
+            }
+        }
+
+        function openAdminPasswordModal(enable) {
+            pendingUpdateState = enable;
+            document.getElementById('adminPassInput').value = '';
+            document.getElementById('adminPassError').style.display = 'none';
+            document.getElementById('adminPasswordModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
+        }
+
+        function closeAdminPasswordModal() {
+            document.getElementById('adminPasswordModal').style.display = 'none';
+        }
+
+        function verifyAdminPassword() {
+            let pass = document.getElementById('adminPassInput').value;
+            if (pass !== ADMIN_PASSWORD) {
+                document.getElementById('adminPassError').style.display = 'block';
+                return;
+            }
+            closeAdminPasswordModal();
+            closeSettingsModal();
+
+            if (systemUpdateActive && pendingUpdateState === true && document.getElementById('updateBannerOverlay').style.display === 'flex') {
+                logout();
+                return;
+            }
+
+            if (pendingUpdateState) {
+                db.ref('systemUpdate').set({ active: true, completed: false });
+            } else {
+                db.ref('systemUpdate').set({ active: false, completed: true });
+            }
+        }
+
+        function acknowledgeUpdate() {
+            localStorage.setItem('ack_update_completed_state', systemUpdateCompletedState.toString());
+            document.getElementById('updateBannerOverlay').style.display = 'none';
+        }
+
+        function renderUpdateOverlay() {
+            let overlay = document.getElementById('updateBannerOverlay');
+            let bannerBox = document.getElementById('updateBannerBox');
+            let title = document.getElementById('bannerTitle');
+            let text = document.getElementById('bannerText');
+
+            let ackState = localStorage.getItem('ack_update_completed_state');
+            let isAlreadyAcked = (ackState === systemUpdateCompletedState.toString());
+
+            if (systemUpdateActive) {
+                bannerBox.className = "update-banner-box";
+                title.innerText = "⚠️ UPOZORNĚNÍ NA ÚDRŽBU";
+                text.innerHTML = "POZOR: Proběhne aktualizace programu připravte se na výpadek.<br><br>Neřiďte se PROGRAMEM !!!";
+                overlay.style.display = 'flex';
+            } else if (systemUpdateCompletedState && !isAlreadyAcked) {
+                bannerBox.className = "update-banner-box completed-box";
+                title.innerText = "✅ HOTOVO";
+                text.innerText = "Program aktualizován, potvrzením dojde k resetu objednávek z důvodu aktualizace.";
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+            }
+
+            let btnYes = document.getElementById('setUpdateYes');
+            let btnNo = document.getElementById('setUpdateNo');
+            if (btnYes && btnNo) {
+                if (systemUpdateActive) {
+                    btnYes.className = 'btn-yn active-yes';
+                    btnNo.className = 'btn-yn';
+                } else {
+                    btnYes.className = 'btn-yn';
+                    btnNo.className = 'btn-yn active-no';
+                }
+            }
+        }
+
+        function openSettingsModal() { 
+            updateSoundUI();
+            document.getElementById('settingsModal').style.display = 'flex'; 
+        }
+        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+
+        function setLoginMode(mode) {
+            selectedLoginMode = mode;
+            const btnL1 = document.getElementById('loginBtnL1');
+            const btnL2 = document.getElementById('loginBtnL2');
+            const btnL12 = document.getElementById('loginBtnL12');
+            const btnVZV = document.getElementById('loginBtnVZV');
+
+            btnL1.className = 'login-mode-btn ' + (mode === 'L1' ? 'active-l1' : '');
+            btnL2.className = 'login-mode-btn ' + (mode === 'L2' ? 'active-l2' : '');
+            btnL12.className = 'login-mode-btn ' + (mode === 'L12' ? 'active-l12' : '');
+            btnVZV.className = 'login-mode-btn ' + (mode === 'VZV' ? 'active-vzv' : '');
+        }
+
+        function checkPassword() {
+            const input = document.getElementById('passInput').value;
+            if (input === SYSTEM_PASSWORD) {
+                sessionStorage.setItem('device_authenticated', 'true');
+                sessionStorage.setItem('active_role', selectedLoginMode);
+                document.getElementById('loginError').style.display = 'none';
+                updatePresence();
+                showApp();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            db.ref('presence/' + deviceId).remove();
+            sessionStorage.removeItem('device_authenticated');
+            sessionStorage.removeItem('active_role');
+            document.getElementById('passInput').value = '';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appScreen').style.display = 'none';
+            document.getElementById('updateBannerOverlay').style.display = 'none';
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'block';
+            let role = sessionStorage.getItem('active_role') || selectedLoginMode || 'L1';
+            
+            let badge = document.getElementById('roleBadge');
+            let lineSelectContainer = document.getElementById('lineSelectContainer');
+            let lineSelectContainerLbl = document.getElementById('lineSelectContainerLbl');
+
+            if (role === 'L1') {
+                curLine = 1;
+                badge.innerText = 'Linka 1';
+                badge.className = 'role-badge';
+                if (lineSelectContainer) lineSelectContainer.style.display = 'none';
+                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'none';
+            } else if (role === 'L2') {
+                curLine = 2;
+                badge.innerText = 'Linka 2';
+                badge.className = 'role-badge l2';
+                if (lineSelectContainer) lineSelectContainer.style.display = 'none';
+                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'none';
+            } else if (role === 'L12') {
+                curLine = 1;
+                badge.innerText = 'Linka 1-2';
+                badge.className = 'role-badge l12';
+                if (lineSelectContainer) lineSelectContainer.style.display = 'grid';
+                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'block';
+            } else if (role === 'VZV') {
+                badge.innerText = 'VZV';
+                badge.className = 'role-badge vzv';
+            }
+
+            document.getElementById('viewA').style.display = role !== 'VZV' ? 'block' : 'none';
+            document.getElementById('viewB').style.display = role === 'VZV' ? 'block' : 'none';
+
+            setLine(curLine);
+            render();
+        }
+
+        if (sessionStorage.getItem('device_authenticated') === 'true') {
+            updatePresence();
+            showApp();
+        }
+
+        function toggleNotifications(enable) {
+            notificationsEnabled = enable;
+            const setYes = document.getElementById('setNotifYes');
+            const setNo = document.getElementById('setNotifNo');
+            if (enable) {
+                if(setYes) setYes.className = 'btn-yn active-yes';
+                if(setNo) setNo.className = 'btn-yn';
+            } else {
+                if(setYes) setYes.className = 'btn-yn';
+                if(setNo) setNo.className = 'btn-yn active-no';
+            }
+        }
+
+        function triggerNotification(title, bodyText) {
+            if (!notificationsEnabled) return;
+            try {
+                let AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                let ctx = new AudioCtx();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                let osc = ctx.createOscillator();
+                let gain = ctx.createGain();
+                
+                if (selectedSoundType === 1) {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.4);
+                } else if (selectedSoundType === 2) {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(400, ctx.currentTime);
+                    osc.frequency.setValueAtTime(800, ctx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(400, ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.35);
+                } else {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(1046.50, ctx.currentTime);
+                    osc.frequency.setValueAtTime(1318.51, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.5);
+                }
+            } catch(e){}
+        }
+
+        function toggleSingleMode(enable) {
+            singleModeLines[curLine] = enable;
+            if (enable) {
+                twoVariantModeLines[curLine] = false;
+                if (!singleModeCar[curLine]) singleModeCar[curLine] = 'Tiguan';
+                triggerNotification("Režim aktivován", "Zapnut režim 1 varianta");
+            } else {
+                singleModeLines[curLine] = false;
+            }
+            save();
+            updateDynamicTheme();
+            render();
+        }
+
+        function toggleTwoVariantMode(enable) {
+            twoVariantModeLines[curLine] = enable;
+            if (enable) {
+                singleModeLines[curLine] = false;
+                if (!twoVariantPair[curLine]) twoVariantPair[curLine] = 'Tiguan / Kodiaq';
+                triggerNotification("Režim aktivován", "Zapnut režim 2 varianty");
+            } else {
+                twoVariantModeLines[curLine] = false;
+            }
+            save();
+            updateDynamicTheme();
+            render();
+        }
+
+        function setSingleCar(car, el) { 
+            singleModeCar[curLine] = car; 
+            save(); 
+            updateDynamicTheme(); 
+            triggerNotification("Změna režimu", "Změněna varianta");
+        }
+        function setTwoPair(pair, el) { 
+            twoVariantPair[curLine] = pair; 
+            save(); 
+            updateDynamicTheme(); 
+            triggerNotification("Změna režimu", "Změněna dvojice variant");
+        }
+
+        function updateDynamicTheme() {
+            let activeClass = curLine === 1 ? 'selected-1' : 'selected-2';
+            let panelClass = curLine === 1 ? 'single-mode-panel line-1' : 'single-mode-panel line-2';
+            let selectorBoxClass = curLine === 1 ? 'mode-selector-box line-1 active' : 'mode-selector-box line-2 active';
+            let customBoxClass = curLine === 1 ? 'custom-stojan-input line-1 active' : 'custom-stojan-input line-2 active';
+
+            document.getElementById('singleModePanel').className = panelClass;
+            document.getElementById('twoVariantPanel').className = panelClass;
+            document.getElementById('singleModeSelectBox').className = selectorBoxClass;
+            document.getElementById('twoModeSelectBox').className = selectorBoxClass;
+            
+            let isSingleActive = singleModeLines[curLine];
+            document.getElementById('btnSingleYes').className = 'btn-yn ' + (isSingleActive ? 'active-yes' : '');
+            document.getElementById('btnSingleNo').className = 'btn-yn ' + (!isSingleActive ? 'active-no' : '');
+
+            let isTwoActive = twoVariantModeLines[curLine];
+            document.getElementById('btnTwoYes').className = 'btn-yn ' + (isTwoActive ? 'active-yes' : '');
+            document.getElementById('btnTwoNo').className = 'btn-yn ' + (!isTwoActive ? 'active-no' : '');
+
+            let accordionWrapper = document.getElementById('modesAccordionWrapper');
+            if (accordionWrapper) {
+                accordionWrapper.classList.remove('active-mode-line-1', 'active-mode-line-2');
+                if (isSingleActive || isTwoActive) {
+                    accordionWrapper.classList.add(curLine === 1 ? 'active-mode-line-1' : 'active-mode-line-2');
+                }
+            }
+
+            let singleSelectBox = document.getElementById('singleModeSelectBox');
+            let twoSelectBox = document.getElementById('twoModeSelectBox');
+            let standardSection = document.getElementById('standardOrderSection');
+
+            if (isSingleActive) {
+                singleSelectBox.style.display = 'block';
+                twoSelectBox.style.display = 'none';
+                standardSection.style.display = 'none';
+            } else if (isTwoActive) {
+                singleSelectBox.style.display = 'none';
+                twoSelectBox.style.display = 'block';
+                standardSection.style.display = 'none';
+            } else {
+                singleSelectBox.style.display = 'none';
+                twoSelectBox.style.display = 'none';
+                standardSection.style.display = 'block';
+            }
+
+            let currentSingleCar = singleModeCar[curLine] || 'Tiguan';
+            let singleCarGrid = document.getElementById('singleCarGrid');
+            let cars = ['Tiguan', 'Kodiaq', 'Tayron', 'Audi', 'Seat'];
+            singleCarGrid.innerHTML = cars.map(c => `
+                <div class="btn-opt ${currentSingleCar === c ? activeClass : ''}" onclick="setSingleCar('${c}', this)">${c}</div>
+            `).join('');
+
+            let currentPair = twoVariantPair[curLine] || 'Tiguan / Kodiaq';
+            let twoPairGrid = document.getElementById('twoPairGrid');
+            let pairs = ['Tiguan / Kodiaq', 'Audi / Seat'];
+            twoPairGrid.innerHTML = pairs.map(p => `
+                <div class="btn-opt ${currentPair === p ? activeClass : ''}" onclick="setTwoPair('${p}', this)">${p}</div>
+            `).join('');
+
+            document.querySelectorAll('#carGrid .btn-opt').forEach(b => {
+                b.classList.remove('selected-1', 'selected-2');
+                if (b.innerText === curCar) b.classList.add(activeClass);
+            });
+
+            document.querySelectorAll('#opt3WRT, #opt6WRT, #optCustomWRT').forEach(b => b.classList.remove('selected-1', 'selected-2'));
+            if (curStojany === 3) {
+                document.getElementById('opt3WRT').classList.add(activeClass);
+            } else if (curStojany === 6) {
+                document.getElementById('opt6WRT').classList.add(activeClass);
+            } else {
+                document.getElementById('optCustomWRT').classList.add(activeClass);
+                document.getElementById('customStojanBox').className = customBoxClass;
+            }
+            renderRepeatBoxesUI();
+        }
+
+        function setLine(l) {
+            let role = sessionStorage.getItem('active_role');
+            if (role === 'L1') curLine = 1;
+            else if (role === 'L2') curLine = 2;
+            else curLine = l;
+
+            document.getElementById('lBtn1').className = 'line-btn ' + (curLine===1?'active-1':'');
+            document.getElementById('lBtn2').className = 'line-btn ' + (curLine===2?'active-2':'');
+            updateDynamicTheme();
+        }
+
+        function setCar(c, el) { curCar = c; updateDynamicTheme(); }
+        function setStojany(s, el) { curStojany = s; document.getElementById('customStojanBox').classList.remove('active'); updateDynamicTheme(); updateCalculations(); }
+        function enableCustomStojany(el) { document.getElementById('customStojanBox').classList.add('active'); curStojany = parseInt(document.getElementById('customInput').value) || 1; updateDynamicTheme(); updateCalculations(); }
+        function onCustomStojanyInput(val) { curStojany = parseInt(val) || 0; updateCalculations(); }
+        
+        function updateCalculations() {
+            let ks = curStojany * 12;
+            let ob = Math.ceil(ks / 9);
+            document.getElementById('lblKs').innerText = ks + ' ks';
+            document.getElementById('lblOb').innerText = ob + ' obaly';
+        }
+
+        function addOrder() {
+            let ks = curStojany * 12;
+            let ob = Math.ceil(ks / 9);
+            let note = document.getElementById('noteInput').value.trim();
+            let defaultFirst = (curLine === 1) ? 3 : 1;
+            orders.push({ id: Date.now(), line: curLine, car: curCar, stojany: curStojany, total: ob, done: 0, note: note, firstBox: defaultFirst });
+            document.getElementById('noteInput').value = '';
+            lastOrderCount = orders.length;
+            save();
+            triggerNotification("Objednávka", "Objednávka odeslána");
+        }
+
+        function setOrderFirstBox(orderId, chosenBox) {
+            if (orderId === 'null') return;
+            let o = orders.find(x => x.id === orderId);
+            if (o) {
+                o.firstBox = parseInt(chosenBox);
+                save();
+                render();
+            }
+        }
+
+        function cancelOrder(id) { orders = orders.filter(x => x.id !== id); lastOrderCount = orders.length; save(); }
+        function toggleOrderExpand(id) { expandedOrderId = (expandedOrderId === id ? null : id); render(); }
+
+        function toggleOrderBoxDone(id, boxIndex) {
+            let o = orders.find(x => x.id === id);
+            if (!o) return;
+            
+            if (boxIndex <= o.done) {
+                o.done = boxIndex - 1;
+            } else {
+                o.done = boxIndex;
+            }
+
+            o.note = (o.note ? o.note + " | " : "") + "Obsluha srovnala počet obalů";
+
+            if (o.done >= o.total) {
+                orders = orders.filter(x => x.id !== id);
+                expandedOrderId = null;
+            }
+            lastOrderCount = orders.length;
+            save();
+        }
+
+        function moveOrder(id, direction) {
+            let index = orders.findIndex(x => x.id === id);
+            if (index === -1) return;
+            let targetOrder = orders[index];
+
+            let lineOrders = orders.filter(x => x.line === targetOrder.line);
+            let subIndex = lineOrders.findIndex(x => x.id === id);
+            let targetSubIndex = subIndex + direction;
+
+            if (targetSubIndex < 0 || targetSubIndex >= lineOrders.length) return;
+            let neighborOrder = lineOrders[targetSubIndex];
+            let neighborIndex = orders.findIndex(x => x.id === neighborOrder.id);
+
+            orders[index] = neighborOrder;
+            orders[neighborIndex] = targetOrder;
+            save();
+        }
+
+        function sendCustomStockAlert() {
+            let variant = document.getElementById('vzvVariantSelect').value;
+            let count = document.getElementById('vzvCountInput').value;
+            if (!count) { return; }
+            stockAlerts.push({ id: Date.now(), variant: variant, count: count });
+            triggerNotification("⚠️ Hlášení", `VZV poslal hlášení pro ${variant}`);
+            document.getElementById('vzvCountInput').value = '';
+            save();
+        }
+
+        function dismissAlert(alertId) { stockAlerts = stockAlerts.filter(a => a.id !== alertId); save(); }
+
+        function zavezt(id) {
+            let o = orders.find(x => x.id === id);
+            if (o) {
+                o.done++;
+                if (o.done >= o.total) { 
+                    orders = orders.filter(x => x.id !== id); 
+                    lastOrderCount = orders.length; 
+                }
+                save();
+            }
+        }
+
+        function render() {
+            if (sessionStorage.getItem('device_authenticated') !== 'true') return;
+            renderRepeatBoxesUI();
+
+            let vzvSensorAlertArea = document.getElementById('vzvSensorAlertArea');
+            if (vzvSensorAlertArea) {
+                let activeSensors = [];
+                for (let i = 1; i <= 4; i++) { if (repeatBoxes[i]) activeSensors.push(i); }
+
+                let vatHtml = '';
+                vzvVatAlerts.forEach(v => {
+                    vatHtml += `
+                        <div class="vzv-sensor-alert" style="margin-bottom:8px;">
+                            <div class="vzv-sensor-title">⚠️ UPOZORNĚNÍ OD OBSLUHY</div>
+                            <div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">${v.text}</div>
+                            <button class="btn-resolve-sensor" onclick="dismissVzvVatAlert(${v.id})">✓ OK / POTVRĎ</button>
+                        </div>
+                    `;
+                });
+
+                if (activeSensors.length > 0 || vzvVatAlerts.length > 0) {
+                    let sensorText = activeSensors.length > 0 ? `<div class="vzv-sensor-alert"><div class="vzv-sensor-title">⚠️ Opakuj zavezení, bedna není na čidlech !</div><div style="font-size:0.8rem; font-weight:bold; color:#f8fafc; margin-bottom:6px;">Boxy: ${activeSensors.join(', ')}</div><button class="btn-resolve-sensor" onclick="clearAllRepeatBoxes()">✓ OK / VYŘEŠENO</button></div>` : '';
+                    vzvSensorAlertArea.innerHTML = vatHtml + sensorText;
+                } else {
+                    vzvSensorAlertArea.innerHTML = '';
+                }
+            }
+
+            let alertArea = document.getElementById('alertAreaA');
+            if (alertArea) {
+                alertArea.innerHTML = '';
+                stockAlerts.forEach(a => {
+                    alertArea.innerHTML += `
+                        <div class="stock-alert-box">
+                            <span>⚠️ <b>VZV hlásí:</b> Pro variantu <b>${a.variant}</b> zbývá <b>${a.count} obalů</b>!</span>
+                            <button class="btn-dismiss" onclick="dismissAlert(${a.id})">✕ Rozumím</button>
+                        </div>
+                    `;
+                });
+            }
+
+            let listA = document.getElementById('listA');
+            if (listA) {
+                let htmlContent = '';
+                
+                // Obě linky (Linka 1 i Linka 2) se nyní zobrazují společně na obou zařízeních
+                let linesToRender = [1, 2];
+
+                linesToRender.forEach(l => {
+                    let badgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
+                    if (singleModeLines[l]) {
+                        htmlContent += `<div style="background:#1e293b; padding:10px; border-radius:6px; margin-bottom:6px; border:1px solid #f59e0b; display:flex; justify-content:space-between; align-items:center;"><span>🔒 <b>Režim 1 varianta:</b> ${singleModeCar[l]||'Tiguan'} <span class="${badgeCls}">Linka ${l}</span></span><span style="font-size:0.75rem; color:#f59e0b; font-weight:bold;">Aktivní</span></div>`;
+                    }
+                    if (twoVariantModeLines[l]) {
+                        htmlContent += `<div style="background:#1e293b; padding:10px; border-radius:6px; margin-bottom:6px; border:1px solid #f59e0b; display:flex; justify-content:space-between; align-items:center;"><span>🔒 <b>Režim 2 varianty:</b> ${twoVariantPair[l]||''} <span class="${badgeCls}">Linka ${l}</span></span><span style="font-size:0.75rem; color:#f59e0b; font-weight:bold;">Aktivní</span></div>`;
+                    }
+                });
+
+                let anyActiveMode = linesToRender.some(l => singleModeLines[l] || twoVariantModeLines[l]);
+                let filteredOrders = orders.filter(x => linesToRender.includes(x.line));
+
+                if (filteredOrders.length === 0 && !anyActiveMode) {
+                    htmlContent += '<div class="empty">Žádné aktivní objednávky</div>';
+                }
+
+                linesToRender.forEach(l => {
+                    let lineOrders = orders.filter(x => x.line === l);
+                    let totalInLine = lineOrders.length;
+
+                    if (totalInLine > 0) {
+                        let lineTitleClass = l === 1 ? 'l1' : 'l2';
+                        let lineBadgeCls = l === 1 ? 'wrt-badge-1' : 'wrt-badge-2';
+                        htmlContent += `<div class="queue-section-box">
+                            <div class="queue-section-title ${lineTitleClass}">📍 Linka ${l} - Fronta zpracování</div>`;
+
+                        lineOrders.forEach((o, index) => {
+                            let lineClass = o.line === 1 ? 'line-1' : 'line-2';
+                            let noteHtml = o.note ? `<div class="note-tag ${lineClass}">📝 ${o.note}</div>` : '';
+                            let remainingWRT = Math.max(0, o.stojany - o.done);
+                            let isExpanded = (expandedOrderId === o.id);
+                            let queueNum = index + 1;
+
+                            let expandMenuHtml = '';
+                            if (isExpanded) {
+                                let boxesHtml = '';
+                                for (let i = 1; i <= o.total; i++) {
+                                    boxesHtml += `<div class="box-unit ${i <= o.done ? 'done' : 'pending'}" onclick="toggleOrderBoxDone(${o.id}, ${i})">#${i}</div>`;
+                                }
+
+                                expandMenuHtml = `
+                                    <div class="order-expand-menu">
+                                        <div class="expand-menu-title">⚠️ SROVNÁT POČET</div>
+                                        <div class="boxes-row" style="margin:4px 0 0 0;">${boxesHtml}</div>
+                                    </div>
+                                `;
+                            }
+
+                            let moveButtonsHtml = '';
+                            if (index > 0) {
+                                moveButtonsHtml += `<button class="btn-move" onclick="moveOrder(${o.id}, -1)" title="Posunout nahoru">▲</button>`;
+                            }
+                            if (index < totalInLine - 1) {
+                                moveButtonsHtml += `<button class="btn-move" onclick="moveOrder(${o.id}, 1)" title="Posunout dolů">▼</button>`;
+                            }
+
+                            htmlContent += `<div style="background:#1e293b; padding:8px 10px; border-radius:6px; margin-bottom:6px; border:1px solid #334155;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; gap:4px;">
+                                    <span class="queue-order-num">${queueNum}.</span>
+                                    <span style="flex-grow:1; font-size:0.85rem;"><b>${o.car}</b> <span class="${lineBadgeCls}">Zbývá ${remainingWRT}/${o.stojany} WRT</span></span>
+                                    
+                                    ${moveButtonsHtml}
+
+                                    <span onclick="toggleOrderExpand(${o.id})" class="editable-progress">📦 ${o.done}/${o.total} obalů</span>
+                                    <button class="btn-delete" onclick="cancelOrder(${o.id})" title="Zrušit">✖</button>
+                                </div>
+                                ${noteHtml}
+                                ${expandMenuHtml}
+                            </div>`;
+                        });
+                        htmlContent += `</div>`;
+                    }
+                });
+
+                listA.innerHTML = htmlContent;
+            }
+
+            [1, 2].forEach(l => {
+                let lOrders = orders.filter(x => x.line === l);
+                let title = document.getElementById(`l${l}Title`);
+                let next = document.getElementById(`l${l}Next`);
+                let body = document.getElementById(`l${l}Body`);
+                let headerBox = document.getElementById(`l${l}FirstBoxHeader`);
+                let isSingle = singleModeLines[l];
+                let isTwo = twoVariantModeLines[l];
+
+                if (title && next && body) {
+                    if (headerBox) {
+                        let boxA = (l === 1) ? 3 : 1;
+                        let boxB = (l === 1) ? 4 : 2;
+                        let activeOrder = lOrders[0];
+                        let currentFirst = (activeOrder && activeOrder.firstBox) ? activeOrder.firstBox : boxA;
+                        let activeOrderId = activeOrder ? activeOrder.id : 'null';
+                        let isOpen = folderOpenState[l];
+
+                        headerBox.innerHTML = `
+                            <div class="first-box-folder">
+                                <div class="first-box-folder-header ${isOpen ? 'open' : ''}" onclick="toggleFolder(${l})">
+                                    <span>Nastavení zavezení</span>
+                                    <span class="folder-arrow">▼</span>
+                                </div>
+                                <div class="first-box-folder-content ${isOpen ? 'open' : ''}">
+                                    <span class="toggle-title-lbl">Obal zavezen jako první:</span>
+                                    <div class="first-box-toggle-container">
+                                        <button class="btn-toggle-box ${currentFirst === boxA ? 'active' : ''}" onclick="setOrderFirstBox(${activeOrderId}, ${boxA})">BOX ${boxA}</button>
+                                        <button class="btn-toggle-box ${currentFirst === boxB ? 'active' : ''}" onclick="setOrderFirstBox(${activeOrderId}, ${boxB})">BOX ${boxB}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (lOrders.length === 0 && !isSingle && !isTwo) {
+                        title.innerText = 'Žádná objednávka';
+                        next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
+                        body.innerHTML = '<div class="empty">Linka čeká na materiál.<br>NECHTE BOX PRÁZDNÝ DO NOVÉ OBJEDNÁVKY.</div>';
+                    } else {
+                        if (isSingle || isTwo) {
+                            title.innerText = isSingle ? `🔒 ${singleModeCar[l]}` : `🔒 ${twoVariantPair[l]}`;
+                            next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
+                        } else {
+                            let cur = lOrders[0];
+                            let nxt1 = lOrders[1];
+                            
+                            let firstB = cur.firstBox || ((l === 1) ? 3 : 1);
+                            let targetBox = '';
+                            if (l === 1) {
+                                targetBox = (firstB === 3) ? ((cur.done % 2 === 0) ? 'Box 3' : 'Box 4') : ((cur.done % 2 === 0) ? 'Box 4' : 'Box 3');
+                            } else {
+                                targetBox = (firstB === 1) ? ((cur.done % 2 === 0) ? 'Box 1' : 'Box 2') : ((cur.done % 2 === 0) ? 'Box 2' : 'Box 1');
+                            }
+
+                            title.innerText = `${cur.car} (${targetBox})`;
+
+                            if (nxt1) {
+                                next.className = 'next-txt';
+                                next.innerHTML = `Následuje ➔ <b>${nxt1.car}</b> (${nxt1.total} ob.)`;
+                            } else {
+                                next.className = 'next-txt none'; next.innerText = 'Následuje ➔ Žádné';
+                            }
+                        }
+
+                        let boxRangeText = (l === 1) ? '(Box 3 - 4)' : '(Box 1 - 2)';
+                        let modeAlertHtml = isSingle ? `<div class="vzv-single-mode-box">⚠️ ZAVÁŽET POUZE: ${singleModeCar[l].toUpperCase()} ${boxRangeText}</div>` : (isTwo ? `<div class="vzv-single-mode-box">⚠️ ${twoVariantPair[l]} ${boxRangeText}</div>` : '');
+
+                        if (isSingle || isTwo) {
+                            body.innerHTML = modeAlertHtml + '<div class="empty" style="color:#fbbf24; font-weight:bold;">Režim je aktivní na lince</div>';
+                        } else if (lOrders.length === 0) {
+                            body.innerHTML = modeAlertHtml + '<div class="empty">Linka čeká na materiál.<br>NECHTE BOX PRÁZDNÝ DO NOVÉ OBJEDNÁVKY.</div>';
+                        } else {
+                            let cur = lOrders[0];
+                            let boxes = '';
+                            for (let i = 1; i <= cur.total; i++) {
+                                boxes += `<div class="box-unit ${i <= cur.done ? 'done' : 'pending'}">#${i}</div>`;
+                            }
+                            
+                            let targetBox = '';
+                            let firstB = cur.firstBox || ((l === 1) ? 3 : 1);
+
+                            if (l === 1) {
+                                if (firstB === 3) {
+                                    targetBox = (cur.done % 2 === 0) ? '3' : '4';
+                                } else {
+                                    targetBox = (cur.done % 2 === 0) ? '4' : '3';
+                                }
+                            } else {
+                                if (firstB === 1) {
+                                    targetBox = (cur.done % 2 === 0) ? '1' : '2';
+                                } else {
+                                    targetBox = (cur.done % 2 === 0) ? '2' : '1';
+                                }
+                            }
+
+                            let isLastBox = (cur.done + 1 >= cur.total);
+                            let btnText = isLastBox 
+                                ? `⚠️ ZAVEZ POSLEDNÍ OBAL DO BOXU ${targetBox} ! POTÉ PŘÍJDE JINÁ VARIANTA !` 
+                                : `✓ ZAVEZ OBAL DO BOXU ${targetBox} ! POTÉ POTVRĎ !`;
+                            let btnClass = 'btn-zavez' + (isLastBox ? ' last-box-btn' : '');
+
+                            body.innerHTML = `
+                                ${modeAlertHtml}
+                                ${cur.note ? `<div class="note-tag ${cur.line===1?'line-1':'line-2'}">📝 ${cur.note}</div>` : ''}
+                                <div class="boxes-row">${boxes}</div>
+                                <button class="${btnClass}" onclick="zavezt(${cur.id})">${btnText}</button>
+                            `;
+                        }
+                    }
+                }
+            });
+            updateDynamicTheme();
+        }
+
+        function clearAllRepeatBoxes() {
+            repeatBoxes = { 1: false, 2: false, 3: false, 4: false };
+            diffBoxes = { 1: {1:'', 2:'', 3:'', 4:''}, 2: {1:'', 2:'', 3:'', 4:''} };
+            defectBoxes = { 1: {1:false, 2:false, 3:false, 4:false}, 2: {1:false, 2:false, 3:false, 4:false} };
+            vzvVatAlerts = [];
+            save();
+            render();
+        }
+    </script>
 </body>
 </html>
-"""
