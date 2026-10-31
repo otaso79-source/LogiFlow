@@ -66,6 +66,34 @@
         .line-btn.active-2 { border-color: #a855f7; color: #fff; background: #581c87; }
         .line-btn.active-12 { border-color: #10b981; color: #fff; background: #065f46; }
 
+        /* Jednoduchý náhled linky po klepnutí na její tlačítko */
+        .line-preview-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999;
+            background: rgba(2, 6, 23, .82); padding: 18px;
+            align-items: center; justify-content: center;
+        }
+        .line-preview-overlay.show { display: flex; }
+        .line-preview-card {
+            width: 100%; max-width: 390px; background: #1e293b;
+            border: 1px solid #475569; border-radius: 16px; padding: 18px;
+            box-shadow: 0 18px 55px rgba(0,0,0,.55);
+        }
+        .line-preview-title { color: #f8fafc; font-size: 1.15rem; font-weight: 800; text-align: center; margin-bottom: 6px; }
+        .line-preview-subtitle { color: #94a3b8; text-align: center; font-size: .85rem; margin-bottom: 18px; }
+        .line-preview-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .line-preview-group { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; }
+        .line-preview-group-title { font-weight: 800; margin-bottom: 10px; text-align: center; }
+        .line-preview-group.line-one { border-color: #3b82f6; }
+        .line-preview-group.line-one .line-preview-group-title { color: #60a5fa; }
+        .line-preview-group.line-two { border-color: #a855f7; }
+        .line-preview-group.line-two .line-preview-group-title { color: #c084fc; }
+        .line-preview-boxes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; }
+        .line-preview-box { border: 1px solid #475569; background: #1e293b; color: #cbd5e1; border-radius: 8px; padding: 13px 5px; text-align: center; font-weight: 800; }
+        .line-preview-box.active-one { background: #1e3a8a; border-color: #3b82f6; color: white; }
+        .line-preview-box.active-two { background: #581c87; border-color: #a855f7; color: white; }
+        .line-preview-box.active-all { background: #065f46; border-color: #10b981; color: white; }
+        .line-preview-close { width: 100%; margin-top: 16px; padding: 12px; border: 0; border-radius: 9px; background: #f59e0b; color: #0f172a; font-weight: 900; font-size: 1rem; cursor: pointer; }
+
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 8px; }
@@ -414,9 +442,18 @@
             <div id="alertAreaA"></div>
             <div class="lbl" id="lineSelectContainerLbl">Vyberte Linku</div>
             <div class="line-select" id="lineSelectContainer">
-                <div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1<br><span style="font-size:0.6rem; font-weight:normal;">BOX 4 - 3</span></div>
-                <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.6rem; font-weight:normal;">BOX 2 - 1</span></div>
-                <div class="line-btn" id="lBtn12" onclick="setLine('1-2')">LINKA 1-2<br><span style="font-size:0.6rem; font-weight:normal;">Všechny</span></div>
+                <div class="line-btn active-1" id="lBtn1" onclick="selectLineAndPreview(1)">LINKA 1<br><span style="font-size:0.6rem; font-weight:normal;">BOX 4 - 3</span></div>
+                <div class="line-btn" id="lBtn2" onclick="selectLineAndPreview(2)">LINKA 2<br><span style="font-size:0.6rem; font-weight:normal;">BOX 2 - 1</span></div>
+                <div class="line-btn" id="lBtn12" onclick="selectLineAndPreview('1-2')">LINKA 1-2<br><span style="font-size:0.6rem; font-weight:normal;">Všechny</span></div>
+            </div>
+
+            <div class="line-preview-overlay" id="linePreviewOverlay" onclick="closeLinePreview()">
+                <div class="line-preview-card" onclick="event.stopPropagation()">
+                    <div class="line-preview-title" id="linePreviewTitle">Náhled linky</div>
+                    <div class="line-preview-subtitle" id="linePreviewSubtitle">Rozložení boxů</div>
+                    <div class="line-preview-groups" id="linePreviewGroups"></div>
+                    <button type="button" class="line-preview-close" onclick="closeLinePreview()">ZAVŘÍT NÁHLED</button>
+                </div>
             </div>
 
             <div class="accordion-wrapper" id="modesAccordionWrapper">
@@ -1740,6 +1777,53 @@
             }
             renderRepeatBoxesUI();
         }
+
+        function selectLineAndPreview(line) {
+            // Jedno klepnutí vybere linku a současně zobrazí její jednoduchý náhled.
+            setLine(line);
+            openLinePreview(line);
+        }
+
+        function openLinePreview(line) {
+            const overlay = document.getElementById('linePreviewOverlay');
+            const title = document.getElementById('linePreviewTitle');
+            const subtitle = document.getElementById('linePreviewSubtitle');
+            const groups = document.getElementById('linePreviewGroups');
+            if (!overlay || !title || !subtitle || !groups) return;
+
+            const makeGroup = (label, boxes, cls, activeCls) => `
+                <div class="line-preview-group ${cls}">
+                    <div class="line-preview-group-title">${label}</div>
+                    <div class="line-preview-boxes">
+                        ${boxes.map(box => `<div class="line-preview-box ${activeCls}">BOX ${box}</div>`).join('')}
+                    </div>
+                </div>`;
+
+            if (line === 1) {
+                title.textContent = 'Náhled LINKY 1';
+                subtitle.textContent = 'Používané pozice: BOX 4 a BOX 3';
+                groups.innerHTML = makeGroup('LINKA 1', [4, 3], 'line-one', 'active-one');
+            } else if (line === 2) {
+                title.textContent = 'Náhled LINKY 2';
+                subtitle.textContent = 'Používané pozice: BOX 2 a BOX 1';
+                groups.innerHTML = makeGroup('LINKA 2', [2, 1], 'line-two', 'active-two');
+            } else {
+                title.textContent = 'Náhled LINKY 1–2';
+                subtitle.textContent = 'Společný přehled všech boxů';
+                groups.innerHTML = makeGroup('LINKA 1', [4, 3], 'line-one', 'active-all') +
+                                   makeGroup('LINKA 2', [2, 1], 'line-two', 'active-all');
+            }
+            overlay.classList.add('show');
+        }
+
+        function closeLinePreview() {
+            const overlay = document.getElementById('linePreviewOverlay');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') closeLinePreview();
+        });
 
         function setLine(l) {
             curLine = l;
