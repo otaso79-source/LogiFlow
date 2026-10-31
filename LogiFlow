@@ -59,12 +59,13 @@
         .btn-logout { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-settings { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; padding: 5px 8px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-        .line-select { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
-        .line-btn { padding: 10px 4px; background: #1e293b; border: 2px solid #334155; color: #94a3b8; font-weight: bold; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.7rem; line-height: 1.3; }
-        
-        .line-btn.active-1 { border-color: #3b82f6; color: #fff; background: #1e3a8a; }
-        .line-btn.active-2 { border-color: #a855f7; color: #fff; background: #581c87; }
-        .line-btn.active-12 { border-color: #10b981; color: #fff; background: #065f46; }
+        /* Nová statická informační lišta pro zobrazení zvolené linky */
+        .current-line-info {
+            background: #1e293b; border: 1px solid #334155; border-radius: 8px;
+            padding: 10px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .current-line-title { font-size: 0.95rem; font-weight: bold; color: #f59e0b; text-transform: uppercase; }
+        .btn-back-to-select { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid #3b82f6; padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
         .lbl { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin: 8px 0 4px 0; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
@@ -277,7 +278,7 @@
         .queue-section-title.l2 { color: #a855f7; border-bottom: 1px solid rgba(168, 85, 247, 0.3); padding-bottom: 4px; }
         .queue-order-num { font-size: 0.7rem; background: #334155; color: #cbd5e1; padding: 3px 6px; border-radius: 4px; font-weight: bold; white-space: nowrap; }
 
-        /* Styly pro obrazovku výběru linky ve Výrobě (3 okénka) */
+        /* Styly pro úvodní obrazovku výběru pracoviště */
         #lineSelectionScreen {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             min-height: 70vh; padding: 20px; text-align: center;
@@ -325,7 +326,7 @@
         </div>
     </div>
 
-    <!-- Přihlašovací obrazovka s volbou Výroba | VZV a filtrováním pracovníků -->
+    <!-- Přihlašovací obrazovka -->
     <div id="loginScreen">
         <div class="login-box">
             <div class="login-title">⚡ LogiFlow</div>
@@ -337,7 +338,6 @@
             </div>
 
             <select id="workerSelect" class="login-select" onchange="onWorkerSelectChange()">
-                <!-- Naplní se dynamicky podle zvolené sekce -->
             </select>
 
             <input type="password" id="passInput" class="login-input" placeholder="••••" autofocus onkeydown="if(event.key==='Enter') checkPassword()">
@@ -356,7 +356,7 @@
             </div>
         </div>
 
-        <!-- Obrazovka výběru linky ve Výrobě (3 okénka po přihlášení) -->
+        <!-- Úvodní obrazovka výběru pracoviště pro Výrobu (3 okénka) -->
         <div id="lineSelectionScreen" style="display:none;">
             <div class="line-selection-box">
                 <div class="line-selection-title">🏭 Výběr Pracoviště</div>
@@ -380,11 +380,11 @@
 
         <div id="viewA" style="display:none;">
             <div id="alertAreaA"></div>
-            <div class="lbl" id="lineSelectContainerLbl">Vyberte Linku</div>
-            <div class="line-select" id="lineSelectContainer">
-                <div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1<br><span style="font-size:0.6rem; font-weight:normal;">BOX 4 - 3</span></div>
-                <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.6rem; font-weight:normal;">BOX 2 - 1</span></div>
-                <div class="line-btn" id="lBtn12" onclick="setLine('1-2')">Přehled<br><span style="font-size:0.6rem; font-weight:normal;">objednávek</span></div>
+            
+            <!-- Zobrazení označené linky namísto přepínacích tlačítek -->
+            <div class="current-line-info">
+                <div class="current-line-title" id="currentLineDisplayTitle">LINKA 1 (BOX 4 - 3)</div>
+                <button class="btn-back-to-select" onclick="showLineSelection()">↩️ Změnit pracoviště</button>
             </div>
 
             <div class="accordion-wrapper" id="modesAccordionWrapper">
@@ -654,7 +654,7 @@
         </div>
     </div>
 
-    <!-- Modální okno pro administraci (správa uživatelů, posun v seznamu, hesla) -->
+    <!-- Modální okno pro administraci -->
     <div id="workersManagerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); z-index:10000; align-items:center; justify-content:center; padding:15px;">
         <div class="settings-box" style="max-width:420px;">
             <div class="settings-header">
@@ -671,7 +671,6 @@
 
             <div class="lbl" style="color:#f59e0b; margin-top:0;">🟢 Aktivní přihlášení uživatelé:</div>
             <div id="activeSessionsContainer" style="max-height:120px; overflow-y:auto; margin-bottom:12px; display:flex; flex-direction:column; gap:6px; background:#0f172a; padding:8px; border-radius:8px; border:1px solid #334155;">
-                <!-- Načte se dynamicky -->
             </div>
 
             <div class="lbl" style="color:#f59e0b;">📋 Seznam uživatelů a hesel (možnost posunu):</div>
@@ -1493,11 +1492,15 @@
                     badge.className = 'role-badge l12';
                 }
                 curLine = null;
-                document.getElementById('lineSelectionScreen').style.display = 'flex';
-                document.getElementById('viewA').style.display = 'none';
-                document.getElementById('viewB').style.display = 'none';
+                showLineSelection();
             }
             render();
+        }
+
+        function showLineSelection() {
+            document.getElementById('lineSelectionScreen').style.display = 'flex';
+            document.getElementById('viewA').style.display = 'none';
+            document.getElementById('viewB').style.display = 'none';
         }
 
         function selectLineAndOpen(line) {
@@ -1711,12 +1714,12 @@
         function setLine(l) {
             curLine = l;
 
-            let btn1 = document.getElementById('lBtn1');
-            let btn2 = document.getElementById('lBtn2');
-            let btn12 = document.getElementById('lBtn12');
-            if(btn1) btn1.className = 'line-btn ' + (curLine===1?'active-1':'');
-            if(btn2) btn2.className = 'line-btn ' + (curLine===2?'active-2':'');
-            if(btn12) btn12.className = 'line-btn ' + (curLine==='1-2'?'active-12':'');
+            let displayTitle = document.getElementById('currentLineDisplayTitle');
+            if (displayTitle) {
+                if (curLine === 1) displayTitle.innerText = 'LINKA 1 (BOX 4 - 3)';
+                else if (curLine === 2) displayTitle.innerText = 'LINKA 2 (BOX 2 - 1)';
+                else displayTitle.innerText = 'PŘEHLED OBJEDNÁVEK (LINKA 1 & 2)';
+            }
 
             let modesWrapper = document.getElementById('modesAccordionWrapper');
             let sensorWrapper = document.getElementById('sensorAccordionWrapper');
@@ -1955,4 +1958,4 @@
     </script>
 </body>
 </html>
-!!! Testovaci verze !!!
+!!! Test verze 2 !!!
