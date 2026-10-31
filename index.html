@@ -172,9 +172,9 @@
         .next-txt.none { color: #64748b; font-weight: normal; }
         
         .boxes-row { display: flex; gap: 4px; margin: 8px 0; }
-        .vzv-box-btn { flex: 1; height: 32px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #94a3b8; font-weight: bold; cursor: pointer; }
-        .vzv-box-btn.done { background: #065f46; color: #34d399; border-color: #059669; }
-        .vzv-box-btn.pending { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; }
+        .vzv-box-btn { flex: 1; height: 32px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #64748b; font-weight: bold; cursor: not-allowed; opacity: 0.5; }
+        .vzv-box-btn.done { background: #065f46; color: #34d399; border-color: #059669; cursor: not-allowed; opacity: 1; }
+        .vzv-box-btn.clickable-active { background: rgba(239, 68, 68, 0.25); color: #f87171; border-color: #ef4444; cursor: pointer; opacity: 1; animation: pulseAlarm 1.5s infinite; }
 
         .first-box-selector { display: flex; align-items: center; gap: 4px; background: #0f172a; padding: 4px; border-radius: 6px; border: 1px solid #334155; }
         .first-box-lbl { font-size: 0.65rem; color: #94a3b8; font-weight: bold; }
@@ -1898,6 +1898,7 @@
             let o = orders.find(x => x.id === id);
             if (!o) return;
             
+            // Povolit kliknutí POUZE na aktuální nevyřízený box (boxIdx == o.done + 1)
             if (boxIdx === o.done + 1) {
                 o.done++;
                 if (o.done >= o.total) {
@@ -2008,6 +2009,7 @@
             let l2Body = document.getElementById('l2Body');
             let l2FirstBoxHeader = document.getElementById('l2FirstBoxHeader');
 
+            // Render Linka 1 (Boxy 3 a 4)
             if (l1Title && l1Body) {
                 let ordersL1 = orders.filter(x => x.line === 1);
                 if (ordersL1.length > 0) {
@@ -2038,7 +2040,13 @@
                     boxSequence.forEach((bNum, idx) => {
                         let boxStep = idx + 1;
                         let isDone = current.done >= boxStep;
-                        boxesHtml += `<div class="vzv-box-btn ${isDone ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, ${boxStep})">#${bNum}</div>`;
+                        let isNextToClick = (boxStep === current.done + 1);
+                        
+                        let btnClass = 'vzv-box-btn';
+                        if (isDone) btnClass += ' done';
+                        else if (isNextToClick) btnClass += ' clickable-active';
+
+                        boxesHtml += `<div class="${btnClass}" onclick="toggleVzvBoxDone(${current.id}, ${boxStep})">#${bNum}</div>`;
                     });
 
                     let currentBannerBox = boxSequence[current.done] || boxSequence[boxSequence.length - 1];
@@ -2059,6 +2067,7 @@
                 }
             }
 
+            // Render Linka 2 (Boxy 1 a 2) - OPRAVENO správné střídání podle zvoleného firstBox (1 nebo 2)
             if (l2Title && l2Body) {
                 let ordersL2 = orders.filter(x => x.line === 2);
                 if (ordersL2.length > 0) {
@@ -2089,7 +2098,13 @@
                     boxSequence.forEach((bNum, idx) => {
                         let boxStep = idx + 1;
                         let isDone = current.done >= boxStep;
-                        boxesHtml += `<div class="vzv-box-btn ${isDone ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, ${boxStep})">#${bNum}</div>`;
+                        let isNextToClick = (boxStep === current.done + 1);
+                        
+                        let btnClass = 'vzv-box-btn';
+                        if (isDone) btnClass += ' done';
+                        else if (isNextToClick) btnClass += ' clickable-active';
+
+                        boxesHtml += `<div class="${btnClass}" onclick="toggleVzvBoxDone(${current.id}, ${boxStep})">#${bNum}</div>`;
                     });
 
                     let currentBannerBox = boxSequence[current.done] || boxSequence[boxSequence.length - 1];
