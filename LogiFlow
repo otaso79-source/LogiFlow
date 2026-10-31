@@ -171,78 +171,6 @@
         .btn-zavez { width: 100%; padding: 10px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-zavez.last-box-btn { background: #f59e0b; animation: pulseAlarm 1.5s infinite; }
 
-        .first-box-folder {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            overflow: hidden;
-            width: 155px;
-            flex-shrink: 0;
-        }
-        .first-box-folder-header {
-            font-size: 0.6rem;
-            color: #f59e0b;
-            font-weight: bold;
-            padding: 5px 6px;
-            text-transform: uppercase;
-            text-align: center;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-            background: #0f172a;
-        }
-        .first-box-folder-header .folder-arrow {
-            font-size: 0.6rem;
-            color: #94a3b8;
-            transition: transform 0.2s;
-        }
-        .first-box-folder-header.open .folder-arrow {
-            transform: rotate(180deg);
-        }
-        .first-box-folder-content {
-            display: none;
-            padding: 6px;
-            border-top: 1px solid #334155;
-            background: #162032;
-            text-align: center;
-        }
-        .first-box-folder-content.open {
-            display: block;
-        }
-        .first-box-toggle-container {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            font-size: 0.7rem;
-            margin-top: 2px;
-        }
-        .toggle-title-lbl {
-            font-size: 0.6rem;
-            color: #94a3b8;
-            margin-bottom: 2px;
-            font-weight: bold;
-            display: block;
-            text-align: center;
-        }
-        .btn-toggle-box {
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.7rem;
-            border: none;
-            cursor: pointer;
-            color: #64748b;
-            background: transparent;
-        }
-        .btn-toggle-box.active {
-            background: #f59e0b;
-            color: #0f172a;
-        }
-
         #settingsModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px;
@@ -327,8 +255,6 @@
         .note-tag.line-1 { background: rgba(59, 130, 246, 0.15); border-left: 3px solid #3b82f6; color: #93c5fd; }
         .note-tag.line-2 { background: rgba(168, 85, 247, 0.15); border-left: 3px solid #a855f7; color: #d8b4fe; }
 
-        .vzv-single-mode-box { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.75rem; color: #fbbf24; font-weight: bold; text-align: center; line-height: 1.4; }
-
         .btn-delete { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-left: 4px; flex-shrink: 0; }
         .btn-move { background: rgba(51, 65, 85, 0.5); border: 1px solid #334155; color: #94a3b8; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-left: 4px; flex-shrink: 0; }
         .btn-move:hover { background: #334155; color: #fff; }
@@ -353,6 +279,29 @@
         .queue-section-title.l1 { color: #3b82f6; border-bottom: 1px solid rgba(59, 130, 246, 0.3); padding-bottom: 4px; }
         .queue-section-title.l2 { color: #a855f7; border-bottom: 1px solid rgba(168, 85, 247, 0.3); padding-bottom: 4px; }
         .queue-order-num { font-size: 0.7rem; background: #334155; color: #cbd5e1; padding: 3px 6px; border-radius: 4px; font-weight: bold; white-space: nowrap; }
+
+        /* Styly pro novou úvodní obrazovku výběru linky ve Výrobě */
+        #lineSelectionScreen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 70vh; padding: 20px; text-align: center;
+        }
+        .line-selection-box {
+            background: #1e293b; border: 1px solid #334155; border-radius: 16px;
+            padding: 24px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .line-selection-title { font-size: 1.2rem; font-weight: bold; color: #f59e0b; margin-bottom: 6px; }
+        .line-selection-sub { font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px; }
+        
+        .big-line-options { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .big-line-btn {
+            background: #0f172a; border: 2px solid #334155; border-radius: 12px; padding: 16px;
+            color: #fff; font-size: 1rem; font-weight: bold; cursor: pointer; transition: all 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .big-line-btn:hover { border-color: #f59e0b; background: rgba(245, 158, 11, 0.05); }
+        .big-line-btn.btn-l1 { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
+        .big-line-btn.btn-l2 { border-color: #a855f7; background: rgba(168, 85, 247, 0.1); color: #d8b4fe; }
+        .big-line-btn.btn-l12 { border-color: #10b981; background: rgba(16, 185, 129, 0.1); color: #34d399; }
     </style>
 </head>
 <body>
@@ -410,7 +359,29 @@
             </div>
         </div>
 
-        <div id="viewA">
+        <!-- Obrazovka výběru linky ve Výrobě (3 okénka po přihlášení) -->
+        <div id="lineSelectionScreen">
+            <div class="line-selection-box">
+                <div class="line-selection-title">🏭 Výběr Pracoviště</div>
+                <div class="line-selection-sub">Zvolte linku, na které pracujete</div>
+                <div class="big-line-options">
+                    <button class="big-line-btn btn-l1" onclick="selectLineAndOpen(1)">
+                        <span>Linka 1</span>
+                        <span style="font-size: 0.7rem; font-weight: normal; color: #93c5fd;">BOX 4 - 3</span>
+                    </button>
+                    <button class="big-line-btn btn-l2" onclick="selectLineAndOpen(2)">
+                        <span>Linka 2</span>
+                        <span style="font-size: 0.7rem; font-weight: normal; color: #d8b4fe;">BOX 2 - 1</span>
+                    </button>
+                    <button class="big-line-btn btn-l12" onclick="selectLineAndOpen('1-2')">
+                        <span>Přehled objednávek</span>
+                        <span style="font-size: 0.7rem; font-weight: normal; color: #34d399;">Linka 1 & 2</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewA" style="display:none;">
             <div id="alertAreaA"></div>
             <div class="lbl" id="lineSelectContainerLbl">Vyberte Linku</div>
             <div class="line-select" id="lineSelectContainer">
@@ -740,7 +711,7 @@
         let notificationsEnabled = true;
         let selectedSoundType = parseInt(localStorage.getItem('selected_sound_type')) || 1;
 
-        let curLine = 1, curCar = 'Tiguan', curStojany = 3;
+        let curLine = null, curCar = 'Tiguan', curStojany = 3;
         let singleModeLines = { 1: false, 2: false };
         let singleModeCar = { 1: 'Tiguan', 2: 'Tiguan' };
         let twoVariantModeLines = { 1: false, 2: false };
@@ -762,9 +733,8 @@
         let lastOrderCount = 0;
         let lastVzvAlertCount = 0;
         let expandedOrderId = null;
-        let folderOpenState = { 1: false, 2: false };
 
-        let selectedLoginSection = 'VYROBA'; // Výchozí přihlašovací záložka
+        let selectedLoginSection = 'VYROBA';
 
         let deviceId = sessionStorage.getItem('device_id');
         if (!deviceId) {
@@ -1014,11 +984,6 @@
             }
         }
 
-        function toggleFolder(lineNum) {
-            folderOpenState[lineNum] = !folderOpenState[lineNum];
-            render();
-        }
-
         function toggleAccordion(contentId, headerId) {
             let content = document.getElementById(contentId);
             let header = document.getElementById(headerId);
@@ -1049,7 +1014,7 @@
             if (isAuth) {
                 let section = sessionStorage.getItem('active_section') || 'VYROBA';
                 let workerName = sessionStorage.getItem('active_worker') || 'Neznámý';
-                let role = sessionStorage.getItem('active_role') || '';
+                let role = sessionStorage.getItem('active_role'] || '';
                 
                 if (role.includes('ADMIN')) {
                     db.ref('presence/' + deviceId).remove();
@@ -1508,15 +1473,16 @@
             document.getElementById('appScreen').style.display = 'block';
             let role = sessionStorage.getItem('active_role') || '';
             let workerName = sessionStorage.getItem('active_worker') || '';
-            let section = sessionStorage.getItem('active_section') || 'VYROBA';
+            let section = sessionStorage.getItem('active_section'] || 'VYROBA';
             
             let badge = document.getElementById('roleBadge');
-            let lineSelectContainer = document.getElementById('lineSelectContainer');
-            let lineSelectContainerLbl = document.getElementById('lineSelectContainerLbl');
 
             if (section === 'VZV') {
                 badge.innerText = workerName + ' (VZV)';
                 badge.className = 'role-badge vzv';
+                document.getElementById('lineSelectionScreen').style.display = 'none';
+                document.getElementById('viewA').style.display = 'none';
+                document.getElementById('viewB').style.display = 'block';
             } else {
                 if (role.includes('ADMIN')) {
                     badge.innerText = workerName + ' (Správce)';
@@ -1525,21 +1491,24 @@
                     badge.innerText = workerName + ' (Výroba)';
                     badge.className = 'role-badge l12';
                 }
-                if (lineSelectContainer) lineSelectContainer.style.display = 'grid';
-                if (lineSelectContainerLbl) lineSelectContainerLbl.style.display = 'block';
-            }
-
-            let isVzvOnly = (section === 'VZV');
-            document.getElementById('viewA').style.display = !isVzvOnly ? 'block' : 'none';
-            document.getElementById('viewB').style.display = isVzvOnly ? 'block' : 'none';
-
-            if (!isVzvOnly) {
-                setLine(curLine);
+                // Pro Výrobu nejdříve zobrazíme obrazovku se třemi velkými okénky (bod 3)
+                curLine = null;
+                document.getElementById('lineSelectionScreen').style.display = 'flex';
+                document.getElementById('viewA').style.display = 'none';
+                document.getElementById('viewB').style.display = 'none';
             }
             render();
         }
 
-        if (sessionStorage.getItem('device_authenticated') === 'true') {
+        // Funkce pro výběr konkrétní linky ze tří velkých okének (bod 3 -> bod 4)
+        function selectLineAndOpen(line) {
+            curLine = line;
+            document.getElementById('lineSelectionScreen').style.display = 'none';
+            document.getElementById('viewA').style.display = 'block';
+            setLine(curLine);
+        }
+
+        if (sessionStorage.getItem('device_authenticated'] === 'true') {
             updatePresence();
             showApp();
         } else {
@@ -1649,7 +1618,7 @@
         }
 
         function updateDynamicTheme() {
-            if (curLine === '1-2') return;
+            if (curLine === '1-2' || curLine === null) return;
             let activeClass = curLine === 1 ? 'selected-1' : 'selected-2';
             let panelClass = curLine === 1 ? 'single-mode-panel line-1' : 'single-mode-panel line-2';
             let selectorBoxClass = curLine === 1 ? 'mode-selector-box line-1 active' : 'mode-selector-box line-2 active';
@@ -1741,6 +1710,8 @@
         }
 
         function setLine(l) {
+            // Pokud uživatel klikne na hlavičkový výběr linky zpět na výběr linek (pokud by chtěl), můžeme ho případně vrátit na rozcestník, 
+            // ale tady standardně přepínáme mezi linkami přímo v rozhraní bodu 4, nebo může kliknout zpět.
             curLine = l;
 
             let btn1 = document.getElementById('lBtn1');
@@ -1782,7 +1753,7 @@
         }
 
         function addOrder() {
-            if (curLine === '1-2') return;
+            if (curLine === '1-2' || curLine === null) return;
             let ks = curStojany * 12;
             let ob = Math.ceil(ks / 9);
             let noteInput = document.getElementById('noteInput');
@@ -1793,16 +1764,6 @@
             lastOrderCount = orders.length;
             save();
             triggerNotification("Objednávka", "Objednávka odeslána");
-        }
-
-        function setOrderFirstBox(orderId, chosenBox) {
-            if (orderId === 'null') return;
-            let o = orders.find(x => x.id === orderId);
-            if (o) {
-                o.firstBox = parseInt(chosenBox);
-                save();
-                render();
-            }
         }
 
         function cancelOrder(id) { orders = orders.filter(x => x.id !== id); lastOrderCount = orders.length; save(); }
@@ -1858,18 +1819,6 @@
 
         function dismissAlert(alertId) { stockAlerts = stockAlerts.filter(a => a.id !== alertId); save(); }
 
-        function zavezt(id) {
-            let o = orders.find(x => x.id === id);
-            if (o) {
-                o.done++;
-                if (o.done >= o.total) { 
-                    orders = orders.filter(x => x.id !== id); 
-                    lastOrderCount = orders.length; 
-                }
-                save();
-            }
-        }
-
         function render() {
             if (sessionStorage.getItem('device_authenticated') !== 'true') return;
             renderRepeatBoxesUI();
@@ -1914,11 +1863,6 @@
             let listA = document.getElementById('listA');
             if (listA) {
                 let htmlContent = '';
-                // UPRAVENO: Obě linky (1 i 2) vidí vždy objednávki obou linek současně (pokud se zrovna nedívají na konkrétní linku, 
-                // resp. podle požadavku: "Linka 1 viděla objednavky Linky 2 a opačně"). 
-                // Pokud je zvolena Konkrétní linka (1 nebo 2), zobrazíme sekce obou linek, přičemž aktivní linka může mít přednost, 
-                // nebo zobrazíme obě dvě pod sebou jako v "Přehledu objednávek". 
-                // Podle zadání obě linky vidí vše navzájem, takže zobrazíme vždy [1, 2] pro Linku 1 i Linku 2.
                 let linesToRender = (curLine === 1 || curLine === 2) ? [curLine, curLine === 1 ? 2 : 1] : [1, 2];
 
                 linesToRender.forEach(l => {
@@ -1955,8 +1899,6 @@
                             let isExpanded = (expandedOrderId === o.id);
                             let queueNum = index + 1;
 
-                            // Povolit mazání/úpravu pouze pokud se jedná o vlastní linku, nebo povolit všem dle domluvy. 
-                            // Tady necháme plnou interakci pro zobrazené objednávki obou linek.
                             let expandMenuHtml = '';
                             if (isExpanded) {
                                 let boxesHtml = '';
@@ -2000,7 +1942,7 @@
 
                 listA.innerHTML = htmlContent;
             }
-            if (curLine !== '1-2') {
+            if (curLine !== '1-2' && curLine !== null) {
                 updateDynamicTheme();
             }
         }
@@ -2016,4 +1958,4 @@
     </script>
 </body>
 </html>
-Verze 1.0.2
+!!! Testovaci verze !!!
