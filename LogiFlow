@@ -416,7 +416,7 @@
             <div class="line-select" id="lineSelectContainer">
                 <div class="line-btn active-1" id="lBtn1" onclick="setLine(1)">LINKA 1<br><span style="font-size:0.6rem; font-weight:normal;">BOX 4 - 3</span></div>
                 <div class="line-btn" id="lBtn2" onclick="setLine(2)">LINKA 2<br><span style="font-size:0.6rem; font-weight:normal;">BOX 2 - 1</span></div>
-                <div class="line-btn" id="lBtn12" onclick="setLine('1-2')">LINKA 1-2<br><span style="font-size:0.6rem; font-weight:normal;">Všechny</span></div>
+                <div class="line-btn" id="lBtn12" onclick="setLine('1-2')">Přehled<br><span style="font-size:0.6rem; font-weight:normal;">objednávek</span></div>
             </div>
 
             <div class="accordion-wrapper" id="modesAccordionWrapper">
