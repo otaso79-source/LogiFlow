@@ -1986,7 +1986,7 @@
                 });
             }
 
-            // --- Vykreslení pro pohled VZV (viewB) jako na Foto 1 ---
+            // --- Vykreslení pro pohled VZV (viewB) ---
             let l1Title = document.getElementById('l1Title');
             let l1Next = document.getElementById('l1Next');
             let l1Body = document.getElementById('l1Body');
@@ -2030,8 +2030,6 @@
                         <div class="boxes-row">
                             <div class="vzv-box-btn ${b1Done ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, 1)">#${b1Num}</div>
                             <div class="vzv-box-btn ${b2Done ? 'done' : 'pending'}" onclick="toggleVzvBoxDone(${current.id}, 2)">#${b2Num}</div>
-                            <div class="vzv-box-btn" style="opacity:0.3; pointer-events:none;">#3</div>
-                            <div class="vzv-box-btn" style="opacity:0.3; pointer-events:none;">#4</div>
                         </div>
                         ${current.done < 2 ? `<div class="vzv-action-banner">✓ ZAVEZ OBAL DO BOXU ${bannerBoxTarget} ! POTÉ POTVRĎ !</div>` : ''}
                         ${current.note ? `<div class="note-tag line-1" style="margin-top:6px;">📝 ${current.note}</div>` : ''}
@@ -2189,4 +2187,4 @@
     </script>
 </body>
 </html>
-!!! snad ok !!!
+!!! posledni uprava pred odjezdem 13:52 !!!
